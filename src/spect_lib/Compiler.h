@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -20,16 +20,18 @@ class spect::Compiler
     public:
         Compiler(uint32_t first_addr);
         ~Compiler();
-        
+
         void Compile(std::string path);
         int CompileFinish();
 
         spect::SymbolTable *symbols_;
         spect::CpuProgram *program_;
         std::map<std::string, spect::SourceFile*> files_;
-        
+
         uint32_t first_addr_;
         uint32_t curr_addr_;
+
+        int num_instr_ = 0;
 
     private:
         void TrimSpaces(std::string &input);
@@ -39,7 +41,7 @@ class spect::Compiler
         bool ParseConstant(spect::SourceFile *sf, std::string &line_buf, int line_nr);
         spect::Instruction* ParseInstruction(spect::SourceFile *sf, std::string &line_buf, int line_nr,  spect::Symbol *label);
         spect::CpuGpr ParseOp(spect::SourceFile *sf, int line_nr, std::string &arg);
-    
+
     public:
         static void Error(std::string err);
         static void ErrorAt(std::string err, const SourceFile *sf, int line_nr);

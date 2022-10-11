@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -141,7 +141,7 @@ void spect::Compiler::ParseArgument(spect::SourceFile *sf, int line_nr, spect::I
             instr_i->immediate_ = ParseValue(sf, line_nr, arg, s, IENC_IMMEDIATE_MASK);
             instr_i->s_immediate_ = s;
             if (s && s->type_ == SymbolType::LABEL) {
-                char buf[128];            
+                char buf[128];
                 std::sprintf(buf, "Using label: '%s' as immediate oprand. Is this correct?",
                                     s->identifier_.c_str());
                 WarningAt(buf, sf, line_nr);
@@ -175,10 +175,10 @@ spect::Symbol* spect::Compiler::ParseLabel(spect::SourceFile *sf, std::string &l
             Symbol *s = symbols_->GetSymbol(ident);
 
             if (s->resolved_) {
-                char buf[128];            
+                char buf[128];
                 std::sprintf(buf, "Symbol: '%s' previously defined at: %s:%d",
                                 ident.c_str(), s->f_->path_.c_str(), s->line_nr_);
-                ErrorAt(std::string(buf), sf, line_nr);   
+                ErrorAt(std::string(buf), sf, line_nr);
             } else {
                 symbols_->ResolveSymbol(s, SymbolType::LABEL, curr_addr_);
                 return s;
@@ -240,7 +240,7 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
                             mnemonic.c_str(), new_instr->argc_);
             ErrorAt(std::string(buf), sf, line_nr);
         }
-        
+
         size_t pos = line_buf.find(',');
         std::string arg;
         if (pos != std::string::npos) {
@@ -263,6 +263,8 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
                         mnemonic.c_str(), new_instr->argc_, arg_index - 1);
         ErrorAt(std::string(buf), sf, line_nr);
     }
+
+    num_instr_++;
 
     return new_instr;
 }
@@ -292,7 +294,7 @@ void spect::Compiler::Compile(std::string path)
             continue;
 
         TrimSpaces(line_buf);
-        
+
         // Check for definitions of constants
         if (ParseConstant(sf, line_buf, line_nr))
             continue;
@@ -308,7 +310,7 @@ void spect::Compiler::Compile(std::string path)
                             first_addr_, (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - first_addr_) / 4);
             ErrorAt(std::string(buf), sf, line_nr);
         }
-        
+
         program_->AppendInstruction(new_instr);
         if (line_buf != sf->lines_.back())
             curr_addr_ += 4;
@@ -324,8 +326,12 @@ int spect::Compiler::CompileFinish()
     std::cout << std::string(80, '*') << std::endl;
     std::cout << "First instruction address: " << std::hex << first_addr_ << std::endl;
     std::cout << "Last instruction address:  " << std::hex << curr_addr_ << std::endl;
-    std::cout << "Number of instructions:    " << std::dec << ((curr_addr_ - first_addr_) / 4 + 1) << std::endl;
+    std::cout << "Number of instructions:    " << std::dec << num_instr_ << std::endl;
 
+    if (num_instr_ == 0) {
+        Warning("Program is empty, no instructions found!");
+        rv = 1;
+    }
     if (!symbols_->IsDefined(START_SYMBOL)) {
         Warning("'" START_SYMBOL "' symbol not found in the program!");
         rv = 1;
