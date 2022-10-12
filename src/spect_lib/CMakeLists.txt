@@ -54,11 +54,12 @@ foreach(LINE ${IDEF_LIST})
         list(GET LINE_LIST 1 MNEMONIC)
         list(GET LINE_LIST 2 OPCODE)
         list(GET LINE_LIST 3 FUNC)
+        list(GET LINE_LIST 4 OPMASK)
 
         message("   ${InstructionColor}${MNEMONIC}${ColourReset}")
 
         # Instruction definitions (header + implicit constructor)
-        set(DEF_STR "${DEF_STR} DEFINE_${ITYPE}_INSTRUCTION(Instruction${MNEMONIC},\"${MNEMONIC}\",${OPCODE},${FUNC}) ")
+        set(DEF_STR "${DEF_STR} DEFINE_${ITYPE}_INSTRUCTION(Instruction${MNEMONIC},\"${MNEMONIC}\",${OPCODE},${FUNC},${OPMASK}) ")
 
         # Instruction registration within instruction factory
         set(REG_STR "${REG_STR} REGISTER_${ITYPE}_INSTRUCTION(spect::Instruction${MNEMONIC}) ")

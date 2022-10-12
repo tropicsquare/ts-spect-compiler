@@ -1,13 +1,13 @@
-/****************************************************************************** 
-* 
+/******************************************************************************
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 *****************************************************************************/
 
 #ifndef SPECT_LIB_INSTRUCTION_J_H_
@@ -20,7 +20,8 @@
 class spect::InstructionJ : public Instruction
 {
     public:
-        InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func, uint16_t new_pc);
+        InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
+                     uint16_t new_pc);
         void Dump(std::ostream& os);
         spect::Symbol* Relocate();
         uint32_t Assemble();
@@ -28,7 +29,7 @@ class spect::InstructionJ : public Instruction
 
         uint16_t new_pc_ : IENC_NEW_PC_BITS;
 
-        spect::Symbol *s_new_pc_;
+        spect::Symbol *s_new_pc_= nullptr;
 };
 
 #endif

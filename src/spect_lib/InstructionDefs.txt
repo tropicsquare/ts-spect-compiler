@@ -1,54 +1,54 @@
-TYPE          MNEMONIC         OPCODE        FUNC
---------------------------------------------------
-R               ADD            0b0001        0b001
-R               SUB            0b0010        0b001
-R               CMP            0b0011        0b001
-R               AND            0b0001        0b010
-R                OR            0b0010        0b010
-R               XOR            0b0100        0b010
-R               NOT            0b1000        0b010
-R               LSL            0b0001        0b100
-R               LSR            0b0010        0b100
-R               ROL            0b0101        0b100
-R               ROR            0b0110        0b100
-R              ROL8            0b1001        0b100
-R              ROR8            0b1010        0b100
-R               SWE            0b1100        0b100
-R               MOV            0b0001        0b101
-R             CSWAP            0b0011        0b101
-R              HASH            0b0101        0b111
-R               GRV            0b1001        0b111
-R               SCB            0b1111        0b111
-R          MUL25519            0b0011        0b110
-R            MUL256            0b0111        0b110
-R              ADDP            0b1101        0b110
-R              SUBP            0b1110        0b110
-R              MULP            0b1111        0b110
-R              REDP            0b1100        0b110
+TYPE          MNEMONIC         OPCODE        FUNC       OPERAND MASK (op1,op2,op3)
+----------------------------------------------------------------------------------
+R               ADD            0b0001        0b001          0b111
+R               SUB            0b0010        0b001          0b111
+R               CMP            0b0011        0b001          0b011
+R               AND            0b0001        0b010          0b111
+R                OR            0b0010        0b010          0b111
+R               XOR            0b0100        0b010          0b111
+R               NOT            0b1000        0b010          0b110
+R               LSL            0b0001        0b100          0b110
+R               LSR            0b0010        0b100          0b110
+R               ROL            0b0101        0b100          0b110
+R               ROR            0b0110        0b100          0b110
+R              ROL8            0b1001        0b100          0b110
+R              ROR8            0b1010        0b100          0b110
+R               SWE            0b1100        0b100          0b110
+R               MOV            0b0001        0b101          0b110
+R             CSWAP            0b0011        0b101          0b110
+R              HASH            0b0101        0b111          0b110
+R               GRV            0b1001        0b111          0b100
+R               SCB            0b1111        0b111          0b111
+R          MUL25519            0b0011        0b110          0b111
+R            MUL256            0b0111        0b110          0b111
+R              ADDP            0b1101        0b110          0b111
+R              SUBP            0b1110        0b110          0b111
+R              MULP            0b1111        0b110          0b111
+R              REDP            0b1100        0b110          0b111
 
 
-I              ADDI            0b0001        0b001
-I              SUBI            0b0010        0b001
-I              CMPI            0b0100        0b001
-I              ANDI            0b0001        0b010
-I               ORI            0b0010        0b010
-I              XORI            0b0100        0b010
-I              CMPA            0b1000        0b101
-I              MOVI            0b0001        0b101
-I           HASH_IT            0b0110        0b111
-I               GPK            0b1010        0b111
+I              ADDI            0b0001        0b001          0b111
+I              SUBI            0b0010        0b001          0b111
+I              CMPI            0b0100        0b001          0b011
+I              ANDI            0b0001        0b010          0b111
+I               ORI            0b0010        0b010          0b111
+I              XORI            0b0100        0b010          0b111
+I              CMPA            0b1000        0b101          0b011
+I              MOVI            0b0001        0b101          0b101
+I           HASH_IT            0b0110        0b111          0b000
+I               GPK            0b1010        0b111          0b101
 
 
-M                LD            0b0010        0b101
-M                ST            0b0100        0b101
+M                LD            0b0010        0b101          0b110
+M                ST            0b0100        0b101          0b110
 
 
-J              CALL            0b0001        0b000
-J               RET            0b0010        0b000
-J               BRZ            0b0100        0b000
-J              BRNZ            0b0101        0b000
-J               BRC            0b0110        0b000
-J              BRNC            0b0111        0b000
-J               JMP            0b1100        0b000
-J               END            0b1001        0b111
-J               NOP            0b1010        0b111
+J              CALL            0b0001        0b000          0b100
+J               RET            0b0010        0b000          0b000
+J               BRZ            0b0100        0b000          0b100
+J              BRNZ            0b0101        0b000          0b100
+J               BRC            0b0110        0b000          0b100
+J              BRNC            0b0111        0b000          0b100
+J               JMP            0b1100        0b000          0b100
+J               END            0b1001        0b111          0b000
+J               NOP            0b1010        0b111          0b000

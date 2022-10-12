@@ -1,13 +1,13 @@
-/****************************************************************************** 
-* 
+/******************************************************************************
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 *****************************************************************************/
 
 #include "Instruction.h"
@@ -18,12 +18,12 @@
 
 
 spect::Instruction::Instruction(std::string mnemonic, InstructionType itype,
-                                uint32_t opcode, uint32_t func, int argc) :
+                                uint32_t opcode, uint32_t func, int op_mask) :
     itype_(itype),
     opcode_(opcode),
     func_(func),
     mnemonic_(mnemonic),
-    argc_(argc)
+    op_mask_(op_mask)
 {}
 
 spect::Instruction::~Instruction()

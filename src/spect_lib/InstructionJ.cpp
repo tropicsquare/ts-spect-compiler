@@ -1,22 +1,22 @@
-/****************************************************************************** 
-* 
+/******************************************************************************
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 *****************************************************************************/
 
 #include "InstructionJ.h"
 #include "InstructionFactory.h"
 #include "Symbol.h"
 
-spect::InstructionJ::InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func,
+spect::InstructionJ::InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
                                   uint16_t new_pc) :
-    Instruction(mnemonic, InstructionType::J, opcode, func, 1),
+    Instruction(mnemonic, InstructionType::J, opcode, func, op_mask),
     new_pc_(new_pc)
 {}
 
@@ -43,7 +43,7 @@ uint32_t spect::InstructionJ::Assemble()
 
 spect::Instruction* spect::InstructionJ::DisAssemble(uint32_t wrd)
 {
-    uint32_t new_pc = (wrd >> IENC_NEW_PC_OFFSET) & IENC_NEW_PC_MASK; 
+    uint32_t new_pc = (wrd >> IENC_NEW_PC_OFFSET) & IENC_NEW_PC_MASK;
     uint32_t func   = (wrd >> IENC_FUNC_OFFSET)   & IENC_FUNC_MASK;
     uint32_t opcode = (wrd >> IENC_OPCODE_OFFSET) & IENC_OPCODE_MASK;
     uint32_t itype  = (wrd >> IENC_TYPE_OFFSET)   & IENC_TYPE_MASK;

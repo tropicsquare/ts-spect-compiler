@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -20,13 +20,15 @@ spect::CpuProgram::CpuProgram(size_t expected_size)
 }
 
 void spect::CpuProgram::AppendInstruction(spect::Instruction *instr)
-{    
+{
     code_.push_back(instr);
 }
 
 void spect::CpuProgram::Assemble(uint32_t *mem)
 {
     for (auto const &instr : code_) {
+
+        // If relocation entry is unresolved, then it is returned
         Symbol *s_unknown = instr->Relocate();
         if (s_unknown != nullptr) {
             char buf[128];
@@ -43,7 +45,7 @@ void spect::CpuProgram::Assemble(std::string path)
 {
     uint32_t *mem = new uint32_t[code_.size()];
     Assemble(mem);
-    
+
     std::ofstream ofs;
     ofs.open(path);
     ofs << std::hex;

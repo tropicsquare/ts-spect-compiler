@@ -1,13 +1,13 @@
-/****************************************************************************** 
-* 
+/******************************************************************************
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 *****************************************************************************/
 
 #include "InstructionI.h"
@@ -15,9 +15,9 @@
 #include "Symbol.h"
 
 
-spect::InstructionI::InstructionI(std::string mnemonic, uint32_t opcode, uint32_t func,
+spect::InstructionI::InstructionI(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
                                   CpuGpr op1, CpuGpr op2, uint16_t immediate) :
-    Instruction(mnemonic, InstructionType::I, opcode, func, 3),
+    Instruction(mnemonic, InstructionType::I, opcode, func, op_mask),
     op1_(op1),
     op2_(op2),
     immediate_(immediate)

@@ -231,14 +231,29 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
     spect::Instruction *new_instr = gold_instr->Clone();
     new_instr->s_label_ = label;
 
+    // Calculate number of expected arguments (number of bitsin 1 in op_mask)
+    int exp_argc = 0;
+    for (int i = 2; i >= 0; i--)
+        if ((new_instr->op_mask_ >> i) & 0x1)
+            exp_argc++;
+
     // Parse arguments
     int arg_index = 1;
+    int skipped_args = 0;
+
     while (!line_buf.empty()) {
-        if (arg_index > new_instr->argc_) {
+
+        if (arg_index > exp_argc + skipped_args) {
             char buf[128];
             std::sprintf(buf, "Too many arguments to instruction: %s. Expected only %d arguments.",
-                            mnemonic.c_str(), new_instr->argc_);
+                            mnemonic.c_str(), exp_argc);
             ErrorAt(std::string(buf), sf, line_nr);
+        }
+
+        // Skip un-implemented arguments for given unstruction
+        while (((new_instr->op_mask_ >> (3 - arg_index)) & 0x1) == 0) {
+            arg_index++;
+            skipped_args++;
         }
 
         size_t pos = line_buf.find(',');
@@ -257,10 +272,10 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
         arg_index++;
     }
 
-    if (arg_index <= new_instr->argc_) {
+    if (arg_index <= exp_argc + skipped_args) {
         char buf[128];
         std::sprintf(buf, "Missing arguments to instruction: %s. Expected %d arguments found only %d!",
-                        mnemonic.c_str(), new_instr->argc_, arg_index - 1);
+                        mnemonic.c_str(), exp_argc, arg_index - 1);
         ErrorAt(std::string(buf), sf, line_nr);
     }
 
