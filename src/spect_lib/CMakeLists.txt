@@ -43,6 +43,7 @@ set(REG_STR "")
 set(SUM_STR "")
 
 string(ASCII 27 Esc)
+set(ColourReset         "${Esc}[m")
 set(InstructionColor    "${Esc}[1;36m")
 
 message("${InstructionColor} Loading available SPECT instructions:${ColourReset}")
