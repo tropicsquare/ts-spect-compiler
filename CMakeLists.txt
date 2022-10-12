@@ -13,4 +13,7 @@ include_directories(
 
 add_compile_options(-Wall -Wextra -fPIC)
 
+enable_testing()
+
 add_subdirectory(src)
+add_subdirectory(test)
