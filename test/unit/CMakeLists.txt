@@ -13,5 +13,5 @@ add_test(NAME m_type_unit_test COMMAND spect_compiler --first-address=0x8000
                                                       ${CMAKE_CURRENT_SOURCE_DIR}/m_type_test.s)
 
 add_test(NAME j_type_unit_test COMMAND spect_compiler --first-address=0x8000
-                                                      --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/m_type_test.hex
+                                                      --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/j_type_test.hex
                                                       ${CMAKE_CURRENT_SOURCE_DIR}/j_type_test.s)
