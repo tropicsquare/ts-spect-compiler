@@ -39,6 +39,7 @@ class spect::Compiler
         void ParseArgument(spect::SourceFile *sf, int line_nr, spect::Instruction* instr, std::string &arg, int arg_index);
         spect::Symbol* ParseLabel(spect::SourceFile *sf, std::string &line_buf, int line_nr);
         bool ParseConstant(spect::SourceFile *sf, std::string &line_buf, int line_nr);
+        bool ParseIncludeFile(spect::SourceFile *sf, std::string &line_buf);
         spect::Instruction* ParseInstruction(spect::SourceFile *sf, std::string &line_buf, int line_nr,  spect::Symbol *label);
         spect::CpuGpr ParseOp(spect::SourceFile *sf, int line_nr, std::string &arg);
 

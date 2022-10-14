@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -38,6 +38,7 @@ void spect::SymbolTable::ResolveSymbol(spect::Symbol *s, spect::SymbolType type,
 {
     assert (!s->resolved_);
 
+    std::cout << "Resolving symbol: " << s->identifier_ << "(" << val << ")" << std::endl;
     s->f_ = curr_file_;
     s->resolved_ = true;
     s->type_ = type;

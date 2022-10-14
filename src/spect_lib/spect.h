@@ -1,13 +1,13 @@
-/****************************************************************************** 
-* 
+/******************************************************************************
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 *****************************************************************************/
 
 #ifndef SPECT_LIB_SPECT_H_
@@ -114,10 +114,13 @@ namespace spect {
         ((TO_INT(itype)  & IENC_TYPE_MASK)      << IENC_TYPE_OFFSET)
 
     #define IDENT_REGEX "([a-zA-Z_][a-zA-Z_0-9]*)"
-    #define VAL_REGEX "(0x|0b)*[0-9]+"
+    #define FILE_REGEX ".+"
+    #define VAL_REGEX "(0x|0b)*[0-9a-fA-F]+"
     #define OP_REGEX "(r|R)(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31)"
     #define NUM_REGEX "(0x[a-fA-F0-9]+|0b[0-1]+|[0-9]+)"
     #define START_SYMBOL "_start"
+    #define INCLUDE_KEYWORD "(\\.include)"
+    #define EQ_KEYWORD "(\\.eq)"
 
     /*
     #define CALL_WITH_EXCEPTION_HANDLER (fnc, ret_code_var, err_handle_symbol) do { \

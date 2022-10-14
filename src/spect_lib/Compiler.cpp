@@ -192,21 +192,42 @@ spect::Symbol* spect::Compiler::ParseLabel(spect::SourceFile *sf, std::string &l
 
 bool spect::Compiler::ParseConstant(spect::SourceFile *sf, std::string &line_buf, int line_nr)
 {
-    if (std::regex_match(line_buf, std::regex("^" IDENT_REGEX "[ ]+(eq|EQ)[ ]+" VAL_REGEX))) {
+    if (std::regex_match(line_buf, std::regex("^" IDENT_REGEX "[ ]+" EQ_KEYWORD "[ ]+" VAL_REGEX))) {
         std::string ident = line_buf.substr(0, line_buf.find(' '));
         std::string val = line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
-        spect::Symbol *s;
+        Symbol *s;
+        Symbol *s_dummy;
 
         if (symbols_->IsDefined(ident)) {
-            char buf[128];
             s = symbols_->GetSymbol(ident);
-            std::sprintf(buf, "Symbol: '%s' previously defined at: %s:%d",
-                            ident.c_str(), s->f_->path_.c_str(), s->line_nr_);
-            ErrorAt(std::string(buf), sf, line_nr);
+            if (s->resolved_) {
+                char buf[128];
+                std::sprintf(buf, "Symbol: '%s' previously defined at: %s:%d",
+                                ident.c_str(), s->f_->path_.c_str(), s->line_nr_);
+                ErrorAt(std::string(buf), sf, line_nr);
+            } else {
+                symbols_->ResolveSymbol(s, SymbolType::CONSTANT, ParseValue(sf, line_nr, val, s_dummy));
+            }
+        } else {
+            symbols_->AddSymbol(ident, SymbolType::CONSTANT, ParseValue(sf, line_nr, val, s_dummy), line_nr);
         }
 
-        symbols_->AddSymbol(ident, SymbolType::CONSTANT, ParseValue(sf, line_nr, val, s), line_nr);
-        // TODO: Check it is not refering to other value!
+        // TODO: Check s_dummy ??
+
+        return true;
+    }
+    return false;
+}
+
+bool spect::Compiler::ParseIncludeFile(spect::SourceFile *sf, std::string &line_buf)
+{
+    if (std::regex_match(line_buf, std::regex("^" INCLUDE_KEYWORD "[ ]+" FILE_REGEX))) {
+
+        // TODO: Make this universal across OS type!
+        std::string new_file = sf->path_.substr(0, sf->path_.find_last_of("/")) + "/" +
+                               line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
+        std::cout << "Loading included file: " << new_file << std::endl;
+        Compile(new_file);
         return true;
     }
     return false;
@@ -312,6 +333,10 @@ void spect::Compiler::Compile(std::string path)
 
         // Check for definitions of constants
         if (ParseConstant(sf, line_buf, line_nr))
+            continue;
+
+        // Check for include of another file
+        if (ParseIncludeFile(sf, line_buf))
             continue;
 
         spect::Instruction *new_instr = ParseInstruction(sf, line_buf, line_nr, label);
