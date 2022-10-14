@@ -1,17 +1,17 @@
 
 
-add_test(NAME r_type_unit_test COMMAND spect_compiler --first-address=0x8000
-                                                      --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/r_type_test.hex
-                                                      ${CMAKE_CURRENT_SOURCE_DIR}/r_type_test.s)
+set (CC spect_compiler)
+set (CARGS --first-address=0x8000)
 
-add_test(NAME i_type_unit_test COMMAND spect_compiler --first-address=0x8000
-                                                      --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/i_type_test.hex
-                                                      ${CMAKE_CURRENT_SOURCE_DIR}/i_type_test.s)
+macro(ADD_UNIT_TEST TEST_NAME)
+    add_test(NAME ${TEST_NAME} COMMAND ${CC} ${CARGS} --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/build/${TEST_NAME}.hex
+                                                      ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME}.s)
+endmacro()
 
-add_test(NAME m_type_unit_test COMMAND spect_compiler --first-address=0x8000
-                                                      --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/m_type_test.hex
-                                                      ${CMAKE_CURRENT_SOURCE_DIR}/m_type_test.s)
+ADD_UNIT_TEST(type_r_test)
+ADD_UNIT_TEST(type_i_test)
+ADD_UNIT_TEST(type_j_test)
+ADD_UNIT_TEST(type_m_test)
 
-add_test(NAME j_type_unit_test COMMAND spect_compiler --first-address=0x8000
-                                                      --sim-hex=${CMAKE_CURRENT_SOURCE_DIR}/j_type_test.hex
-                                                      ${CMAKE_CURRENT_SOURCE_DIR}/j_type_test.s)
+ADD_UNIT_TEST(eq_test)
+ADD_UNIT_TEST(include_test)

@@ -5,6 +5,8 @@ _start:
     SUBI r4,r5, 456       ; Example comment
     CMPI r7, 0xFFF
 
+.include j_type_test.s
+
     ; 32 bit logic
     ANDI r9, r10,0x22
     ORI r12,r13,0x79
