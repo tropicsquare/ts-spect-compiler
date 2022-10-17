@@ -46,7 +46,7 @@ void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
     memory_[address >> 2] = data;
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ordt_data wdata;
+        ordt_data wdata(1, 0);
         wdata[0] = data;
         regs_->write(address, wdata);
         UpdateInterrupts();
@@ -59,7 +59,7 @@ uint32_t spect::CpuModel::GetMemory(uint16_t address)
     return memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ordt_data rdata;
+        ordt_data rdata(1, 0);
         regs_->read(address, rdata);
         return rdata[0];
     }
@@ -72,7 +72,7 @@ void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
         memory_[address >> 2] = data;
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ordt_data wdata;
+        ordt_data wdata(1, 0);
         wdata[0] = data;
         regs_->write(address, wdata);
         UpdateInterrupts();
@@ -87,7 +87,7 @@ uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
         return memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ordt_data rdata;
+        ordt_data rdata(1, 0);
         regs_->read(address, rdata);
         return rdata[0];
     }
@@ -206,6 +206,9 @@ bool spect::CpuModel::IsWithinMem(CpuMemory mem, uint16_t address)
         start = SPECT_INSTR_MEM_BASE;
         end = start + SPECT_INSTR_MEM_SIZE;
         break;
+    case CpuMemory::CONFIG_REGS:
+         start = SPECT_CONFIG_REGS_BASE;
+         end = start + SPECT_CONFIG_REGS_SIZE;
     default:
         break;
     }
