@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -26,7 +26,7 @@ extern "C" {
     {
         try {
             compiler = new spect::Compiler(SPECT_INSTR_MEM_BASE);
-            model = new spect::CpuModel(SPECT_INSTR_MEM_AHB_RW); 
+            model = new spect::CpuModel(SPECT_INSTR_MEM_AHB_RW);
         } catch (const std::bad_alloc& e) {
             std::cout << "Failed to initialize SPECT DPI model:" << std::endl;
             std::cout << e.what() << std::endl;
@@ -183,19 +183,18 @@ extern "C" {
         }
     }
 
-    uint32_t spect_dpi_assemble_and_load_firmware(const char *path)
+    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path)
     {
         uint32_t err;
-        
+
         try {
-            compiler->Compile(std::string(path));
+            compiler->Compile(std::string(program_path));
 
             err = compiler->CompileFinish();
             if (err)
                 return err;
-            
-            uint32_t *first_addr = model->memory_ + (compiler->first_addr_ >> 2);
-            compiler->program_->Assemble(first_addr);
+
+            compiler->program_->Assemble(std::string(hex_path));
 
         } catch(std::runtime_error &err) {
             return 1;
@@ -204,7 +203,7 @@ extern "C" {
         return 0;
     }
 
-    uint32_t spect_dpi_load_hex(const char *path)
+    uint32_t spect_dpi_load_hex_file(const char *path)
     {
         spect::HexHandler::LoadHexFile(std::string(path), model->memory_);
         // TODO: Here it might be good to check that hex file spans out of
