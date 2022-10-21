@@ -277,13 +277,14 @@ package spect_iss_dpi_pkg;
   import "DPI-C" function int unsigned spect_dpi_get_interrupt(dpi_int_type_t int_type);
 
   /**
-   *  @brief Assemble and load firmware, set Program counter to value of '_start' symbol.
-   *  @param path Path to .s file
-   *  @returns 0 - Program assembled and loaded correctly
+   *  @brief Compile SPECT Program (.s assembly file) to hex file.
+   *  @param program_path Path to .s file
+   *  @param hex_path Path to output hex file
+   *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
-  import "DPI-C" function int unsigned spect_dpi_assemble_and_load_firmware(string path);
+  import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path);
 
   /**
    *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,
@@ -292,7 +293,7 @@ package spect_iss_dpi_pkg;
    *  @returns 0 - Program assembled and loaded correctly
    *           non-zero - Loading of assembly failed.
    */
-  import "DPI-C" function int unsigned spect_dpi_load_hex(string path);
+  import "DPI-C" function int unsigned spect_dpi_load_hex_file(string path);
 
   /**
    *  @brief Execute single instruction of program, and remember how many clock cycles
