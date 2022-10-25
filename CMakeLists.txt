@@ -11,7 +11,7 @@ include_directories(
     "src/cosim"
 )
 
-add_compile_options(-Wall -Wextra -fPIC)
+add_compile_options(-Wall -Wextra -fPIC -fdump-tree-original)
 
 enable_testing()
 

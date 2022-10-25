@@ -48,9 +48,14 @@ spect::Instruction* spect::InstructionJ::DisAssemble(uint32_t wrd)
     uint32_t opcode = (wrd >> IENC_OPCODE_OFFSET) & IENC_OPCODE_MASK;
     uint32_t itype  = (wrd >> IENC_TYPE_OFFSET)   & IENC_TYPE_MASK;
 
-    spect::InstructionJ *cln = (spect::InstructionJ*) spect::InstructionFactory::
-            GetInstruction(INSTR_ENCODE(func, opcode, itype))->Clone();
-    cln->new_pc_ = new_pc;
+    spect::Instruction *instr = spect::InstructionFactory::
+                                GetInstruction(INSTR_ENCODE(func, opcode, itype));
+    spect::InstructionJ *cln = nullptr;
+    if (instr) {
+        cln = (spect::InstructionJ*) instr->Clone();
+        cln->new_pc_ = new_pc;
+    }
+
     return cln;
 }
 

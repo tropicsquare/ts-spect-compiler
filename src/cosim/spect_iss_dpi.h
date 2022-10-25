@@ -252,6 +252,17 @@ extern "C" {
      */
     uint32_t spect_dpi_program_run(uint32_t instructions);
 
+    /**
+     *  @brief Sets verbosity level of SPECT model
+     *  @param level Verbosity level to set:
+     *                  0 - None        - No debug prints
+     *                  1 - Low         - Only most important debug prints
+     *                  2 - Medium      - Regular debug prints
+     *                  3 - High        - Print everything
+     *  @note Debug prints from model execution to standard output.
+     */
+    void spect_dpi_set_verbosity(uint32_t level);
+
 }
 
 #endif

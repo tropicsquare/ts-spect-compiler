@@ -73,6 +73,16 @@ namespace spect {
         bool carry;
     };
 
+    enum class CpuFlagType {
+        ZERO,
+        CARRY
+    };
+
+    enum class CpuIntType {
+        INT_DONE,
+        INT_ERR
+    };
+
     enum class CpuMemory {
         DATA_RAM_IN,
         DATA_RAM_OUT,
@@ -121,6 +131,13 @@ namespace spect {
     #define START_SYMBOL "_start"
     #define INCLUDE_KEYWORD "(\\.include)"
     #define EQ_KEYWORD "(\\.eq)"
+
+    #define VERBOSITY_NONE 0
+    #define VERBOSITY_LOW 1
+    #define VERBOSITY_MEDIUM 2
+    #define VERBOSITY_HIGH 3
+
+    #define MODEL_LABEL "SPECT_MODEL: "
 
     /*
     #define CALL_WITH_EXCEPTION_HANDLER (fnc, ret_code_var, err_handle_symbol) do { \

@@ -56,11 +56,15 @@ spect::Instruction* spect::InstructionI::DisAssemble(uint32_t wrd)
     uint32_t opcode    = (wrd >> IENC_OPCODE_OFFSET)    & IENC_OPCODE_MASK;
     uint32_t itype     = (wrd >> IENC_TYPE_OFFSET)      & IENC_TYPE_MASK;
 
-    spect::InstructionI *cln = (spect::InstructionI*) spect::InstructionFactory::
-            GetInstruction(INSTR_ENCODE(func, opcode, itype))->Clone();
-    cln->op1_ = TO_CPU_GPR(op1);
-    cln->op2_ = TO_CPU_GPR(op2);
-    cln->immediate_ = immediate;
+    spect::Instruction *instr = spect::InstructionFactory::
+                                GetInstruction(INSTR_ENCODE(func, opcode, itype));
+    spect::InstructionI *cln = nullptr;
+    if (instr) {
+        cln = (spect::InstructionI*) instr->Clone();
+        cln->op1_ = TO_CPU_GPR(op1);
+        cln->op2_ = TO_CPU_GPR(op2);
+        cln->immediate_ = immediate;
+    }
     return cln;
 }
 

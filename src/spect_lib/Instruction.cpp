@@ -10,6 +10,8 @@
 *
 *****************************************************************************/
 
+#include <ostream>
+
 #include "Instruction.h"
 #include "InstructionR.h"
 #include "InstructionM.h"
@@ -69,3 +71,11 @@ void spect::Instruction::Dump(std::ostream& os)
         break;
     }
 }
+
+std::string spect::Instruction::Dump()
+{
+    std::stringstream ss;
+    Dump(ss);
+    return ss.str();
+}
+

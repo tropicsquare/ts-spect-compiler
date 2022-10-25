@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     if (options[INSTRUCTIION_MEM_HEX]) {
         try {
             std::string path = std::string(options[INSTRUCTIION_MEM_HEX].arg);
-            spect::HexHandler::LoadHexFile(path, model->memory_);
+            spect::HexHandler::LoadHexFile(path, model->GetMemoryPtr());
         } catch(std::runtime_error &err) {
             std::cout << err.what() << std::endl;
             ret_code = 1;
@@ -74,8 +74,6 @@ int main(int argc, char** argv)
     }
 
     // TODO: Load Data RAM IN and const ROM!
-    std::cout << std::endl << std::endl;
-    std::cout << "Starting program execution" << std::endl;
     model->start_pc_ = 0x8000;
     model->Start();
     model->Step(0);

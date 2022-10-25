@@ -24,6 +24,7 @@ class spect::Instruction
                     uint32_t func, int op_mask);
         virtual ~Instruction();
         void Dump(std::ostream& os);
+        std::string Dump();
         virtual bool Execute() = 0;
         virtual uint32_t Assemble() = 0;
         virtual Instruction* Clone() = 0;

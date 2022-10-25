@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include <fstream>
+#include <cstdarg>
 
 #include "CpuModel.h"
 
@@ -34,15 +35,41 @@ spect::CpuModel::~CpuModel()
 
 void spect::CpuModel::Start()
 {
-    pc_ = start_pc_;
+    DebugInfo(VERBOSITY_LOW, "Starting program execution...");
+    DebugInfo(VERBOSITY_LOW, "First instruction address:", start_pc_);
+    SetPc(start_pc_);
 
     ordt_data wdata(1, 0);
     regs_->r_status.f_idle.write(wdata);
     UpdateInterrupts();
+
+    end_executed_ = false;
+
+    // To make browsing logs easier
+    DebugInfo(VERBOSITY_LOW, "");
+}
+
+void spect::CpuModel::Finish(int status_err)
+{
+    end_executed_ = true;
+    DebugInfo(VERBOSITY_LOW, "Finishing program execution...");
+    ordt_data wdata(1,0);
+    ordt_data wdata_err(1,0);
+    wdata[0] = 1;
+    wdata_err[0] = status_err;
+    regs_->r_status.f_idle.write(wdata);
+    regs_->r_status.f_done.write(wdata);
+    regs_->r_status.f_err.write(wdata_err);
+
+    DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[DONE] =", wdata[0]);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[IDLE] =", wdata[0]);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[ERR]  =", status_err);
 }
 
 void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
 {
+    DebugInfo(VERBOSITY_MEDIUM, "Setting memory, address:", address, "data:", data);
+
     memory_[address >> 2] = data;
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
@@ -56,17 +83,28 @@ void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
 
 uint32_t spect::CpuModel::GetMemory(uint16_t address)
 {
-    return memory_[address >> 2];
+    uint32_t rv = memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
         ordt_data rdata(1, 0);
         regs_->read(address, rdata);
-        return rdata[0];
+        rv = rdata[0];
     }
+
+    DebugInfo(VERBOSITY_MEDIUM, "Getting memory, address:", address, "data:", rv);
+
+    return rv;
+}
+
+uint32_t* spect::CpuModel::GetMemoryPtr()
+{
+    return memory_;
 }
 
 void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
 {
+    DebugInfo(VERBOSITY_MEDIUM, "AHB Write", address, "data:", data);
+
     if ( IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_rw_))
         memory_[address >> 2] = data;
@@ -82,30 +120,38 @@ void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
 
 uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
 {
+    uint32_t rv = 0;
+
     if ( IsWithinMem(CpuMemory::DATA_RAM_OUT, address) ||
         (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_rw_))
-        return memory_[address >> 2];
+        rv = memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
         ordt_data rdata(1, 0);
         regs_->read(address, rdata);
-        return rdata[0];
+        rv = rdata[0];
     }
 
-    return 0x0;
+    DebugInfo(VERBOSITY_MEDIUM, "AHB Read", address, "data:", rv);
+    return rv;
 }
 
 uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
 {
+    uint32_t rv = 0;
     if (IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         IsWithinMem(CpuMemory::CONST_ROM, address))
-        return memory_[address >> 2];
+        rv = memory_[address >> 2];
 
-    return 0x0;
+    DebugInfo(VERBOSITY_MEDIUM, "Core Read", address, "data:", rv);
+
+    return rv;
 }
 
 uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 {
+    DebugInfo(VERBOSITY_MEDIUM, "Core Write", address, "data:", data);
+
     if (IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         IsWithinMem(CpuMemory::DATA_RAM_OUT, address)) {
         memory_[address >> 2] = data;
@@ -115,14 +161,215 @@ uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 
 uint32_t spect::CpuModel::ReadMemoryCoreFetch(uint16_t address)
 {
+    DebugInfo(VERBOSITY_MEDIUM, "Fetching instruction, address: ", address);
     if (IsWithinMem(CpuMemory::INSTR_MEM, address)) {
         return memory_[address >> 2];
     }
     return 0x0;
 }
 
+const uint256_t& spect::CpuModel::GetGpr(int index)
+{
+    return gpr_[index];
+}
+
+void spect::CpuModel::SetGpr(int index, const uint256_t &val)
+{
+    char reg[4] = {0};
+    sprintf(reg, "R%d", index);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting", reg, "to", val);
+    gpr_[index] = val;
+}
+
+uint16_t spect::CpuModel::GetPc()
+{
+    return pc_;
+}
+
+void spect::CpuModel::SetPc(uint16_t val)
+{
+    DebugInfo(VERBOSITY_MEDIUM, "Setting PC to", val);
+    pc_ = val;
+}
+
+void spect::CpuModel::SetCpuFlag(CpuFlagType type, bool val)
+{
+    switch (type) {
+    case CpuFlagType::ZERO:
+        DebugInfo(VERBOSITY_MEDIUM, "Setting Z flag to", val);
+        flags_.zero = val;
+        break;
+    case CpuFlagType::CARRY:
+        DebugInfo(VERBOSITY_MEDIUM, "Setting C flag to", val);
+        flags_.carry = val;
+        break;
+    default:
+        break;
+    }
+}
+
+bool spect::CpuModel::GetCpuFlag(CpuFlagType type)
+{
+    switch (type) {
+    case CpuFlagType::ZERO:
+        return flags_.zero;
+    case CpuFlagType::CARRY:
+        return flags_.carry;
+    default:
+        return false;
+    }
+}
+
+spect::CpuFlags spect::CpuModel::GetCpuFlags()
+{
+    return flags_;
+}
+
+const uint256_t& spect::CpuModel::GetSrr()
+{
+    return srr_;
+}
+
+void spect::CpuModel::SetSrr(const uint256_t &val)
+{
+    DebugInfo(VERBOSITY_MEDIUM, "Setting SRR flag to", val);
+    srr_ = val;
+}
+
+void spect::CpuModel::RarPush(uint16_t ret_addr)
+{
+    DebugInfo(VERBOSITY_MEDIUM, "Pushing", ret_addr, "to RAR stack.");
+
+    if (GetRarSp() == SPECT_RAR_DEPTH - 1)
+        DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack overflow");
+
+    rar_stack_[rar_sp_] = ret_addr;
+    SetRarSp(GetRarSp() + 1);
+}
+
+uint16_t spect::CpuModel::RarPop()
+{
+    uint16_t rv = GetRarAt(GetRarSp());
+
+    if (GetRarSp() == 0)
+        DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack underflow");
+
+    DebugInfo(VERBOSITY_MEDIUM, "Poping ", rv, "from RAR stack.");
+    SetRarSp(GetRarSp() - 1);
+
+    return rv;
+}
+
+uint16_t spect::CpuModel::GetRarAt(uint16_t index)
+{
+    return rar_stack_[index];
+}
+
+uint16_t spect::CpuModel::GetRarSp()
+{
+    return rar_sp_;
+}
+
+void spect::CpuModel::SetRarSp(uint16_t val)
+{
+    DebugInfo(VERBOSITY_MEDIUM, "Setting RAR SP to:", val);
+    rar_sp_ = val;
+}
+
+bool spect::CpuModel::GetInterrrupt(CpuIntType int_type)
+{
+    switch (int_type) {
+    case CpuIntType::INT_DONE:
+        return int_done_;
+    case CpuIntType::INT_ERR:
+        return int_err_;
+    default:
+        break;
+    }
+}
+
+void spect::CpuModel::GrvQueuePush(uint32_t data)
+{
+    DebugInfo(VERBOSITY_HIGH, "Pushing to GRV queue:", data);
+    grv_q_.push(data);
+}
+
+uint256_t spect::CpuModel::GrvQueuePop()
+{
+    uint256_t rv = grv_q_.front();
+    grv_q_.pop();
+    DebugInfo(VERBOSITY_HIGH, "Popping from GRV queue:", rv);
+    return rv;
+}
+
+void spect::CpuModel::GpkQueuePush(uint32_t index, uint32_t data)
+{
+    DebugInfo(VERBOSITY_HIGH, "Pushing to GPK queue", index, ":", data);
+    gpk_q_[index].push(data);
+}
+
+uint256_t spect::CpuModel::GpkQueuePop(uint32_t index)
+{
+    uint256_t rv = gpk_q_[index].front();
+    gpk_q_[index].pop();
+    DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", rv);
+    return rv;
+}
+
+void spect::CpuModel::ReportChange(dpi_state_change_t change)
+{
+    if (change_reporting_) {
+        DebugInfo(VERBOSITY_HIGH, "Pushing following change to SPECT model change queue:");
+        DebugInfo(VERBOSITY_HIGH, "     kind:      ", change.kind);
+        DebugInfo(VERBOSITY_HIGH, "     obj:       ", change.obj);
+
+        // TODO: Maybe convert only to single line to keep it shorter
+        for (int i = 0; i < 8; i++) {
+            char buf[16];
+            sprintf(buf, "old_val[%d]:", i);
+            DebugInfo(VERBOSITY_HIGH, "    ", buf, change.old_val[i]);
+        }
+        for (int i = 0; i < 8; i++) {
+            char buf[16];
+            sprintf(buf, "new_val[%d]:", i);
+            DebugInfo(VERBOSITY_HIGH, "    ", buf, change.new_val[i]);
+        }
+
+        change_q_.push(change);
+    }
+}
+
+dpi_state_change_t spect::CpuModel::ConsumeChange()
+{
+    dpi_state_change_t rv = {};
+
+    if (!HasChange()) {
+        DebugInfo(VERBOSITY_LOW, "WARNING: Change queue empty, nothing to Pop, returning invalid change!");
+        return rv;
+    }
+
+    rv = change_q_.front();
+    change_q_.pop();
+
+    DebugInfo(VERBOSITY_HIGH, "Popping following change to SPECT model change queue:");
+    DebugInfo(VERBOSITY_HIGH, "     kind:   ", rv.kind);
+    DebugInfo(VERBOSITY_HIGH, "     obj:    ", rv.obj);
+    DebugInfo(VERBOSITY_HIGH, "     old_val:", rv.old_val);
+    DebugInfo(VERBOSITY_HIGH, "     new_val:", rv.old_val);
+
+    return rv;
+}
+
+bool spect::CpuModel::HasChange()
+{
+    return !change_q_.empty();
+}
+
+
 int spect::CpuModel::Step(int n)
 {
+    DebugInfo(VERBOSITY_HIGH, "Executing", n, "instructions:");
+
     int cnt = 0;
     if (n == 0) {
         do {
@@ -142,18 +389,139 @@ int spect::CpuModel::Step(int n)
 
 int spect::CpuModel::StepSingle(int cycles)
 {
+    DebugInfo(VERBOSITY_HIGH, "Executing single instruction in ", cycles, " RTL clock cycles:");
+
     return ExecuteNextInstruction(cycles);
 }
 
-void spect::CpuModel::FillMemory(CpuMemory mem, uint32_t val)
+void spect::CpuModel::Reset()
 {
-    int size;
-    uint32_t *mem_ptr = MemToPtrs(mem, &size);
+    DebugInfo(VERBOSITY_LOW, "Reseting CPU Model.");
 
-    for (int i = 0; i < size; i++) {
-        mem_ptr[i] = val;
-        mem_ptr++;
+    for (int i = 0; i < SPECT_GPR_CNT; i++)
+        SetGpr(i, uint256_t("0x0"));
+
+    SetCpuFlag(CpuFlagType::CARRY, false);
+    SetCpuFlag(CpuFlagType::ZERO, false);
+    SetSrr("0x0");
+
+    for (int i = 0; i < SPECT_RAR_DEPTH; i++)
+        rar_stack_[i] = 0x0;
+
+    SetRarSp(0);
+    end_executed_ = false;
+    sha_512_ = Sha512();
+    SetPc(0x0);
+
+    // Re-create new register model -> Erase registers to reset values.
+    delete regs_;
+    regs_ = new ordt_root(SPECT_CONFIG_REGS_BASE, SPECT_CONFIG_REGS_BASE + SPECT_CONFIG_REGS_SIZE);
+
+    // To make browsing logs easier
+    DebugInfo(VERBOSITY_LOW, "");
+
+    // Don't fill the content of memories intentionally!
+    // This more realistically corresponds to un-inited memory having
+    // all Xs in RTL sim. In model, content will be random based on previous
+    // content of memory!
+}
+
+void spect::CpuModel::UpdateInterrupts()
+{
+    DebugInfo(VERBOSITY_LOW, "Updating CPU Interrupt values");
+
+    ordt_data en(1,0);
+    ordt_data status(1,0);
+
+    DEFINE_CHANGE(ch_int_done, DPI_CHANGE_INT, DPI_SPECT_INT_DONE);
+    DEFINE_CHANGE(ch_int_err, DPI_CHANGE_INT, DPI_SPECT_INT_ERR);
+    if (change_reporting_) {
+        ordt_data rdata(1, 0);
+        regs_->r_status.f_done.read(rdata);
+        ch_int_done.old_val[0] = rdata[0];
+        regs_->r_status.f_err.read(rdata);
+        ch_int_err.old_val[0] = rdata[0];
     }
+
+    regs_->r_status.f_done.read(status);
+    regs_->r_int_ena.f_int_done_en.read(en);
+
+    // TODO: Writing register values needs to be debugged!
+    int_done_ = (en[0] == 1 && status[0] == 1);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting int_done     =", int_done_);
+
+    regs_->r_status.f_err.read(status);
+    regs_->r_int_ena.f_int_err_en.read(en);
+
+    int_err_ = (en[0] == 1 && status[0] == 1);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting int_err      =", int_err_);
+
+    // Construct and report model change
+    ordt_data rdata(1, 0);
+    regs_->r_status.f_done.read(rdata);
+    ch_int_done.new_val[0] = rdata[0];
+    regs_->r_status.f_err.read(rdata);
+    ch_int_err.new_val[0] = rdata[0];
+
+    ReportChange(ch_int_done);
+    ReportChange(ch_int_err);
+}
+
+void spect::CpuModel::UpdateRegisterEffects()
+{
+    DebugInfo(VERBOSITY_LOW, "Updating Register effects");
+
+    // COMMAND[START] == 1
+    ordt_data val(1,0);
+    regs_->r_command.f_start.read(val);
+    if (val[0] == 1)
+        Start();
+
+    // COMMAND[SOFT_RESET] == 1
+    regs_->r_command.f_start.read(val);
+    if (val[0] == 1)
+        Reset();
+}
+
+int spect::CpuModel::ExecuteNextInstruction(int cycles)
+{
+    uint32_t wrd = ReadMemoryCoreFetch(GetPc());
+
+    DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", wrd);
+    Instruction *instr = spect::Instruction::DisAssemble(wrd);
+
+    // Detect invalid instruction and finish
+    if (instr == nullptr) {
+        DebugInfo(VERBOSITY_LOW, "Detected invalid instruction!");
+        Finish(1);
+        UpdateInterrupts();
+
+        return 0;
+    }
+
+    DebugInfo(VERBOSITY_LOW, "Executing instruction:         ", instr->Dump());
+
+    // Execute instruction
+    instr->model_ = this;
+    if (instr->Execute())
+        SetPc(GetPc() + 0x4);
+
+    // Check last execution time of instruction with the same mnemonic
+    // Hold execution time of instruction per-mnemonic in Instruction Factory.
+    // Ignore cases where instruction is executed first time (gold->cycles_ == 0)
+    // or we stop measurement for whatever reason (cycles == 0).
+    int rv = 0;
+    Instruction *gold = spect::InstructionFactory::GetInstruction(instr->mnemonic_);
+    if (cycles > 0 && gold->cycles_ > 0 && cycles != gold->cycles_)
+        rv = gold->cycles_;
+
+    gold->cycles_ = cycles;
+
+    // Separate instructions by empty line -> More readable output
+    DebugInfo(VERBOSITY_MEDIUM, "");
+
+    delete instr;
+    return rv;
 }
 
 uint32_t *spect::CpuModel::MemToPtrs(CpuMemory mem, int *size)
@@ -219,116 +587,29 @@ bool spect::CpuModel::IsWithinMem(CpuMemory mem, uint16_t address)
     return false;
 }
 
-void spect::CpuModel::Reset()
+void spect::CpuModel::PrintArgs()
 {
-    for (int i = 0; i < SPECT_GPR_CNT; i++)
-        gpr_[i] = uint256_t("0x0");
-
-    flags_.carry = false;
-    flags_.zero = false;
-
-    srr_ = uint256_t("0x0");
-
-    for (int i = 0; i < SPECT_RAR_DEPTH; i++)
-        rar_stack_[i] = 0x0;
-
-    rar_sp_ = 0;
-    end_executed_ = false;
-    sha_512_ = Sha512();
-    pc_ = 0x0;
-
-    // Re-create new register model -> Erase registers to reset values.
-    delete regs_;
-    regs_ = new ordt_root(SPECT_CONFIG_REGS_BASE, SPECT_CONFIG_REGS_BASE + SPECT_CONFIG_REGS_SIZE);
-
-    // Don't fill the content of memories intentionally!
-    // This more realistically corresponds to un-inited memory having
-    // all Xs in RTL sim. In model, content will be random based on previous
-    // content of memory!
-}
-
-void spect::CpuModel::UpdateInterrupts()
-{
-    ordt_data en(1,0);
-    ordt_data status(1,0);
-
-    DEFINE_CHANGE(ch_int_done, DPI_CHANGE_INT, DPI_SPECT_INT_DONE);
-    DEFINE_CHANGE(ch_int_err, DPI_CHANGE_INT, DPI_SPECT_INT_ERR);
-    if (change_reporting_) {
-        ordt_data rdata(1, 0);
-        regs_->r_status.f_done.read(rdata);
-        ch_int_done.old_val[0] = rdata[0];
-        regs_->r_status.f_err.read(rdata);
-        ch_int_err.old_val[0] = rdata[0];
-    }
-
-    regs_->r_status.f_done.read(status);
-    regs_->r_int_ena.f_int_done_en.read(en);
-    int_done_ = (en[0] == 1 && status[0] == 1);
-
-    regs_->r_status.f_err.read(status);
-    regs_->r_int_ena.f_int_err_en.read(en);
-    int_err_ = (en[0] == 1 && status[0] == 1);
-
-    if (change_reporting_) {
-        ordt_data rdata(1, 0);
-        regs_->r_status.f_done.read(rdata);
-        ch_int_done.new_val[0] = rdata[0];
-        regs_->r_status.f_err.read(rdata);
-        ch_int_err.new_val[0] = rdata[0];
-        change_q_.push(ch_int_done);
-        change_q_.push(ch_int_err);
-    }
-}
-
-void spect::CpuModel::UpdateRegisterEffects()
-{
-    // COMMAND[START] == 1
-    ordt_data val(1,0);
-    regs_->r_command.f_start.read(val);
-    if (val[0] == 1)
-        Start();
-
-    // COMMAND[SOFT_RESET] == 1
-    regs_->r_command.f_start.read(val);
-    if (val[0] == 1)
-        Reset();
-}
-
-int spect::CpuModel::ExecuteNextInstruction(int cycles)
-{
-    uint32_t wrd = ReadMemoryCoreFetch(pc_);
-    Instruction *instr = spect::Instruction::DisAssemble(wrd);
-
-    // Detect invalid instruction and finish
-    if (instr == nullptr) {
-        ordt_data wdata(1,0);
-        wdata[0] = 1;
-        regs_->r_status.f_idle.write(wdata);
-        regs_->r_status.f_err.write(wdata);
-        UpdateInterrupts();
-        end_executed_ = true;
-    }
-
-    // Execute instruction
-    instr->model_ = this;
-    std::cout << std::hex << "Executing: 0x" << pc_ << ": ";
-    instr->Dump(std::cout);
     std::cout << std::endl;
-    if (instr->Execute())
-        pc_ += 4;
+}
 
-    // Check last execution time of instruction with the same mnemonic
-    // Hold execution time of instruction per-mnemonic in Instruction Factory.
-    // Ignore cases where instruction is executed first time (gold->cycles_ == 0)
-    // or we stop measurement for whatever reason (cycles == 0).
-    int rv = 0;
-    Instruction *gold = spect::InstructionFactory::GetInstruction(instr->mnemonic_);
-    if (cycles > 0 && gold->cycles_ > 0 && cycles != gold->cycles_)
-        rv = gold->cycles_;
+template<typename Arg>
+void spect::CpuModel::PrintArgs(Arg arg)
+{
+    std::cout << arg << std::endl;
+}
 
-    gold->cycles_ = cycles;
+template<typename First, typename... Args>
+void spect::CpuModel::PrintArgs(First first, Args... args)
+{
+    std::cout << first << " ";
+    PrintArgs(args...);
+}
 
-    delete instr;
-    return rv;
+template<typename... Args>
+void spect::CpuModel::DebugInfo(uint32_t verbosity_level, const Args ...args)
+{
+    if (verbosity_ >= verbosity_level) {
+        std::cout << MODEL_LABEL;
+        PrintArgs(args...);
+    }
 }

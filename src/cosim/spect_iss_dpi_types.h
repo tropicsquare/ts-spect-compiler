@@ -42,7 +42,7 @@ typedef enum {
 } dpi_change_kind_t;
 
 typedef struct {
-    dpi_change_kind_t kind;
+    dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
     // Identifies object on which change occured based on kind
     //  DPI_CHANGE_GPR:
@@ -69,7 +69,7 @@ typedef struct {
     //
     //  DPI_CAHNGE_RAR_SP:
     //      -
-    uint32_t          obj;
+    uint32_t          obj = 0;
 
     // Old / New value of the object based  on 'kind':
     //  DPI_CHANGE_GPR:
@@ -91,8 +91,8 @@ typedef struct {
     //
     //  DPI_CAHNGE_RAR_SP:
     //      Value of RAR stack pointer
-    uint32_t          old_val[8];
-    uint32_t          new_val[8];
+    uint32_t          old_val[8] = {0};
+    uint32_t          new_val[8] = {0};
 } dpi_state_change_t;
 
 #endif
