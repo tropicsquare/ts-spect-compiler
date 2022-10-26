@@ -606,15 +606,9 @@ bool spect::InstructionJMP::Execute()
 
 bool spect::InstructionEND::Execute()
 {
-    DEFINE_CHANGE(ch_srr, DPI_CHANGE_SRR, 0);
-    PUT_GPR_TO_CHANGE(ch_srr, old_val, model_->GetSrr());
-
     model_->SetSrr(model_->GetGpr(31));
     model_->Finish(0);
     model_->UpdateInterrupts();
-
-    PUT_GPR_TO_CHANGE(ch_srr, new_val, model_->GetSrr());
-    model_->ReportChange(ch_srr);
 
     return false;
 }

@@ -35,7 +35,6 @@ typedef enum {
     DPI_CHANGE_GPR              = (1 << 0),
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
-    DPI_CHANGE_SRR              = (1 << 3),
     DPI_CHANGE_INT              = (1 << 4),
     DPI_CHANGE_RAR              = (1 << 5),
     DPI_CHANGE_RAR_SP           = (1 << 6)
@@ -56,9 +55,6 @@ typedef struct {
     //
     //  DPI_CHANGE_MEM:
     //      Address in memory on which change occured.
-    //
-    //  DPI_CHANGE_SRR:
-    //      -
     //
     //  DPI_CHANGE_INT:
     //      DPI_SPECT_INT_DONE
