@@ -40,6 +40,7 @@ package spect_iss_dpi_pkg;
   } dpi_change_kind_t;
 
   typedef struct {
+<<<<<<< HEAD
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
     // Identifies object on which change occured based on kind
@@ -342,7 +343,6 @@ package spect_iss_dpi_pkg;
    *  @note Debug prints from model execution to standard output.
    */
   import "DPI-C" function void spect_dpi_set_verbosity(int unsigned level);
-
 
 endpackage : spect_iss_dpi_pkg
 
