@@ -279,6 +279,7 @@ extern "C" {
                 compiler->program_->Assemble(std::string(hex_path));
 
         } catch(std::runtime_error &exception) {
+            std::cout << exception.what() << std::endl;
             err = 1;
         }
 

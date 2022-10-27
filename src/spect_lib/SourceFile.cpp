@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -23,7 +23,7 @@ spect::SourceFile::SourceFile(const std::string &path, uint32_t first_addr) :
         while (std::getline(ifs, line))
             lines_.push_back(line);
     } else {
-        std::runtime_error("Unable to open a file:" + path);
+        throw std::runtime_error("Unable to open a file: " + path);
     }
     ifs.close();
 }
