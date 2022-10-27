@@ -35,7 +35,7 @@ extern "C" {
 
     uint32_t spect_dpi_init()
     {
-        DPI_CALL_LOG_ENTER
+        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' entered." << std::endl;
 
         uint32_t rv = 0;
         try {
@@ -47,16 +47,18 @@ extern "C" {
             rv = 1;
         }
 
-        DPI_CALL_LOG_EXIT
+        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' exiting." << std::endl;
         return rv;
     }
 
     void spect_dpi_exit()
     {
-        DPI_CALL_LOG_ENTER
+        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' entered." << std::endl;
+
         delete compiler;
         delete model;
-        DPI_CALL_LOG_EXIT
+
+        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' exiting." << std::endl;
     }
 
     void spect_dpi_reset()
