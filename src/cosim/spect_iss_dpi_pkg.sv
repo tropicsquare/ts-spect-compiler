@@ -40,7 +40,6 @@ package spect_iss_dpi_pkg;
   } dpi_change_kind_t;
 
   typedef struct {
-<<<<<<< HEAD
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
     // Identifies object on which change occured based on kind
