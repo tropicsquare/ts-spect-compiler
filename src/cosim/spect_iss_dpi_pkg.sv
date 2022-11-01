@@ -35,7 +35,7 @@ package spect_iss_dpi_pkg;
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
-    DPI_CHANGE_RAR              = (1 << 5),
+    DPI_CHANGE_RAR              = (1 << 5)
   } dpi_change_kind_t;
 
   typedef enum {
