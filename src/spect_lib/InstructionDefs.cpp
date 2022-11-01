@@ -552,33 +552,27 @@ bool spect::InstructionST::Execute()
 
 bool spect::InstructionCALL::Execute()
 {
-    DEFINE_CHANGE(ch_rar, DPI_CHANGE_RAR, new_pc_);
-    DEFINE_CHANGE(ch_rar_sp, DPI_CHANGE_RAR_SP, 0);
-    ch_rar.old_val[0] = model_->GetRarAt(model_->GetRarSp());
-    ch_rar_sp.old_val[0] = model_->GetRarSp();
+    DEFINE_CHANGE(ch_rar, DPI_CHANGE_RAR, DPI_RAR_PUSH);
 
     uint16_t ret_addr = model_->GetPc() + 0x4;
     model_->RarPush(ret_addr);
     model_->SetPc(new_pc_);
 
-    ch_rar.new_val[0] = ret_addr;
-    ch_rar_sp.new_val[0] = model_->GetRarSp();
+    ch_rar.new_val[0] = model_->GetRarAt(model_->GetRarSp());
     model_->ReportChange(ch_rar);
-    model_->ReportChange(ch_rar_sp);
 
     return false;
 }
 
 bool spect::InstructionRET::Execute()
 {
-    DEFINE_CHANGE(ch_rar_sp, DPI_CHANGE_RAR_SP, new_pc_);
-    ch_rar_sp.old_val[0] = model_->GetRarSp();
+    DEFINE_CHANGE(ch_rar, DPI_CHANGE_RAR, DPI_RAR_POP);
 
     uint16_t ret_addr = model_->RarPop();
     model_->SetPc(ret_addr);
 
-    ch_rar_sp.new_val[0] = model_->GetRarSp();
-    model_->ReportChange(ch_rar_sp);
+    ch_rar.new_val[0] = ret_addr;
+    model_->ReportChange(ch_rar);
 
     return false;
 }

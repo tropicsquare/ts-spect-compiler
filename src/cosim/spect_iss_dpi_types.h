@@ -36,9 +36,13 @@ typedef enum {
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
-    DPI_CHANGE_RAR              = (1 << 5),
-    DPI_CHANGE_RAR_SP           = (1 << 6)
+    DPI_CHANGE_RAR              = (1 << 5)
 } dpi_change_kind_t;
+
+typedef enum {
+    DPI_RAR_PUSH                = (1 << 0),
+    DPI_RAR_POP                 = (1 << 1)
+} dpi_rar_change_kind_t;
 
 typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
@@ -61,10 +65,8 @@ typedef struct {
     //      DPI_SPECT_INT_ERR
     //
     //  DPI_CHANGE_RAR:
-    //      0 - G_RAR_DEPTH - Index of RAR stack where changed occured
-    //
-    //  DPI_CAHNGE_RAR_SP:
-    //      -
+    //      DPI_RAR_PUSH - Push on stack
+    //      DPI_RAR_POP - Pop from stack
     uint32_t          obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -83,10 +85,9 @@ typedef struct {
     //      0 - Value of the interrupt
     //
     //  DPI_CHANGE_RAR:
-    //      0 - Bits 31:0 of RAR stack location
-    //
-    //  DPI_CAHNGE_RAR_SP:
-    //      Value of RAR stack pointer
+    //      obj == DPI_RAR_PUSH (push) - Data pushed on stack
+    //      obj == DPI_RAR_POP (pop) - Data popped from stack
+    //      both are valid only in "new_val".
     uint32_t          old_val[8] = {0};
     uint32_t          new_val[8] = {0};
 } dpi_state_change_t;
