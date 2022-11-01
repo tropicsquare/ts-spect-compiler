@@ -312,12 +312,11 @@ void spect::Compiler::Compile(std::string path)
     Symbol *label;
     symbols_->curr_file_ = sf;
     files_[path] = sf;
-    int line_nr = 0;
 
     std::cout << "Compiling: " << path << std::endl;
 
-    for (auto line_buf : sf->lines_) {
-        line_nr++;
+    for (unsigned int line_nr = 1; line_nr <= sf->lines_.size(); line_nr++) {
+        std::string line_buf = sf->lines_[line_nr - 1];
 
         // Remove comments
         line_buf = std::regex_replace(line_buf, std::regex(";.*"), "");
@@ -352,8 +351,8 @@ void spect::Compiler::Compile(std::string path)
         }
 
         program_->AppendInstruction(new_instr);
-        if (line_buf != sf->lines_.back())
-            curr_addr_ += 4;
+        //std::cout << new_instr->Dump() << std::endl;
+        curr_addr_ += 4;
     }
 }
 
@@ -365,7 +364,7 @@ int spect::Compiler::CompileFinish()
     std::cout << "Compilation finished OK!" << std::endl;
     std::cout << std::string(80, '*') << std::endl;
     std::cout << "First instruction address: " << std::hex << first_addr_ << std::endl;
-    std::cout << "Last instruction address:  " << std::hex << curr_addr_ << std::endl;
+    std::cout << "Last instruction address:  " << std::hex << curr_addr_ - 4 << std::endl;
     std::cout << "Number of instructions:    " << std::dec << num_instr_ << std::endl;
 
     if (num_instr_ == 0) {
