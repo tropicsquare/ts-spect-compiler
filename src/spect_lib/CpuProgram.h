@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -25,6 +25,7 @@ class spect::CpuProgram
         //void DisAssemble(uint32_t *mem, size_t len);
 
         uint32_t first_addr_;
+        Compiler *compiler_;
 
     private:
         std::vector<spect::Instruction*> code_;

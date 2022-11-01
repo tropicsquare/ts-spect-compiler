@@ -286,6 +286,7 @@ bool spect::CpuModel::GetInterrrupt(CpuIntType int_type)
     default:
         break;
     }
+    return false;
 }
 
 void spect::CpuModel::GrvQueuePush(uint32_t data)

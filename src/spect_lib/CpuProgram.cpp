@@ -34,7 +34,7 @@ void spect::CpuProgram::Assemble(uint32_t *mem)
             char buf[128];
             std::sprintf(buf, "Unable to find definition of symbol: '%s'.",
                               s_unknown->identifier_.c_str());
-            Compiler::ErrorAt(buf, s_unknown->f_, s_unknown->line_nr_);
+            compiler_->ErrorAt(buf, s_unknown->f_, s_unknown->line_nr_);
         }
         *mem = instr->Assemble();
         mem++;
@@ -49,10 +49,12 @@ void spect::CpuProgram::Assemble(std::string path)
     std::ofstream ofs;
     ofs.open(path);
     ofs << std::hex;
+    ofs << std::setfill('0');
     for (size_t i = 0; i < code_.size(); i++)
         // TODO: Check that in hex32 addressing is +4 per-word!
         //       IMHO verilog models will need +1 per word!
-        ofs << "@" << (first_addr_  + (4 * i)) << " " << mem[i] << std::endl;
+        ofs << "@"  << std::setw(4) << (first_addr_  + (4 * i)) << " "
+            << std::setw(8) << mem[i] << std::endl;
     ofs.close();
 
     delete mem;

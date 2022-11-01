@@ -26,6 +26,8 @@ spect::Compiler::Compiler(uint32_t first_addr) :
     first_addr_(first_addr),
     curr_addr_(first_addr)
 {
+    std_out_ << std::hex;
+
     if (first_addr < SPECT_INSTR_MEM_BASE ||
        (first_addr_ > (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE)) ) {
         char buf[256];
@@ -38,6 +40,7 @@ spect::Compiler::Compiler(uint32_t first_addr) :
     symbols_ = new spect::SymbolTable();
     program_ = new spect::CpuProgram(2048);
     program_->first_addr_ = first_addr;
+    program_->compiler_ = this;
 }
 
 spect::Compiler::~Compiler()
@@ -226,7 +229,7 @@ bool spect::Compiler::ParseIncludeFile(spect::SourceFile *sf, std::string &line_
         // TODO: Make this universal across OS type!
         std::string new_file = sf->path_.substr(0, sf->path_.find_last_of("/")) + "/" +
                                line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
-        std::cout << "Loading included file: " << new_file << std::endl;
+        std_out_ << "Loading included file: " << new_file << std::endl;
         Compile(new_file);
         return true;
     }
@@ -313,7 +316,7 @@ void spect::Compiler::Compile(std::string path)
     symbols_->curr_file_ = sf;
     files_[path] = sf;
 
-    std::cout << "Compiling: " << path << std::endl;
+    std_out_ << "Compiling: " << path << std::endl;
 
     for (unsigned int line_nr = 1; line_nr <= sf->lines_.size(); line_nr++) {
         std::string line_buf = sf->lines_[line_nr - 1];
@@ -351,7 +354,7 @@ void spect::Compiler::Compile(std::string path)
         }
 
         program_->AppendInstruction(new_instr);
-        //std::cout << new_instr->Dump() << std::endl;
+        //std_out_ << new_instr->Dump() << std::endl;
         curr_addr_ += 4;
     }
 }
@@ -360,12 +363,12 @@ int spect::Compiler::CompileFinish()
 {
     int rv = 0;
 
-    std::cout << std::string(80, '*') << std::endl;
-    std::cout << "Compilation finished OK!" << std::endl;
-    std::cout << std::string(80, '*') << std::endl;
-    std::cout << "First instruction address: " << std::hex << first_addr_ << std::endl;
-    std::cout << "Last instruction address:  " << std::hex << curr_addr_ - 4 << std::endl;
-    std::cout << "Number of instructions:    " << std::dec << num_instr_ << std::endl;
+    std_out_ << std::string(80, '*') << std::endl;
+    std_out_ << "Compilation finished OK!" << std::endl;
+    std_out_ << std::string(80, '*') << std::endl;
+    std_out_ << "First instruction address: " << std::hex << first_addr_ << std::endl;
+    std_out_ << "Last instruction address:  " << std::hex << curr_addr_ - 4 << std::endl;
+    std_out_ << "Number of instructions:    " << std::dec << num_instr_ << std::endl;
 
     if (num_instr_ == 0) {
         Warning("Program is empty, no instructions found!");
@@ -375,9 +378,9 @@ int spect::Compiler::CompileFinish()
         Warning("'" START_SYMBOL "' symbol not found in the program!");
         rv = 1;
     } else
-        std::cout << "Program start address:     " << std::hex << symbols_->GetSymbol(START_SYMBOL)->val_ << std::endl;
+        std_out_ << "Program start address:     " << std::hex << symbols_->GetSymbol(START_SYMBOL)->val_ << std::endl;
 
-    std::cout << std::string(80, '*') << std::endl;
+    std_out_ << std::string(80, '*') << std::endl;
 
     return rv;
 }
@@ -390,20 +393,20 @@ void spect::Compiler::TrimSpaces(std::string &input)
 
 void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr)
 {
-    std::cout << "\033[1m";
-    std::cout << sf->path_ << ":" << line_nr << ":";
-    std::cout << "\033[31m error: " << "\033[0m";
-    std::cout << err << std::endl;
+    std_out_ << "\033[1m";
+    std_out_ << sf->path_ << ":" << line_nr << ":";
+    std_out_ << "\033[31m error: " << "\033[0m";
+    std_out_ << err << std::endl;
     if (line_nr - 2 >= 0) {
-        std::cout << (line_nr - 1) << ":" << sf->lines_[line_nr - 2] << std::endl;
+        std_out_ << (line_nr - 1) << ":" << sf->lines_[line_nr - 2] << std::endl;
     }
-    std::cout << "\033[1m";
-    std::cout << (line_nr) << ":";
-    std::cout << sf->lines_[line_nr - 1] << std::endl;
+    std_out_ << "\033[1m";
+    std_out_ << (line_nr) << ":";
+    std_out_ << sf->lines_[line_nr - 1] << std::endl;
     // TODO: Right Adjust the line numbers!
-    std::cout << "\033[0m";
+    std_out_ << "\033[0m";
     if ((size_t)line_nr < sf->lines_.size()) {
-        std::cout << (line_nr + 1) << ":" << sf->lines_[line_nr] << std::endl;
+        std_out_ << (line_nr + 1) << ":" << sf->lines_[line_nr] << std::endl;
     }
 
     std::string msg = std::string(80, '*') + std::string("\nCompilation failed\n") + std::string(80, '*');
@@ -412,23 +415,23 @@ void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr
 
 void spect::Compiler::Error(std::string err)
 {
-    std::cout << "\033[1m" << "\033[31m error: " << "\033[0m";
-    std::cout << err << std::endl;
+    std_out_ << "\033[1m" << "\033[31m error: " << "\033[0m";
+    std_out_ << err << std::endl;
 
     throw std::runtime_error("Compilation failed");
 }
 
 void spect::Compiler::WarningAt(std::string warn, const SourceFile *sf, int line_nr)
 {
-    std::cout << "\033[1m";
-    std::cout << sf->path_ << ":" << line_nr << ":";
-    std::cout << "\033[33m warning: " << "\033[0m";
-    std::cout << warn << std::endl;
-    std::cout << sf->lines_[line_nr - 1] << std::endl;
+    std_out_ << "\033[1m";
+    std_out_ << sf->path_ << ":" << line_nr << ":";
+    std_out_ << "\033[33m warning: " << "\033[0m";
+    std_out_ << warn << std::endl;
+    std_out_ << sf->lines_[line_nr - 1] << std::endl;
 }
 void spect::Compiler::Warning(std::string warn)
 {
-    std::cout << "\033[1m" << "\033[33m warning: " << "\033[0m";
-    std::cout << warn << std::endl;
+    std_out_ << "\033[1m" << "\033[33m warning: " << "\033[0m";
+    std_out_ << warn << std::endl;
 }
 

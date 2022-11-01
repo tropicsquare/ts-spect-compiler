@@ -1,6 +1,6 @@
 
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -74,16 +74,16 @@ int main(int argc, char** argv)
     }
 
     // All remaining arguments are input source files
-    comp = new spect::Compiler(first_addr);
-    for (int i = 0; i < parse.nonOptionsCount(); ++i) {
-        std::string path = parse.nonOption(i);
-        try {
-            comp->Compile(path);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
+    try {
+        comp = new spect::Compiler(first_addr);
+        for (int i = 0; i < parse.nonOptionsCount(); ++i) {
+            std::string path = parse.nonOption(i);
+                comp->Compile(path);
         }
+    } catch(std::runtime_error &err) {
+        std::cout << err.what() << std::endl;
+        ret_code = 1;
+        goto cleanup;
     }
 
     if (options[SIM_HEX]) {
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
 
     comp->CompileFinish();
 
-    comp->program_->Dump(std::cout);
+    comp->program_->Dump(comp->std_out_);
 
 cleanup:
     delete comp;
