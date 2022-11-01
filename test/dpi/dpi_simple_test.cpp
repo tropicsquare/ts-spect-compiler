@@ -13,7 +13,7 @@
 
 
 
-int main(int argc, char** argv)
+int main()
 {
     uint32_t rv;
 
