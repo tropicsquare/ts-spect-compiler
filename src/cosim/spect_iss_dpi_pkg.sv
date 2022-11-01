@@ -39,6 +39,11 @@ package spect_iss_dpi_pkg;
     DPI_CHANGE_RAR_SP           = (1 << 6)
   } dpi_change_kind_t;
 
+  typedef enum {
+    DPI_SPECT_RAR_PUSH          = (1 << 0),
+    DPI_SPECT_RAR_POP           = (1 << 1)
+  } dpi_rar_change_kind_t;
+
   typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
@@ -60,10 +65,8 @@ package spect_iss_dpi_pkg;
     //      DPI_SPECT_INT_ERR
     //
     //  DPI_CHANGE_RAR:
-    //      0 - G_RAR_DEPTH - Index of RAR stack where changed occured
-    //
-    //  DPI_CHANGE_RAR_SP:
-    //      -
+    //      DPI_SPECT_RAR_PUSH - Push on stack
+    //      DPI_SPECT_RAR_POP - Pop from stack
     int unsigned      obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -82,10 +85,9 @@ package spect_iss_dpi_pkg;
     //      0 - Value of the interrupt
     //
     //  DPI_CHANGE_RAR:
-    //      0 - Bits 31:0 of RAR stack location
-    //
-    //  DPI_CAHNGE_RAR_SP:
-    //      Value of RAR stack pointer
+    //      obj == DPI_SPECT_RAR_PUSH (push) - Data pushed on stack
+    //      obj == DPI_SPECT_RAR_POP (pop) - Data popped from stack
+    //      both are valid only in "new_val".
     int unsigned      old_val[8] = '{default: 0};
     int unsigned      new_val[8] = '{default: 0};
   } dpi_state_change_t;
