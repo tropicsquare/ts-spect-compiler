@@ -41,7 +41,7 @@ void spect::CpuProgram::Assemble(uint32_t *mem)
     }
 }
 
-void spect::CpuProgram::Assemble(std::string path)
+void spect::CpuProgram::Assemble(std::string path, spect::HexFileType hex_type)
 {
     uint32_t *mem = new uint32_t[code_.size()];
     Assemble(mem);
@@ -50,11 +50,21 @@ void spect::CpuProgram::Assemble(std::string path)
     ofs.open(path);
     ofs << std::hex;
     ofs << std::setfill('0');
-    for (size_t i = 0; i < code_.size(); i++)
-        // TODO: Check that in hex32 addressing is +4 per-word!
-        //       IMHO verilog models will need +1 per word!
-        ofs << "@"  << std::setw(4) << (first_addr_  + (4 * i)) << " "
-            << std::setw(8) << mem[i] << std::endl;
+    for (size_t i = 0; i < code_.size(); i++) {
+        if (hex_type == HexFileType::VERILOG_ADDR_WORD ||
+            hex_type == HexFileType::ISS_WORD) {
+            ofs << "@" << std::setw(4);
+            int addr;
+
+            if (hex_type == HexFileType::VERILOG_ADDR_WORD)
+                addr = first_addr_ - SPECT_INSTR_MEM_BASE + i;
+            else
+                addr = first_addr_ + (4 * i);
+
+            ofs << addr;
+        }
+        ofs << std::setw(8) << mem[i] << std::endl;
+    }
     ofs.close();
 
     delete mem;

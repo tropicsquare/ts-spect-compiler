@@ -266,7 +266,8 @@ extern "C" {
         return rv;
     }
 
-    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path)
+    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
+                                       const int hex_format)
     {
         DPI_CALL_LOG_ENTER
         uint32_t err;
@@ -276,7 +277,7 @@ extern "C" {
 
             err = compiler->CompileFinish();
             if (!err)
-                compiler->program_->Assemble(std::string(hex_path));
+                compiler->program_->Assemble(std::string(hex_path), (spect::HexFileType) hex_format);
 
         } catch(std::runtime_error &exception) {
             std::cout << exception.what() << std::endl;

@@ -20,7 +20,7 @@ class spect::CpuProgram
         CpuProgram(size_t expected_size);
         void AppendInstruction(spect::Instruction *instr);
         void Assemble(uint32_t *mem);
-        void Assemble(std::string path);
+        void Assemble(std::string path, spect::HexFileType hex_type);
         void Dump(std::ostream &os);
         //void DisAssemble(uint32_t *mem, size_t len);
 

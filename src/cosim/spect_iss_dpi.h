@@ -196,11 +196,16 @@ extern "C" {
      *  @brief Compile SPECT Program (.s assembly file) to hex file.
      *  @param program_path Path to .s file
      *  @param hex_path Path to output hex file
+     *  @param hex_format Format of Hex file to be generated.
+     *              0 - Hex file for SPECT model / Instrucction Set Simulator (ISS)
+     *              1 - Hex file for Verilog model (not addressed)
+     *              2 - Hex file for Verilog model (addressed)
      *  @returns 0 - Program compiled succesfully
      *           non-zero - Compilation failed.
      *  @note This function fails if the S file does not define '_start' symbol.
      */
-    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path);
+    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
+                                       const int hex_format);
 
     /**
      *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,
