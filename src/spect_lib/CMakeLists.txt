@@ -75,3 +75,9 @@ endforeach()
 #message(${REG_STR})
 
 target_compile_definitions(SPECT PUBLIC SPECT_DEFINE_INSTRUCTIONS=${DEF_STR} SPECT_REGISTER_INSTRUCTIONS=${REG_STR} SPECT_SUM_INSTRUCTIONS=${SUM_STR})
+
+# Waivers
+set_source_files_properties(InstructionDefs.cpp PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
+set_source_files_properties(ordt_pio_common.cpp PROPERTIES COMPILE_FLAGS -Wno-type-limits)
+set_source_files_properties(ordt_pio.cpp PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
+set_source_files_properties(CpuModel.cpp PROPERTIES COMPILE_FLAGS -Wno-delete-non-virtual-dtor)
