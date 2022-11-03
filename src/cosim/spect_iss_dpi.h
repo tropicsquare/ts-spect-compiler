@@ -5,6 +5,26 @@
 **      - All addresses are passed byte aligned (each next 32-bit word is +0x4 higher).
 **      - Sizes of all memories are handled in bytes.
 **
+**  Operation on the DPI model can be done like so:
+**      spect_dpi_init();
+**
+**      spect_dpi_compile_program(S_FILE_PATH, HEX_FILE_PATH, ISS_WORD);
+**      spect_dpi_load_hex_file(HEX_FILE_PATH);
+**
+**      uint32_t start_pc = spect_dpi_get_compiled_program_start_address();
+**      spect_dpi_set_model_start_pc(start_pc);
+**
+**      // One of following actions executes start of program, both should have the same effect:
+**      spect_dpi_start()
+**      Write COMMAND[START] via spect_ahb_write()
+**
+**      // Step through the program
+**      while (!spect_dpi_is_program_finished()) {
+**          spect_dpi_program_step(<NUMBER_OF_CYCLES_EXECUTION_OF_LAST_INSTRUCTION_TOOK_ON_RTL>)
+**      }
+**
+**      spect_dpi_exit();
+**
 ** TODO: License
 **
 ** Author: Ondrej Ille
@@ -25,7 +45,7 @@ extern "C" {
     uint32_t spect_dpi_init();
 
     /**
-     *  @brief Finish using simulation model (performs memory clean-up)
+     *  @brief Finish using simulation model (performs memory clean-up).
      */
     void spect_dpi_exit();
 
@@ -41,6 +61,26 @@ extern "C" {
      *      6. Erase cycle counter for each instruction mnemonic.
      */
     void spect_dpi_reset();
+
+    /**
+     *  @brief Start program execution
+     *  Executes following:
+     *      1. Sets Program counter to models "Start PC" (first address to be executed)
+     *      2. Update STATUS[DONE] and STATUS[IDLE] and according interrupts.
+     *
+     *  @note The value of models "Start PC" must be first set by spect_dpi_set_model_start_pc.
+     *  @note The same effect is achieved by writing COMMAND[START]=1.
+     *  @note This does not execute any instruction. spect_dpi_step or spect_dpi_run
+     *        must be executed after that.
+     */
+    void spect_dpi_start();
+
+    /**
+     * Checks if program has finished (END)
+     * @returns 0 - Program is not finished (it is being executed)
+     *          1 - Program is finished (END instruction as been executed)
+     */
+     uint32_t spect_dpi_is_program_finished();
 
     /**
      * @brief Returns word from SPECT memory space.
@@ -196,11 +236,29 @@ extern "C" {
      *  @brief Compile SPECT Program (.s assembly file) to hex file.
      *  @param program_path Path to .s file
      *  @param hex_path Path to output hex file
+     *  @param hex_format Format of Hex file to be generated.
+     *              0 - Hex file for SPECT model / Instrucction Set Simulator (ISS)
+     *              1 - Hex file for Verilog model (not addressed)
+     *              2 - Hex file for Verilog model (addressed)
      *  @returns 0 - Program compiled succesfully
      *           non-zero - Compilation failed.
      *  @note This function fails if the S file does not define '_start' symbol.
      */
-    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path);
+    uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
+                                       const int hex_format);
+
+    /**
+     *  @returns Start address from previously compiled program (value of `_start` symbol.)
+     *  @note Return value from this function is valid after previous call of
+     *        'spect_dpi_compile_program'.
+     */
+    uint32_t spect_dpi_get_compiled_program_start_address();
+
+    /**
+     * Sets value of models "Start PC"
+     * @param value Value to be set as start_pc of model
+     */
+    void spect_dpi_set_model_start_pc(uint32_t start_pc);
 
     /**
      *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,

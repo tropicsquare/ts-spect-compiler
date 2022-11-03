@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -24,6 +24,8 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem)
         uint32_t *mem_c = mem;
         while (std::getline(ifs, line)) {
             uint32_t val;
+
+            // Absolute address in the HEX file, +0x4 offset
             if (line.size() > 0 && line[0] == '@') {
                 uint32_t addr;
                 line.erase(0,1);
@@ -32,7 +34,8 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem)
                     throw std::runtime_error("Unable to read line:" + line + " from file: " + path);
                 }
                 mem_c[addr >> 2] = val;
-                
+
+            // No address in hex file
             } else {
                 std::istringstream iss(line);
                 if (!(iss >> val)) {

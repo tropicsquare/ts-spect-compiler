@@ -66,6 +66,11 @@ void spect::CpuModel::Finish(int status_err)
     DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[ERR]  =", status_err);
 }
 
+bool spect::CpuModel::IsFinished()
+{
+    return end_executed_;
+}
+
 void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Setting memory, address:", address, "data:", data);
@@ -286,6 +291,7 @@ bool spect::CpuModel::GetInterrrupt(CpuIntType int_type)
     default:
         break;
     }
+    return false;
 }
 
 void spect::CpuModel::GrvQueuePush(uint32_t data)

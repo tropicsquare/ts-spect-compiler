@@ -97,6 +97,29 @@ namespace spect {
         UNKNOWN
     };
 
+    enum class HexFileType {
+
+        // Instruction set simulator compatible. Word addressing
+        //  Example:
+        //     @8000 ABCDE1234
+        //     @8004 56781234
+        //  The example above is an example of loading data into first two addresses of
+        //  SPECT Instruction Memory.
+        ISS_WORD                    = 0,
+
+        // $readmemh compatible with flat verilog model of 32 bit RAM. No addressing
+        // Example:
+        //      123AEEFF
+        VERILOG_RAW_WORD            = 1,
+
+        // $readmemh compatible with flat verilog model of 32 bit RAM. +0x1 for each address
+        // Example:
+        //      @0000 123AEEFF
+        //      @0001 45789ABC
+        //  Note: First address is relative to base address of memory.
+        VERILOG_ADDR_WORD           = 2
+    };
+
     class Instruction;
     class InstructionFactory;
     class InstructionR;
