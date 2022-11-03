@@ -5,6 +5,26 @@
 **      - All addresses are passed byte aligned (each next 32-bit word is +0x4 higher).
 **      - Sizes of all memories are handled in bytes.
 **
+**  Operation on the DPI model can be done like so:
+**      spect_dpi_init();
+**
+**      spect_dpi_compile_program(S_FILE_PATH, HEX_FILE_PATH, ISS_WORD);
+**      spect_dpi_load_hex_file(HEX_FILE_PATH);
+**
+**      uint32_t start_pc = spect_dpi_get_compiled_program_start_address();
+**      spect_dpi_set_model_start_pc(start_pc);
+**
+**      // One of following actions executes start of program, both should have the same effect:
+**      spect_dpi_start()
+**      Write COMMAND[START] via spect_ahb_write()
+**
+**      // Step through the program
+**      while (!spect_dpi_is_program_finished()) {
+**          spect_dpi_program_step(<NUMBER_OF_CYCLES_EXECUTION_OF_LAST_INSTRUCTION_TOOK_ON_RTL>)
+**      }
+**
+**      spect_dpi_exit();
+**
 ** TODO: License
 **
 ** Author: Ondrej Ille
@@ -25,7 +45,7 @@ extern "C" {
     uint32_t spect_dpi_init();
 
     /**
-     *  @brief Finish using simulation model (performs memory clean-up)
+     *  @brief Finish using simulation model (performs memory clean-up).
      */
     void spect_dpi_exit();
 
@@ -54,6 +74,13 @@ extern "C" {
      *        must be executed after that.
      */
     void spect_dpi_start();
+
+    /**
+     * Checks if program has finished (END)
+     * @returns 0 - Program is not finished (it is being executed)
+     *          1 - Program is finished (END instruction as been executed)
+     */
+     uint32_t spect_dpi_is_program_finished();
 
     /**
      * @brief Returns word from SPECT memory space.

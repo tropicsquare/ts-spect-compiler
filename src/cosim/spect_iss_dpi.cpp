@@ -75,6 +75,14 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
+    uint32_t spect_dpi_is_program_finished()
+    {
+        DPI_CALL_LOG_ENTER
+        uint32_t rv = model->IsFinished();
+        DPI_CALL_LOG_EXIT
+        return rv;
+    }
+
     uint32_t spect_dpi_get_memory(uint32_t addr)
     {
         DPI_CALL_LOG_ENTER

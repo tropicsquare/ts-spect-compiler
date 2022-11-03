@@ -58,6 +58,13 @@ class spect::CpuModel
         void Finish(int status_err);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Checks if program execution is finished (END instruction exectued)
+        /// @return true - END has been executed
+        ///         false - END has not been executed
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        bool IsFinished();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Execute multiple instructions of program
         /// @param n Number of instructions to execute
         /// @returns Number of actually executed instructions
