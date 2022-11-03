@@ -43,6 +43,19 @@ extern "C" {
     void spect_dpi_reset();
 
     /**
+     *  @brief Start program execution
+     *  Executes following:
+     *      1. Sets Program counter to models "Start PC" (first address to be executed)
+     *      2. Update STATUS[DONE] and STATUS[IDLE] and according interrupts.
+     *
+     *  @note The value of models "Start PC" must be first set by spect_dpi_set_model_start_pc.
+     *  @note The same effect is achieved by writing COMMAND[START]=1.
+     *  @note This does not execute any instruction. spect_dpi_step or spect_dpi_run
+     *        must be executed after that.
+     */
+    void spect_dpi_start();
+
+    /**
      * @brief Returns word from SPECT memory space.
      * @param addr Address to return
      * @returns Value read from the SPECT memory space.
@@ -206,6 +219,19 @@ extern "C" {
      */
     uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
                                        const int hex_format);
+
+    /**
+     *  @returns Start address from previously compiled program (value of `_start` symbol.)
+     *  @note Return value from this function is valid after previous call of
+     *        'spect_dpi_compile_program'.
+     */
+    uint32_t spect_dpi_get_compiled_program_start_address();
+
+    /**
+     * Sets value of models "Start PC"
+     * @param value Value to be set as start_pc of model
+     */
+    void spect_dpi_set_model_start_pc(uint32_t start_pc);
 
     /**
      *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,

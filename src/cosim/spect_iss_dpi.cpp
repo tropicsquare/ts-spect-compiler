@@ -68,6 +68,13 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
+    void spect_dpi_start()
+    {
+        DPI_CALL_LOG_ENTER
+        model->Start();
+        DPI_CALL_LOG_EXIT
+    }
+
     uint32_t spect_dpi_get_memory(uint32_t addr)
     {
         DPI_CALL_LOG_ENTER
@@ -286,6 +293,26 @@ extern "C" {
 
         DPI_CALL_LOG_EXIT
         return err;
+    }
+
+    uint32_t spect_dpi_get_compiled_program_start_address()
+    {
+        DPI_CALL_LOG_ENTER
+        spect::Symbol* s_start_addr = compiler->symbols_->GetSymbol(START_SYMBOL);
+        uint32_t rv = 0;
+        if (s_start_addr)
+            rv = s_start_addr->val_;
+        else
+            std::cout << MODEL_LABEL << "'" << START_SYMBOL << "' symbol not defined! Returning 0.";
+        DPI_CALL_LOG_EXIT
+        return rv;
+    }
+
+    void spect_dpi_set_model_start_pc(uint32_t start_pc)
+    {
+        DPI_CALL_LOG_ENTER
+        model->start_pc_ = start_pc;
+        DPI_CALL_LOG_EXIT
     }
 
     uint32_t spect_dpi_load_hex_file(const char *path)
