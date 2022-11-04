@@ -13,6 +13,8 @@
 #ifndef COSIM_SPECT_ISS_DPI_TYPES_H_
 #define COSIM_SPECT_ISS_DPI_TYPES_H_
 
+#include <string>
+
 
 typedef enum {
     DPI_SPECT_DATA_RAM_IN       = (1 << 0),
@@ -32,6 +34,11 @@ typedef enum {
 } dpi_int_type_t;
 
 typedef enum {
+    DPI_RAR_PUSH                = (1 << 0),
+    DPI_RAR_POP                 = (1 << 1)
+} dpi_rar_change_kind_t;
+
+typedef enum {
     DPI_CHANGE_GPR              = (1 << 0),
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
@@ -39,10 +46,56 @@ typedef enum {
     DPI_CHANGE_RAR              = (1 << 5)
 } dpi_change_kind_t;
 
-typedef enum {
-    DPI_RAR_PUSH                = (1 << 0),
-    DPI_RAR_POP                 = (1 << 1)
-} dpi_rar_change_kind_t;
+inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {
+    switch (in){
+    case DPI_CHANGE_GPR  : return std::string("DPI_CHANGE_GPR");
+    case DPI_CHANGE_FLAG : return std::string("DPI_CHANGE_FLAG");
+    case DPI_CHANGE_MEM  : return std::string("DPI_CHANGE_MEM");
+    case DPI_CHANGE_INT  : return std::string("DPI_CHANGE_INT");
+    case DPI_CHANGE_RAR  : return std::string("DPI_CHANGE_RAR");
+    }
+    return "";
+}
+
+inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
+    switch (in){
+    case DPI_CHANGE_GPR:
+        return std::string("R") + std::to_string(obj);
+        break;
+
+    case DPI_CHANGE_FLAG:
+        if (obj == DPI_SPECT_FLAG_ZERO)
+            return std::string("DPI_SPECT_FLAG_ZERO");
+        else if (obj == DPI_SPECT_FLAG_CARRY)
+            return std::string("DPI_SPECT_FLAG_CARRY");
+        else
+            return std::string("UNKNOWN FLAG TYPE!");
+        break;
+
+    case DPI_CHANGE_MEM:
+        return std::to_string(obj);
+        break;
+
+    case DPI_CHANGE_INT:
+        if (obj == DPI_SPECT_INT_DONE)
+            return std::string("DPI_SPECT_INT_DONE");
+        else if (obj == DPI_SPECT_INT_ERR)
+            return std::string("DPI_SPECT_INT_ERR");
+        else
+            return std::string("UNKNOWN INTERRUPT TYPE!");
+        break;
+
+    case DPI_CHANGE_RAR:
+        if (obj == DPI_RAR_PUSH)
+            return std::string("DPI_RAR_PUSH");
+        else if (obj == DPI_RAR_POP)
+            return std::string("DPI_RAR_POP");
+        else
+            return std::string("UNKNOWN RAR CHANGE TYPE!");
+        break;
+    }
+    return "";
+}
 
 typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;

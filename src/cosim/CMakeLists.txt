@@ -6,3 +6,7 @@ target_link_libraries(spect_iss_dpi
     SPECT
     COMMON
 )
+
+target_include_directories(spect_iss_dpi PUBLIC $ENV{VCS_HOME}/include)
+
+set_source_files_properties(spect_iss_dpi.cpp PROPERTIES COMPILE_FLAGS -Wno-write-strings)

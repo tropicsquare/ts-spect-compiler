@@ -74,7 +74,7 @@ int main(int argc, char** argv)
     }
 
     // TODO: Load Data RAM IN and const ROM!
-    model->start_pc_ = 0x8000;
+    model->SetStartPc(0x8000);
     model->Start();
     model->Step(0);
 
