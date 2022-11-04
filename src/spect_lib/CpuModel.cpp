@@ -24,6 +24,7 @@ spect::CpuModel::CpuModel(bool instr_mem_rw) :
 {
     memory_ = new uint32_t[SPECT_TOTAL_MEM_SIZE / 4];
     regs_ = new ordt_root(SPECT_CONFIG_REGS_BASE, SPECT_CONFIG_REGS_BASE + SPECT_CONFIG_REGS_SIZE);
+    print_fnc = &(printf);
     Reset();
 }
 
@@ -595,27 +596,29 @@ bool spect::CpuModel::IsWithinMem(CpuMemory mem, uint16_t address)
 
 void spect::CpuModel::PrintArgs()
 {
-    std::cout << std::endl;
+    print_fnc("\n");
 }
 
 template<typename Arg>
 void spect::CpuModel::PrintArgs(Arg arg)
 {
-    std::cout << arg << std::endl;
+    std::stringstream ss;
+    ss << arg << std::endl;
+    print_fnc(ss.str().c_str());
 }
 
 template<typename First, typename... Args>
 void spect::CpuModel::PrintArgs(First first, Args... args)
 {
-    std::cout << first << " ";
+    std::stringstream ss;
+    ss << first << " ";
+    print_fnc(ss.str().c_str());
     PrintArgs(args...);
 }
 
 template<typename... Args>
 void spect::CpuModel::DebugInfo(uint32_t verbosity_level, const Args ...args)
 {
-    if (verbosity_ >= verbosity_level) {
-        std::cout << MODEL_LABEL;
-        PrintArgs(args...);
-    }
+    if (verbosity_ >= verbosity_level)
+        PrintArgs(MODEL_LABEL, args...);
 }

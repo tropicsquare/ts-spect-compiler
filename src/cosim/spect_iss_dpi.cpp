@@ -6,6 +6,7 @@
 ** Author: Ondrej Ille
 **************************************************************************************************/
 
+#include <stdio.h>
 #include <iostream>
 #include <cassert>
 
@@ -16,6 +17,8 @@
 #include "CpuProgram.h"
 #include "HexHandler.h"
 
+#include "vpi_user.h"
+
 #include "spect_iss_dpi.h"
 
 spect::Compiler *compiler = nullptr;
@@ -25,40 +28,44 @@ spect::CpuModel *model = nullptr;
     assert (model != nullptr &&                                                                     \
             MODEL_LABEL " Model not initalized. Did you forget to call 'spect_dpi_init'?");         \
     if (model->verbosity_ >= VERBOSITY_HIGH)                                                        \
-        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' entered." << std::endl;      \
+        vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);                       \
 
 #define DPI_CALL_LOG_EXIT                                                                           \
     if (model->verbosity_ >= VERBOSITY_HIGH)                                                        \
-        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' exiting." << std::endl;      \
+        vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);                       \
 
 extern "C" {
 
     uint32_t spect_dpi_init()
     {
-        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' entered." << std::endl;
+        vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
 
         uint32_t rv = 0;
         try {
             compiler = new spect::Compiler(SPECT_INSTR_MEM_BASE);
             model = new spect::CpuModel(SPECT_INSTR_MEM_AHB_RW);
+
+            // According to C standard, typecasting function pointer is undefined behavior,
+            // but we only get rid of "const", so we hope its fine :)
+            model->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
+            compiler->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
         } catch (const std::bad_alloc& e) {
-            std::cout << "Failed to initialize SPECT DPI model:" << std::endl;
-            std::cout << e.what() << std::endl;
+            vpi_printf("%s Failed to initialize SPECT DPI model: %s\n", MODEL_LABEL, e.what());
             rv = 1;
         }
 
-        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' exiting." << std::endl;
+        vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
         return rv;
     }
 
     void spect_dpi_exit()
     {
-        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' entered." << std::endl;
+        vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
 
         delete compiler;
         delete model;
 
-        std::cout << MODEL_LABEL << "DPI function '" << __func__ << "' exiting." << std::endl;
+        vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
     }
 
     void spect_dpi_reset()
@@ -295,7 +302,8 @@ extern "C" {
                 compiler->program_->Assemble(std::string(hex_path), (spect::HexFileType) hex_format);
 
         } catch(std::runtime_error &exception) {
-            std::cout << exception.what() << std::endl;
+            vpi_printf("%s Failed to compile program: %s\n",
+                        MODEL_LABEL, exception.what());
             err = 1;
         }
 

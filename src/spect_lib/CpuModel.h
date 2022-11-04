@@ -308,6 +308,9 @@ class spect::CpuModel
         // Program
         CpuProgram *program_ = NULL;
 
+        // Print function
+        int (*print_fnc)(const char *format, ...);
+
     private:
 
         ///////////////////////////////////////////////////////////////////////////////////////////
