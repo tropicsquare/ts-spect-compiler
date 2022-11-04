@@ -293,7 +293,7 @@ package spect_iss_dpi_pkg;
    *  @note This function fails if the S file does not define '_start' symbol.
    */
   import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
-                                                                 const int hex_format);
+                                                                 int hex_format);
 
   /**
    *  @returns Start address from previously compiled program (value of `_start` symbol.)
@@ -306,7 +306,7 @@ package spect_iss_dpi_pkg;
    * Sets value of models "Start PC"
    * @param value Value to be set as start_pc of model
    */
-  import "DPI-C" functionvoid spect_dpi_set_model_start_pc(int unsigned start_pc);
+  import "DPI-C" function void spect_dpi_set_model_start_pc(int unsigned start_pc);
 
   /**
    *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,
