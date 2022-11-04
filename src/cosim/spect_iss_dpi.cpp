@@ -319,7 +319,7 @@ extern "C" {
         if (s_start_addr)
             rv = s_start_addr->val_;
         else
-            std::cout << MODEL_LABEL << "'" << START_SYMBOL << "' symbol not defined! Returning 0.";
+            vpi_printf("%s: '%s' symbol not defined! Returning 0.\n", MODEL_LABEL, START_SYMBOL);
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -327,7 +327,7 @@ extern "C" {
     void spect_dpi_set_model_start_pc(uint32_t start_pc)
     {
         DPI_CALL_LOG_ENTER
-        model->start_pc_ = start_pc;
+        model->SetStartPc(start_pc);
         DPI_CALL_LOG_EXIT
     }
 

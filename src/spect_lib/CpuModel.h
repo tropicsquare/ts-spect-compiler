@@ -100,6 +100,12 @@ class spect::CpuModel
         void UpdateRegisterEffects();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Sets address of first instruction to be executed
+        /// @param start_pc address of first instruction to be executed
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void SetStartPc(uint16_t start_pc);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Set data to model memory
         /// @param address Addresss to set
         /// @param data Data to set to the memory
@@ -302,9 +308,6 @@ class spect::CpuModel
         // SHA512 calculation unit - Direct access
         Sha512 sha_512_;
 
-        // Address of first instruction to be executed
-        uint16_t start_pc_ = SPECT_INSTR_MEM_BASE;
-
         // Program
         CpuProgram *program_ = NULL;
 
@@ -369,11 +372,15 @@ class spect::CpuModel
         ///////////////////////////////////////////////////////////////////////////////////////////
         bool end_executed_;
 
+        // Address of first instruction to be executed
+        uint16_t start_pc_ = SPECT_INSTR_MEM_BASE;
 
         uint32_t *MemToPtrs(CpuMemory mem, int *size);
         bool IsWithinMem(CpuMemory mem, uint16_t address);
 
         int ExecuteNextInstruction(int cycles);
+
+        void PrintChange(dpi_state_change_t change);
 
         void PrintArgs();
 
