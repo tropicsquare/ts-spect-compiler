@@ -9,6 +9,8 @@
 #ifndef SPECT_LIB_COMPILER_H_
 #define SPECT_LIB_COMPILER_H_
 
+#include <iostream>
+
 #include "Instruction.h"
 #include "Symbol.h"
 #include "SymbolTable.h"
@@ -33,6 +35,8 @@ class spect::Compiler
 
         int num_instr_ = 0;
 
+        std::ostream &std_out_ = std::cout;
+
     private:
         void TrimSpaces(std::string &input);
         uint32_t ParseValue(spect::SourceFile *sf, int line_nr, const std::string &val, spect::Symbol* &s, uint32_t limit = 0);
@@ -44,10 +48,10 @@ class spect::Compiler
         spect::CpuGpr ParseOp(spect::SourceFile *sf, int line_nr, std::string &arg);
 
     public:
-        static void Error(std::string err);
-        static void ErrorAt(std::string err, const SourceFile *sf, int line_nr);
-        static void Warning(std::string warn);
-        static void WarningAt(std::string warn, const SourceFile *sf, int line_nr);
+        void Error(std::string err);
+        void ErrorAt(std::string err, const SourceFile *sf, int line_nr);
+        void Warning(std::string warn);
+        void WarningAt(std::string warn, const SourceFile *sf, int line_nr);
 };
 
 #endif
