@@ -61,7 +61,7 @@ void spect::CpuProgram::Assemble(std::string path, spect::HexFileType hex_type)
             else
                 addr = first_addr_ + (4 * i);
 
-            ofs << addr;
+            ofs << addr << " ";
         }
         ofs << std::setw(8) << mem[i] << std::endl;
     }
