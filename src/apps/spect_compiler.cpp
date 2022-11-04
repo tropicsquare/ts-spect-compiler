@@ -21,7 +21,7 @@
 
 #include "OptionParser.h"
 
-enum  optionIndex { UNKNOWN, HELP, FIRST_ADDR, HEX_FORMAT, SIM_HEX};
+enum  optionIndex { UNKNOWN, HELP, FIRST_ADDR, HEX_FORMAT, HEX_FILE};
 
 const option::Descriptor usage[] =
 {
@@ -32,7 +32,7 @@ const option::Descriptor usage[] =
                                                                             "                           0 - Hex file for Instruction simulator or SPECT DPI model (default).\n"
                                                                             "                           1 - Hex file for Verilog model (address not included)\n"
                                                                             "                           2 - Hex file for Verilog model (address included).\n"},
-    {SIM_HEX,          0,  ""  ,    "sim-hex"       ,option::Arg::Optional, "  --hex-file=<file>       HEX file for simulator where code will be assembled."},
+    {HEX_FILE,         0,  ""  ,    "hex-file"      ,option::Arg::Optional, "  --hex-file=<file>       HEX file for simulator where code will be assembled."},
 
     {0,0,0,0,0,0}
 };
@@ -90,8 +90,8 @@ int main(int argc, char** argv)
         goto cleanup;
     }
 
-    if (options[SIM_HEX]) {
-        std::cout << "Assembling program to: " << options[SIM_HEX].arg << std::endl;
+    if (options[HEX_FILE]) {
+        std::cout << "Assembling program to: " << options[HEX_FILE].arg << std::endl;
         try {
             spect::HexFileType hex_type = spect::HexFileType::ISS_WORD;
             if (options[HEX_FORMAT]) {
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
                     hex_type = spect::HexFileType::VERILOG_ADDR_WORD;
             }
 
-            comp->program_->Assemble(std::string(options[SIM_HEX].arg), hex_type);
+            comp->program_->Assemble(std::string(options[HEX_FILE].arg), hex_type);
         } catch(std::runtime_error &err) {
             std::cout << err.what() << std::endl;
             ret_code = 1;
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 
     comp->CompileFinish();
 
-    comp->program_->Dump(comp->std_out_);
+    comp->program_->Dump(std::cout);
 
 cleanup:
     delete comp;

@@ -35,9 +35,13 @@ package spect_iss_dpi_pkg;
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
-    DPI_CHANGE_RAR              = (1 << 5),
-    DPI_CHANGE_RAR_SP           = (1 << 6)
+    DPI_CHANGE_RAR              = (1 << 5)
   } dpi_change_kind_t;
+
+  typedef enum {
+    DPI_SPECT_RAR_PUSH          = (1 << 0),
+    DPI_SPECT_RAR_POP           = (1 << 1)
+  } dpi_rar_change_kind_t;
 
   typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
@@ -60,10 +64,8 @@ package spect_iss_dpi_pkg;
     //      DPI_SPECT_INT_ERR
     //
     //  DPI_CHANGE_RAR:
-    //      0 - G_RAR_DEPTH - Index of RAR stack where changed occured
-    //
-    //  DPI_CHANGE_RAR_SP:
-    //      -
+    //      DPI_SPECT_RAR_PUSH - Push on stack
+    //      DPI_SPECT_RAR_POP - Pop from stack
     int unsigned      obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -82,10 +84,9 @@ package spect_iss_dpi_pkg;
     //      0 - Value of the interrupt
     //
     //  DPI_CHANGE_RAR:
-    //      0 - Bits 31:0 of RAR stack location
-    //
-    //  DPI_CAHNGE_RAR_SP:
-    //      Value of RAR stack pointer
+    //      obj == DPI_SPECT_RAR_PUSH (push) - Data pushed on stack
+    //      obj == DPI_SPECT_RAR_POP (pop) - Data popped from stack
+    //      both are valid only in "new_val".
     int unsigned      old_val[8] = '{default: 0};
     int unsigned      new_val[8] = '{default: 0};
   } dpi_state_change_t;
@@ -121,6 +122,13 @@ package spect_iss_dpi_pkg;
    *      6. Erase cycle counter for each instruction mnemonic.
    */
   import "DPI-C" function void spect_dpi_reset();
+
+  /**
+   * Checks if program has finished (END)
+   * @returns 0 - Program is not finished (it is being executed)
+   *          1 - Program is finished (END instruction as been executed)
+   */
+   import "DPI-C" function int unsigned spect_dpi_is_program_finished();
 
   /**
    * @brief Returns word from SPECT memory space.
@@ -276,11 +284,29 @@ package spect_iss_dpi_pkg;
    *  @brief Compile SPECT Program (.s assembly file) to hex file.
    *  @param program_path Path to .s file
    *  @param hex_path Path to output hex file
+   *  @param hex_format Format of Hex file to be generated.
+   *              0 - Hex file for SPECT model / Instrucction Set Simulator (ISS)
+   *              1 - Hex file for Verilog model (not addressed)
+   *              2 - Hex file for Verilog model (addressed)
    *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
-  import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path);
+  import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
+                                                                 int hex_format);
+
+  /**
+   *  @returns Start address from previously compiled program (value of `_start` symbol.)
+   *  @note Return value from this function is valid after previous call of
+   *        'spect_dpi_compile_program'.
+   */
+  import "DPI-C" function int unsigned spect_dpi_get_compiled_program_start_address();
+
+  /**
+   * Sets value of models "Start PC"
+   * @param value Value to be set as start_pc of model
+   */
+  import "DPI-C" function void spect_dpi_set_model_start_pc(int unsigned start_pc);
 
   /**
    *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,

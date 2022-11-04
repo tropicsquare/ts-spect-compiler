@@ -35,7 +35,8 @@ class spect::Compiler
 
         int num_instr_ = 0;
 
-        std::ostream &std_out_ = std::cout;
+        // Print function
+        int (*print_fnc)(const char *format, ...);
 
     private:
         void TrimSpaces(std::string &input);

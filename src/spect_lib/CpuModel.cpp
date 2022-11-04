@@ -23,7 +23,8 @@ spect::CpuModel::CpuModel(bool instr_mem_rw) :
     instr_mem_rw_(instr_mem_rw)
 {
     memory_ = new uint32_t[SPECT_TOTAL_MEM_SIZE / 4];
-    regs_ = new ordt_root(SPECT_CONFIG_REGS_BASE, SPECT_CONFIG_REGS_BASE + SPECT_CONFIG_REGS_SIZE);
+    regs_ = new ordt_root();
+    print_fnc = &(printf);
     Reset();
 }
 
@@ -39,8 +40,8 @@ void spect::CpuModel::Start()
     DebugInfo(VERBOSITY_LOW, "First instruction address:", start_pc_);
     SetPc(start_pc_);
 
-    ordt_data wdata(1, 0);
-    regs_->r_status.f_idle.write(wdata);
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT is clearing STATUS[IDLE] = 0.");
+    regs_->r_status.f_idle.data = 0;
     UpdateInterrupts();
 
     end_executed_ = false;
@@ -53,22 +54,26 @@ void spect::CpuModel::Finish(int status_err)
 {
     end_executed_ = true;
     DebugInfo(VERBOSITY_LOW, "Finishing program execution...");
-    ordt_data wdata(1,0);
-    ordt_data wdata_err(1,0);
-    wdata[0] = 1;
-    wdata_err[0] = status_err;
-    regs_->r_status.f_idle.write(wdata);
-    regs_->r_status.f_done.write(wdata);
-    regs_->r_status.f_err.write(wdata_err);
 
-    DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[DONE] =", wdata[0]);
-    DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[IDLE] =", wdata[0]);
-    DebugInfo(VERBOSITY_MEDIUM, "Setting STATUS[ERR]  =", status_err);
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[IDLE] = 1.");
+    regs_->r_status.f_idle.data = 1;
+
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[DONE] = 1.");
+    regs_->r_status.f_done.data = 1;
+
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[ERR] = ", status_err);
+    regs_->r_status.f_err.data = status_err;
 }
 
 bool spect::CpuModel::IsFinished()
 {
     return end_executed_;
+}
+
+void spect::CpuModel::SetStartPc(uint16_t start_pc)
+{
+    DebugInfo(VERBOSITY_MEDIUM, "Setting Start PC to:", start_pc);
+    start_pc_ = start_pc;
 }
 
 void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
@@ -78,9 +83,8 @@ void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
     memory_[address >> 2] = data;
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ordt_data wdata(1, 0);
-        wdata[0] = data;
-        regs_->write(address, wdata);
+        ordt_data wdata(1, data);
+        regs_->write(address - SPECT_CONFIG_REGS_BASE, wdata);
         UpdateInterrupts();
         UpdateRegisterEffects();
     }
@@ -92,7 +96,7 @@ uint32_t spect::CpuModel::GetMemory(uint16_t address)
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
         ordt_data rdata(1, 0);
-        regs_->read(address, rdata);
+        regs_->read(address - SPECT_CONFIG_REGS_BASE, rdata);
         rv = rdata[0];
     }
 
@@ -115,9 +119,8 @@ void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
         memory_[address >> 2] = data;
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ordt_data wdata(1, 0);
-        wdata[0] = data;
-        regs_->write(address, wdata);
+        ordt_data wdata(1, data);
+        regs_->write(address - SPECT_CONFIG_REGS_BASE, wdata);
         UpdateInterrupts();
         UpdateRegisterEffects();
     }
@@ -133,7 +136,7 @@ uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
         ordt_data rdata(1, 0);
-        regs_->read(address, rdata);
+        regs_->read(address - SPECT_CONFIG_REGS_BASE, rdata);
         rv = rdata[0];
     }
 
@@ -325,22 +328,8 @@ uint256_t spect::CpuModel::GpkQueuePop(uint32_t index)
 void spect::CpuModel::ReportChange(dpi_state_change_t change)
 {
     if (change_reporting_) {
-        DebugInfo(VERBOSITY_HIGH, "Pushing following change to SPECT model change queue:");
-        DebugInfo(VERBOSITY_HIGH, "     kind:      ", change.kind);
-        DebugInfo(VERBOSITY_HIGH, "     obj:       ", change.obj);
-
-        // TODO: Maybe convert only to single line to keep it shorter
-        for (int i = 0; i < 8; i++) {
-            char buf[16];
-            sprintf(buf, "old_val[%d]:", i);
-            DebugInfo(VERBOSITY_HIGH, "    ", buf, change.old_val[i]);
-        }
-        for (int i = 0; i < 8; i++) {
-            char buf[16];
-            sprintf(buf, "new_val[%d]:", i);
-            DebugInfo(VERBOSITY_HIGH, "    ", buf, change.new_val[i]);
-        }
-
+        DebugInfo(VERBOSITY_HIGH, "Pushing change to model change queue:");
+        PrintChange(change);
         change_q_.push(change);
     }
 }
@@ -357,13 +346,27 @@ dpi_state_change_t spect::CpuModel::ConsumeChange()
     rv = change_q_.front();
     change_q_.pop();
 
-    DebugInfo(VERBOSITY_HIGH, "Popping following change to SPECT model change queue:");
-    DebugInfo(VERBOSITY_HIGH, "     kind:   ", rv.kind);
-    DebugInfo(VERBOSITY_HIGH, "     obj:    ", rv.obj);
-    DebugInfo(VERBOSITY_HIGH, "     old_val:", rv.old_val);
-    DebugInfo(VERBOSITY_HIGH, "     new_val:", rv.old_val);
+    DebugInfo(VERBOSITY_HIGH, "Popping change from model change queue:");
+    PrintChange(rv);
 
     return rv;
+}
+
+void spect::CpuModel::PrintChange(dpi_state_change_t change)
+{
+    DebugInfo(VERBOSITY_HIGH, "     kind:      ", dpi_change_kind_to_str(change.kind));
+    DebugInfo(VERBOSITY_HIGH, "     obj:       ", dpi_change_obj_to_str(change.kind, change.obj));
+
+    char buf[100];
+    sprintf(buf, "old_val: %08x %08x %08x %08x %08x %08x %08x %08x",
+                change.old_val[7], change.old_val[6], change.old_val[5], change.old_val[4],
+                change.old_val[3], change.old_val[2], change.old_val[1], change.old_val[0]);
+    DebugInfo(VERBOSITY_HIGH, "    ", buf);
+
+    sprintf(buf, "new_val: %08x %08x %08x %08x %08x %08x %08x %08x",
+                change.new_val[7], change.new_val[6], change.new_val[5], change.new_val[4],
+                change.new_val[3], change.new_val[2], change.new_val[1], change.new_val[0]);
+    DebugInfo(VERBOSITY_HIGH, "    ", buf);
 }
 
 bool spect::CpuModel::HasChange()
@@ -421,7 +424,7 @@ void spect::CpuModel::Reset()
 
     // Re-create new register model -> Erase registers to reset values.
     delete regs_;
-    regs_ = new ordt_root(SPECT_CONFIG_REGS_BASE, SPECT_CONFIG_REGS_BASE + SPECT_CONFIG_REGS_SIZE);
+    regs_ = new ordt_root();
 
     // To make browsing logs easier
     DebugInfo(VERBOSITY_LOW, "");
@@ -442,32 +445,21 @@ void spect::CpuModel::UpdateInterrupts()
     DEFINE_CHANGE(ch_int_done, DPI_CHANGE_INT, DPI_SPECT_INT_DONE);
     DEFINE_CHANGE(ch_int_err, DPI_CHANGE_INT, DPI_SPECT_INT_ERR);
     if (change_reporting_) {
-        ordt_data rdata(1, 0);
-        regs_->r_status.f_done.read(rdata);
-        ch_int_done.old_val[0] = rdata[0];
-        regs_->r_status.f_err.read(rdata);
-        ch_int_err.old_val[0] = rdata[0];
+        ch_int_done.old_val[0] = regs_->r_status.f_done.data;
+        ch_int_err.old_val[0] = regs_->r_status.f_err.data;
     }
 
-    regs_->r_status.f_done.read(status);
-    regs_->r_int_ena.f_int_done_en.read(en);
-
-    // TODO: Writing register values needs to be debugged!
-    int_done_ = (en[0] == 1 && status[0] == 1);
+    int_done_ = (regs_->r_int_ena.f_int_done_en.data == 1 &&
+                 regs_->r_status.f_done.data == 1);
     DebugInfo(VERBOSITY_MEDIUM, "Setting int_done     =", int_done_);
 
-    regs_->r_status.f_err.read(status);
-    regs_->r_int_ena.f_int_err_en.read(en);
-
-    int_err_ = (en[0] == 1 && status[0] == 1);
+    int_err_ = (regs_->r_int_ena.f_int_err_en.data == 1 &&
+                regs_->r_status.f_err.data == 1);
     DebugInfo(VERBOSITY_MEDIUM, "Setting int_err      =", int_err_);
 
     // Construct and report model change
-    ordt_data rdata(1, 0);
-    regs_->r_status.f_done.read(rdata);
-    ch_int_done.new_val[0] = rdata[0];
-    regs_->r_status.f_err.read(rdata);
-    ch_int_err.new_val[0] = rdata[0];
+    ch_int_done.new_val[0] = regs_->r_status.f_done.data;
+    ch_int_err.new_val[0] = regs_->r_status.f_err.data;
 
     ReportChange(ch_int_done);
     ReportChange(ch_int_err);
@@ -478,15 +470,16 @@ void spect::CpuModel::UpdateRegisterEffects()
     DebugInfo(VERBOSITY_LOW, "Updating Register effects");
 
     // COMMAND[START] == 1
-    ordt_data val(1,0);
-    regs_->r_command.f_start.read(val);
-    if (val[0] == 1)
+    if (regs_->r_command.f_start.data == 1) {
+        DebugInfo(VERBOSITY_LOW, "Written COMMAND[START] = 1.");
         Start();
+    }
 
     // COMMAND[SOFT_RESET] == 1
-    regs_->r_command.f_start.read(val);
-    if (val[0] == 1)
+    if (regs_->r_command.f_soft_reset.data == 1) {
+        DebugInfo(VERBOSITY_LOW, "Written COMMAND[SOFT_RESET] = 1.");
         Reset();
+    }
 }
 
 int spect::CpuModel::ExecuteNextInstruction(int cycles)
@@ -595,27 +588,29 @@ bool spect::CpuModel::IsWithinMem(CpuMemory mem, uint16_t address)
 
 void spect::CpuModel::PrintArgs()
 {
-    std::cout << std::endl;
+    print_fnc("\n");
 }
 
 template<typename Arg>
 void spect::CpuModel::PrintArgs(Arg arg)
 {
-    std::cout << arg << std::endl;
+    std::stringstream ss;
+    ss << std::hex << arg << std::endl;
+    print_fnc(ss.str().c_str());
 }
 
 template<typename First, typename... Args>
 void spect::CpuModel::PrintArgs(First first, Args... args)
 {
-    std::cout << first << " ";
+    std::stringstream ss;
+    ss << std::hex << first << " ";
+    print_fnc(ss.str().c_str());
     PrintArgs(args...);
 }
 
 template<typename... Args>
 void spect::CpuModel::DebugInfo(uint32_t verbosity_level, const Args ...args)
 {
-    if (verbosity_ >= verbosity_level) {
-        std::cout << MODEL_LABEL;
-        PrintArgs(args...);
-    }
+    if (verbosity_ >= verbosity_level)
+        PrintArgs(MODEL_LABEL, args...);
 }
