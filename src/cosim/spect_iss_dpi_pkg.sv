@@ -124,6 +124,13 @@ package spect_iss_dpi_pkg;
   import "DPI-C" function void spect_dpi_reset();
 
   /**
+   * Checks if program has finished (END)
+   * @returns 0 - Program is not finished (it is being executed)
+   *          1 - Program is finished (END instruction as been executed)
+   */
+   import "DPI-C" function int unsigned spect_dpi_is_program_finished();
+
+  /**
    * @brief Returns word from SPECT memory space.
    * @param addr Address to return
    * @returns Value read from the SPECT memory space.
@@ -277,11 +284,29 @@ package spect_iss_dpi_pkg;
    *  @brief Compile SPECT Program (.s assembly file) to hex file.
    *  @param program_path Path to .s file
    *  @param hex_path Path to output hex file
+   *  @param hex_format Format of Hex file to be generated.
+   *              0 - Hex file for SPECT model / Instrucction Set Simulator (ISS)
+   *              1 - Hex file for Verilog model (not addressed)
+   *              2 - Hex file for Verilog model (addressed)
    *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
-  import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path);
+  import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
+                                                                 const int hex_format);
+
+  /**
+   *  @returns Start address from previously compiled program (value of `_start` symbol.)
+   *  @note Return value from this function is valid after previous call of
+   *        'spect_dpi_compile_program'.
+   */
+  import "DPI-C" function int unsigned spect_dpi_get_compiled_program_start_address();
+
+  /**
+   * Sets value of models "Start PC"
+   * @param value Value to be set as start_pc of model
+   */
+  import "DPI-C" functionvoid spect_dpi_set_model_start_pc(int unsigned start_pc);
 
   /**
    *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,
