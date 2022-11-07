@@ -330,7 +330,7 @@ bool spect::InstructionGRV::Execute()
 
     model_->SetGpr(TO_INT(op1_), model_->GrvQueuePop());
 
-    PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
+    PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
     model_->ReportChange(ch_gpr);
 
     return true;
