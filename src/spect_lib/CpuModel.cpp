@@ -444,10 +444,8 @@ void spect::CpuModel::UpdateInterrupts()
 
     DEFINE_CHANGE(ch_int_done, DPI_CHANGE_INT, DPI_SPECT_INT_DONE);
     DEFINE_CHANGE(ch_int_err, DPI_CHANGE_INT, DPI_SPECT_INT_ERR);
-    if (change_reporting_) {
-        ch_int_done.old_val[0] = regs_->r_status.f_done.data;
-        ch_int_err.old_val[0] = regs_->r_status.f_err.data;
-    }
+    ch_int_done.old_val[0] = int_done_;
+    ch_int_err.old_val[0] = int_err_;
 
     int_done_ = (regs_->r_int_ena.f_int_done_en.data == 1 &&
                  regs_->r_status.f_done.data == 1);
@@ -458,11 +456,13 @@ void spect::CpuModel::UpdateInterrupts()
     DebugInfo(VERBOSITY_MEDIUM, "Setting int_err      =", int_err_);
 
     // Construct and report model change
-    ch_int_done.new_val[0] = regs_->r_status.f_done.data;
-    ch_int_err.new_val[0] = regs_->r_status.f_err.data;
+    ch_int_done.new_val[0] = int_done_;
+    ch_int_err.new_val[0] = int_err_;
 
-    ReportChange(ch_int_done);
-    ReportChange(ch_int_err);
+    if (ch_int_done.old_val[0] != ch_int_done.new_val[0])
+        ReportChange(ch_int_done);
+    if (ch_int_err.old_val[0] != ch_int_err.new_val[0])
+        ReportChange(ch_int_err);
 }
 
 void spect::CpuModel::UpdateRegisterEffects()
