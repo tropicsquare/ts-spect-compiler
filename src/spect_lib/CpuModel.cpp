@@ -63,6 +63,9 @@ void spect::CpuModel::Finish(int status_err)
 
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[ERR] = ", status_err);
     regs_->r_status.f_err.data = status_err;
+
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting SRR = ", gpr_[31]);
+    SetSrr(gpr_[31]);
 }
 
 bool spect::CpuModel::IsFinished()
