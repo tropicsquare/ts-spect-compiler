@@ -277,7 +277,7 @@ void spect::CpuModel::RarPush(uint16_t ret_addr)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Pushing", ret_addr, "to RAR stack.");
 
-    if (GetRarSp() == SPECT_RAR_DEPTH - 1)
+    if (GetRarSp() == SPECT_RAR_DEPTH)
         DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack overflow");
 
     rar_stack_[rar_sp_] = ret_addr;
@@ -286,13 +286,13 @@ void spect::CpuModel::RarPush(uint16_t ret_addr)
 
 uint16_t spect::CpuModel::RarPop()
 {
-    uint16_t rv = GetRarAt(GetRarSp());
-
     if (GetRarSp() == 0)
         DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack underflow");
 
-    DebugInfo(VERBOSITY_MEDIUM, "Poping ", rv, "from RAR stack.");
     SetRarSp(GetRarSp() - 1);
+    uint16_t rv = GetRarAt(GetRarSp());
+
+    DebugInfo(VERBOSITY_MEDIUM, "Poping ", rv, "from RAR stack.");
 
     return rv;
 }
