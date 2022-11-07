@@ -529,17 +529,8 @@ bool spect::InstructionST::Execute()
 {
     uint256_t tmp =  model_->GetGpr(TO_INT(op1_));
     for (int i = 0; i < 8; i++) {
-
-        DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, addr_ + i);
-        if (model_->change_reporting_)
-            ch_mem.old_val[0] = model_->GetMemory(addr_ + i);
-
-        uint32_t written = model_->WriteMemoryCoreData(addr_ + i,
-                            static_cast<uint32_t>(tmp & uint256_t("0xFFFFFFFF")));
-
-        ch_mem.new_val[0] = written;
-        model_->ReportChange(ch_mem);
-
+        model_->WriteMemoryCoreData(addr_ + i,
+                    static_cast<uint32_t>(tmp & uint256_t("0xFFFFFFFF")));
         tmp = tmp >> 32;
     }
     return true;

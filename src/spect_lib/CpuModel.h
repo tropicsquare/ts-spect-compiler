@@ -112,7 +112,8 @@ class spect::CpuModel
         /// @note This function does not implement any memory access restrictions it "forces"
         ///       memory location to the 'data' argument.
         /// @note Model implements flat 16 bit of address space even in locations where real HW does
-        //        not have any memory. This function can use also this 'nonexistent' memory.
+        ///       not have any memory. This function can use also this 'nonexistent' memory.
+        /// @note This function does NOT report change to Report queue.
         ///////////////////////////////////////////////////////////////////////////////////////////
         void SetMemory(uint16_t address, uint32_t data);
 
@@ -146,10 +147,12 @@ class spect::CpuModel
         /// @brief Write from the model space as-if via AHB bus
         /// @param address Addresss to write
         /// @param data Data to be written
+        /// @returns Value actually written to the memory
         /// @note This function implements AHB R/W restrictions as defined in SPECT specification
         ///         (e.g. Const ROM is not writable from AHB).
+        /// @note This function reports change to Report queue.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void WriteMemoryAhb(uint16_t address, uint32_t data);
+        uint32_t WriteMemoryAhb(uint16_t address, uint32_t data);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Read from model memory space as if done by Core data port (LD instruction)
@@ -167,6 +170,7 @@ class spect::CpuModel
         /// @returns Data at the memory location after it was written.
         /// @note This function implements Read/Write restrictions as defined in SPECT specification
         ///         (e.g. Const ROM is not writable by SPECT Core)
+        /// @note This function reports change to Report queue.
         ///////////////////////////////////////////////////////////////////////////////////////////
         uint32_t WriteMemoryCoreData(uint16_t address, uint32_t data);
 

@@ -110,20 +110,36 @@ uint32_t* spect::CpuModel::GetMemoryPtr()
     return memory_;
 }
 
-void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
+uint32_t spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "AHB Write", address, "data:", data);
 
+    DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
+    ch_mem.old_val[0] = memory_[address >> 2];
+    uint32_t written = 0;
+
     if ( IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
-        (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_rw_))
+        (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_rw_)) {
         memory_[address >> 2] = data;
+        written = data;
+    }
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
         ordt_data wdata(1, data);
         regs_->write(address - SPECT_CONFIG_REGS_BASE, wdata);
         UpdateInterrupts();
         UpdateRegisterEffects();
+
+        ordt_data rdata(1, 0);
+        regs_->read(address - SPECT_CONFIG_REGS_BASE, rdata);
+        written = rdata[0];
     }
+
+    ch_mem.new_val[0] = written;
+    if (ch_mem.new_val[0] != ch_mem.old_val[0])
+        ReportChange(ch_mem);
+
+    return written;
 }
 
 uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
@@ -160,11 +176,21 @@ uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Core Write", address, "data:", data);
 
+    uint32_t written = 0;
+    DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
+    ch_mem.old_val[0] = memory_[address >> 2];
+
     if (IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         IsWithinMem(CpuMemory::DATA_RAM_OUT, address)) {
         memory_[address >> 2] = data;
+        written = data;
     }
-    return memory_[address >> 2];
+
+    ch_mem.new_val[0] = written;
+    if (ch_mem.new_val[0] != ch_mem.old_val[0])
+        ReportChange(ch_mem);
+
+    return written;
 }
 
 uint32_t spect::CpuModel::ReadMemoryCoreFetch(uint16_t address)
