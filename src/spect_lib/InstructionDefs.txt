@@ -2,7 +2,7 @@ TYPE          MNEMONIC         OPCODE        FUNC       OPERAND MASK (op1,op2,op
 ----------------------------------------------------------------------------------
 R               ADD            0b0001        0b001          0b111
 R               SUB            0b0010        0b001          0b111
-R               CMP            0b0011        0b001          0b011
+R               CMP            0b0100        0b001          0b011
 R               AND            0b0001        0b010          0b111
 R                OR            0b0010        0b010          0b111
 R               XOR            0b0100        0b010          0b111
