@@ -217,7 +217,7 @@ class spect::CpuModel
         /// @returns data from HEAD of the queue
         /// @note This function is used by instruction model when executing GRV instruction.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint256_t GrvQueuePop();
+        uint32_t GrvQueuePop();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Push data to GPK Queue
@@ -234,7 +234,7 @@ class spect::CpuModel
         /// @returns data from HEAD of the queue
         /// @note This function is used by instruction model when executing GPK instruction.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint256_t GpkQueuePop(uint32_t index);
+        uint32_t GpkQueuePop(uint32_t index);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Report Change on the CPU model
@@ -355,11 +355,11 @@ class spect::CpuModel
         bool int_err_ = false;
 
         // Random value queue, source of data provided by GRV instruction
-        std::queue<uint256_t> grv_q_;
+        std::queue<uint32_t> grv_q_;
 
         // Private Key queues, source of data provided by GPK instruction
         // queue is selected by immediate[2:0]
-        std::queue<uint256_t> gpk_q_[8];
+        std::queue<uint32_t> gpk_q_[8];
 
         // Queue for processor state changes
         std::queue<dpi_state_change_t> change_q_;

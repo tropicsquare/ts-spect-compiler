@@ -329,11 +329,15 @@ void spect::CpuModel::GrvQueuePush(uint32_t data)
     grv_q_.push(data);
 }
 
-uint256_t spect::CpuModel::GrvQueuePop()
+uint32_t spect::CpuModel::GrvQueuePop()
 {
-    uint256_t rv = grv_q_.front();
-    grv_q_.pop();
-    DebugInfo(VERBOSITY_HIGH, "Popping from GRV queue:", rv);
+    uint32_t rv = 0;
+    if (!grv_q_.empty()) {
+        rv = grv_q_.front();
+        grv_q_.pop();
+        DebugInfo(VERBOSITY_HIGH, "Popping from GRV queue:", rv);
+    } else
+        DebugInfo(VERBOSITY_LOW, "Popping from empty GRV queue, returning 0");
     return rv;
 }
 
@@ -343,11 +347,15 @@ void spect::CpuModel::GpkQueuePush(uint32_t index, uint32_t data)
     gpk_q_[index].push(data);
 }
 
-uint256_t spect::CpuModel::GpkQueuePop(uint32_t index)
+uint32_t spect::CpuModel::GpkQueuePop(uint32_t index)
 {
-    uint256_t rv = gpk_q_[index].front();
-    gpk_q_[index].pop();
-    DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", rv);
+    uint32_t rv = 0;
+    if (!gpk_q_[index].empty()) {
+        uint32_t rv = gpk_q_[index].front();
+        gpk_q_[index].pop();
+        DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", rv);
+    } else
+        DebugInfo(VERBOSITY_LOW, "Popping from empty GPK queue", index, ": returning 0");
     return rv;
 }
 

@@ -328,7 +328,13 @@ bool spect::InstructionGRV::Execute()
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    model_->SetGpr(TO_INT(op1_), model_->GrvQueuePop());
+    uint256_t tmp = 0;
+    for (int i = 0; i < 8; i++) {
+        uint256_t part = model_->GrvQueuePop();
+        part = part << (32 * i);
+        tmp = tmp | part;
+    }
+    model_->SetGpr(TO_INT(op1_), tmp);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
     model_->ReportChange(ch_gpr);
@@ -495,7 +501,13 @@ bool spect::InstructionGPK::Execute()
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
     int index = immediate_ & 0x7;
-    model_->SetGpr(TO_INT(op1_), model_->GpkQueuePop(index));
+    uint256_t tmp = 0;
+    for (int i = 0; i < 8; i++) {
+        uint256_t part = model_->GpkQueuePop(index);
+        part = part << (32 * i);
+        tmp = tmp | part;
+    }
+    model_->SetGpr(TO_INT(op1_), tmp);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
     model_->ReportChange(ch_gpr);
