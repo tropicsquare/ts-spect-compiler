@@ -558,7 +558,7 @@ bool spect::InstructionCALL::Execute()
     model_->RarPush(ret_addr);
     model_->SetPc(new_pc_);
 
-    ch_rar.new_val[0] = model_->GetRarAt(model_->GetRarSp());
+    ch_rar.new_val[0] = ret_addr;
     model_->ReportChange(ch_rar);
 
     return false;
