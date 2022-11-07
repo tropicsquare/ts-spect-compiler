@@ -43,6 +43,12 @@ package spect_iss_dpi_pkg;
     DPI_SPECT_RAR_POP           = (1 << 1)
   } dpi_rar_change_kind_t;
 
+  typedef enum {
+    DPI_HEX_ISS_WORD            = (1 << 0),
+    DPI_HEX_VERILOG_RAW_WORD    = (1 << 1),
+    DPI_HEX_VERILOG_ADDR_WORD   = (1 << 2)
+  } dpi_hex_file_type_t;
+
   typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
@@ -285,15 +291,15 @@ package spect_iss_dpi_pkg;
    *  @param program_path Path to .s file
    *  @param hex_path Path to output hex file
    *  @param hex_format Format of Hex file to be generated.
-   *              0 - Hex file for SPECT model / Instrucction Set Simulator (ISS)
-   *              1 - Hex file for Verilog model (not addressed)
-   *              2 - Hex file for Verilog model (addressed)
+   *              DPI_HEX_ISS_WORD            - Instruction set simulator
+   *              DPI_HEX_VERILOG_RAW_WORD    - Verilog unadressed
+   *              DPI_HEX_VERILOG_ADDR_WORD   - Verilog addressed
    *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
   import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
-                                                                 int hex_format);
+                                                                 dpi_hex_file_type_t hex_format);
 
   /**
    *  @returns Start address from previously compiled program (value of `_start` symbol.)

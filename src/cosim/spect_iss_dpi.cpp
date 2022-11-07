@@ -289,7 +289,7 @@ extern "C" {
     }
 
     uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
-                                       const int hex_format)
+                                       const dpi_hex_file_type_t hex_format)
     {
         DPI_CALL_LOG_ENTER
         uint32_t err;
@@ -297,9 +297,21 @@ extern "C" {
         try {
             compiler->Compile(std::string(program_path));
 
+            spect::HexFileType internal_hex_type;
+            switch (hex_format) {
+            case DPI_HEX_ISS_WORD:
+                internal_hex_type = spect::HexFileType::ISS_WORD;
+                break;
+            case DPI_HEX_VERILOG_RAW_WORD:
+                internal_hex_type = spect::HexFileType::VERILOG_RAW_WORD;
+                break;
+            case DPI_HEX_VERILOG_ADDR_WORD:
+                internal_hex_type = spect::HexFileType::VERILOG_ADDR_WORD;
+                break;
+            }
             err = compiler->CompileFinish();
             if (!err)
-                compiler->program_->Assemble(std::string(hex_path), (spect::HexFileType) hex_format);
+                compiler->program_->Assemble(std::string(hex_path), (spect::HexFileType) internal_hex_type);
 
         } catch(std::runtime_error &exception) {
             vpi_printf("%s Failed to compile program: %s\n",

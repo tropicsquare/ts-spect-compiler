@@ -46,6 +46,12 @@ typedef enum {
     DPI_CHANGE_RAR              = (1 << 5)
 } dpi_change_kind_t;
 
+typedef enum {
+    DPI_HEX_ISS_WORD            = (1 << 0),
+    DPI_HEX_VERILOG_RAW_WORD    = (1 << 1),
+    DPI_HEX_VERILOG_ADDR_WORD   = (1 << 2)
+} dpi_hex_file_type_t;
+
 inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {
     switch (in){
     case DPI_CHANGE_GPR  : return std::string("DPI_CHANGE_GPR");
