@@ -424,7 +424,7 @@ void spect::Compiler::Error(std::string err)
 void spect::Compiler::WarningAt(std::string warn, const SourceFile *sf, int line_nr)
 {
     print_fnc("\033[1m");
-    print_fnc("%s:%d:\n", sf->path_, line_nr);
+    print_fnc("%s:%d:", sf->path_.c_str(), line_nr);
     print_fnc("\033[33m Warning: \033[0m");
     print_fnc("%s\n", warn.c_str());
     print_fnc("%s\n", sf->lines_[line_nr - 1].c_str());
