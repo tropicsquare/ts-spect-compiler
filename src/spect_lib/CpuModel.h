@@ -266,6 +266,15 @@ class spect::CpuModel
         template<class... T>
         void DebugInfo(uint32_t verbosity_level, const T ...args);
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Print current state of SHA512 unit context
+        /// @param verbosity_level Verbosity of the message
+        ///         VERBOSITY_NONE      - Always shown
+        ///         VERBOSITY_LOW       - Shown when verbosity is 1 or higher
+        ///         VERBOSITY_MEDIUM    - Shown when verbosity is 2 or higher
+        ///         VERBOSITY_HIGH      - Shown when verbosity is 3 or higher
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void PrintHashContext(uint32_t verbosity_level);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////

@@ -406,6 +406,16 @@ void spect::CpuModel::PrintChange(dpi_state_change_t change)
     DebugInfo(VERBOSITY_HIGH, "    ", buf);
 }
 
+void spect::CpuModel::PrintHashContext(uint32_t verbosity_level)
+{
+    for (int i = 0; i < 8; i++) {
+        std::stringstream ss;
+        ss << "W[" << i << "] = ";
+        ss << std::hex << std::setw(16) << sha_512_.getContext(i);
+        DebugInfo(verbosity_level, ss.str().c_str());
+    }
+}
+
 bool spect::CpuModel::HasChange()
 {
     return !change_q_.empty();

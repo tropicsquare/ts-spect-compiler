@@ -282,38 +282,49 @@ bool spect::InstructionHASH::Execute()
     PUT_GPR_TO_CHANGE(ch_gpr_1, old_val, model_->GetGpr(TO_INT(op1_)));
     PUT_GPR_TO_CHANGE(ch_gpr_2, old_val, model_->GetGpr((TO_INT(op1_) + 1) % 32));
 
-    uint1024_t tmp = uint1024_t("0");
-    for (int i = 3; i >=0; i--) {
-        uint1024_t padded = model_->GetGpr((TO_INT(op2_) + i) % 32);
-        tmp = tmp | padded;
-        if (i > 0)
-            tmp = tmp << 256;
+    // Convert registers op2_ .. op2_+3 to input message (must be character stream)
+    unsigned char msg[128];
+    for (int i = 3; i >= 0; i--) {
+        uint256_t tmp = model_->GetGpr((TO_INT(op2_) + i) % 32);
+        for (int j = 0; j < 32; j++) {
+            uint8_t byte = (uint8_t)((tmp >> (248 - (j * 8))) & uint256_t("0xFF"));
+            msg[((3 - i) * 32) + j] = byte;
+        }
     }
-    // TODO: Clean-up
-    //std::cout << "Hash input:" << std::endl;
-    //std::cout << tmp << std::endl;
 
+    // Print Message
+    model_->DebugInfo(VERBOSITY_HIGH, "Hash input message:");
     std::stringstream ss;
-    ss << std::setfill('0') << std::setw(256) << std::hex << tmp;
-    //std::cout << "Hash input stream:" << std::endl;
-    //std::cout << ss.str() << std::endl;
+    ss << std::hex << std::setw(2);
+    for (int i = 0; i < 128; i++)
+        ss << (int)msg[i] << " ";
+    model_->DebugInfo(VERBOSITY_HIGH, ss.str().c_str());
+    model_->DebugInfo(VERBOSITY_HIGH, "");
 
-    model_->sha_512_.update((unsigned char*)ss.str().c_str(), 1024);
+    // Print context before, calculate, Print context after
+    model_->DebugInfo(VERBOSITY_HIGH, "Hash context (before):");
+    model_->PrintHashContext(VERBOSITY_HIGH);
+    model_->DebugInfo(VERBOSITY_HIGH, "");
 
-    // Get current state of HASH context
+    model_->sha_512_.update((unsigned char*)msg, 128);
+
+    model_->DebugInfo(VERBOSITY_HIGH, "Hash context (after):");
+    model_->PrintHashContext(VERBOSITY_HIGH);
+    model_->DebugInfo(VERBOSITY_HIGH, "");
+
+    // Put current HASH context to op1_, op1_+1
     for (int i = 0; i < 2; i++) {
         uint256_t reg = uint256_t(0);
-        for (int j = 0; j < 4; j++) {
-            uint256_t state = uint256_t(model_->sha_512_.getContext(i * 4 + j));
-            reg = reg | (state << (j * 64));
-        }
-        model_->SetGpr((TO_INT(op1_) + i) % 32, reg);
-    }
 
-    // TODO: Check that HASH calculates correctly!!!
-    //std::cout << "Hash result:" << std::endl;
-    //std::cout << std::hex << model_->GetGpr((TO_INT(op1_) + 1) % 32) << std::endl;
-    //std::cout << std::hex << model_->GetGpr(TO_INT(op1_)) << std::endl;
+        for (int j = 0; j < 4; j++) {
+            unsigned long long ctx = model_->sha_512_.getContext((i * 4) + j);
+            reg = reg | uint256_t(ctx);
+            if (j < 3)
+                reg = reg << 64;
+        }
+
+        model_->SetGpr((TO_INT(op1_) + (1 - i)) % 32, reg);
+    }
 
     PUT_GPR_TO_CHANGE(ch_gpr_1, new_val, model_->GetGpr(TO_INT(op1_)));
     PUT_GPR_TO_CHANGE(ch_gpr_2, new_val, model_->GetGpr((TO_INT(op1_) + 1) % 32));

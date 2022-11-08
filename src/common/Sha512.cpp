@@ -1,7 +1,7 @@
 /*
  * Updated to C++, zedwood.com 2012
  * Based on Olivier Gay's version
- * See Modified BSD License below: 
+ * See Modified BSD License below:
  *
  * FIPS 180-2 SHA-224/256/384/512 implementation
  * Issue date:  04/30/2005
@@ -39,7 +39,7 @@
 #include <fstream>
 
 #include "Sha512.h"
- 
+
 const unsigned long long Sha512::sha512_k[80] = //ULL = uint64
             {0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL,
              0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
@@ -81,7 +81,7 @@ const unsigned long long Sha512::sha512_k[80] = //ULL = uint64
              0x3c9ebe0a15c9bebcULL, 0x431d67c49c100d4cULL,
              0x4cc5d4becb3e42b6ULL, 0x597f299cfc657e2aULL,
              0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL};
- 
+
 void Sha512::transform(const unsigned char *message, unsigned int block_nb)
 {
     uint64 w[80];
@@ -116,10 +116,10 @@ void Sha512::transform(const unsigned char *message, unsigned int block_nb)
         for (j = 0; j < 8; j++) {
             m_h[j] += wv[j];
         }
- 
+
     }
 }
- 
+
 void Sha512::init()
 {
     m_h[0] = 0x6a09e667f3bcc908ULL;
@@ -128,8 +128,9 @@ void Sha512::init()
     m_h[3] = 0xa54ff53a5f1d36f1ULL;
     m_h[4] = 0x510e527fade682d1ULL;
     m_h[5] = 0x9b05688c2b3e6c1fULL;
-    m_h[6] = 0x1f83d9abfb41bd6bULL; 
+    m_h[6] = 0x1f83d9abfb41bd6bULL;
     m_h[7] = 0x5be0cd19137e2179ULL;
+
     m_len = 0;
     m_tot_len = 0;
 }
@@ -138,7 +139,7 @@ uint64_t Sha512::getContext(int index)
 {
     return m_h[index];
 }
- 
+
 void Sha512::update(const unsigned char *message, unsigned int len)
 {
     unsigned int block_nb;
@@ -161,7 +162,7 @@ void Sha512::update(const unsigned char *message, unsigned int len)
     m_len = rem_len;
     m_tot_len += (block_nb + 1) << 7;
 }
- 
+
 void Sha512::final(unsigned char *digest)
 {
     unsigned int block_nb;
@@ -180,7 +181,7 @@ void Sha512::final(unsigned char *digest)
         SHA2_UNPACK64(m_h[i], &digest[i << 3]);
     }
 }
- 
+
 std::string sha512(std::string input)
 {
     unsigned char digest[Sha512::DIGEST_SIZE];
@@ -189,7 +190,7 @@ std::string sha512(std::string input)
     ctx.init();
     ctx.update((unsigned char*)input.c_str(), input.length());
     ctx.final(digest);
- 
+
     char buf[2*Sha512::DIGEST_SIZE+1];
     buf[2*Sha512::DIGEST_SIZE] = 0;
     for (unsigned int i = 0; i < Sha512::DIGEST_SIZE; i++)
