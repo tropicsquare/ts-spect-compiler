@@ -353,8 +353,9 @@ bool spect::InstructionSCB::Execute()
     }
 
     uint512_t tmp = model_->GetGpr(TO_INT(op3_));
-    std::string mask = "0xA";
-    mask += std::string(63, '0');
+    std::string mask = "0x80000000"; // 2 ^ 255
+    mask += "80000000";              // 2 ^ 223
+    mask += std::string(48, '0');    // Remaining 48 * 4 zeroes.
     tmp = tmp | uint512_t(mask.c_str());
     tmp = tmp * uint512_t(model_->GetGpr(TO_INT(CpuGpr::R31)));
     tmp = tmp + uint512_t(model_->GetGpr(TO_INT(op2_)));
