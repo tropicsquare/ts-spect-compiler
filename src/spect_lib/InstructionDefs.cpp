@@ -526,11 +526,12 @@ bool spect::InstructionLD::Execute()
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    std::stringstream str;
-    str << "0x" << std::hex << std::setfill('0') << std::setw(32);
-    for (int i = 7; i >=0; i--)
-        str << model_->ReadMemoryCoreData(addr_ + i);
-    model_->SetGpr(TO_INT(op1_), uint256_t(str.str().c_str()));
+    uint256_t tmp = 0;
+    for (int i = 0; i < 8; i++) {
+        uint32_t buf = model_->ReadMemoryCoreData(addr_ + (4 * i));
+        tmp = (uint256_t(buf) << (i * 32)) | tmp;
+    }
+    model_->SetGpr(TO_INT(op1_), tmp);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
     model_->ReportChange(ch_gpr);
@@ -540,9 +541,9 @@ bool spect::InstructionLD::Execute()
 
 bool spect::InstructionST::Execute()
 {
-    uint256_t tmp =  model_->GetGpr(TO_INT(op1_));
+    uint256_t tmp = model_->GetGpr(TO_INT(op1_));
     for (int i = 0; i < 8; i++) {
-        model_->WriteMemoryCoreData(addr_ + i,
+        model_->WriteMemoryCoreData(addr_ + (i * 4),
                     static_cast<uint32_t>(tmp & uint256_t("0xFFFFFFFF")));
         tmp = tmp >> 32;
     }
