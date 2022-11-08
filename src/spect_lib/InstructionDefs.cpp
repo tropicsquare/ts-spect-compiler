@@ -382,7 +382,7 @@ bool spect::InstructionSCB::Execute()
         uint512_t tmp = operation;                                                              \
         model_->SetGpr(TO_INT(op1_), tmp % (uint512_t)mod_num);                                 \
                                                                                                 \
-        PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
+        PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));                       \
         model_->ReportChange(ch_gpr);                                                           \
                                                                                                 \
         return true;                                                                            \
@@ -391,8 +391,8 @@ bool spect::InstructionSCB::Execute()
 IMPLEMENT_MODULAR_OP(InstructionMUL25519, (op2 * op3),          get_p_25519())
 IMPLEMENT_MODULAR_OP(InstructionMUL256,   (op2 * op3),          get_p_256())
 IMPLEMENT_MODULAR_OP(InstructionADDP,     (op2 + op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
-IMPLEMENT_MODULAR_OP(InstructionSUBP,     (op2 + op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
-IMPLEMENT_MODULAR_OP(InstructionMULP,     (op2 + op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
+IMPLEMENT_MODULAR_OP(InstructionSUBP,     (op2 - op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
+IMPLEMENT_MODULAR_OP(InstructionMULP,     (op2 * op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
 IMPLEMENT_MODULAR_OP(InstructionREDP,    ((op2 << 256) | op3),  model_->GetGpr(TO_INT(CpuGpr::R31)))
 
 
