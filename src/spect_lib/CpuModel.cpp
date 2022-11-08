@@ -467,6 +467,7 @@ void spect::CpuModel::Reset()
     SetRarSp(0);
     end_executed_ = false;
     sha_512_ = Sha512();
+    sha_512_.init();
     SetPc(0x0);
 
     // Re-create new register model -> Erase registers to reset values.
