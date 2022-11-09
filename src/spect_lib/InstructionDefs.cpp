@@ -184,7 +184,6 @@ bool spect::InstructionNOT::Execute()
             uint256_t rotated = op2 op_opposite (256 - n_bits);                                     \
             tmp = tmp | rotated;                                                                    \
         }                                                                                           \
-        model_->SetGpr(TO_INT(op1_), tmp);                                                          \
         if (set_carry) {                                                                            \
             std::string mask_str = std::string("0x") + std::string("8") +                           \
                                    std::string(62, '0') +                                           \
@@ -194,6 +193,7 @@ bool spect::InstructionNOT::Execute()
             bool new_flag_val = ((op2 & mask) == uint256_t("0x0")) ? false : true;                  \
             model_->SetCpuFlag(CpuFlagType::CARRY, new_flag_val);                                   \
         }                                                                                           \
+        model_->SetGpr(TO_INT(op1_), tmp);                                                          \
                                                                                                     \
         PUT_FLAG_TO_CHANGE(ch_cf, new_val, model_->GetCpuFlag(CpuFlagType::CARRY));                 \
         PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));                           \
@@ -422,7 +422,7 @@ IMPLEMENT_MODULAR_OP(InstructionREDP,    ((op2 << 256) | op3),  model_->GetGpr(T
         PUT_FLAG_TO_CHANGE(ch_zf, old_val, model_->GetCpuFlag(CpuFlagType::ZERO));              \
         PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
                                                                                                 \
-        uint256_t tmp = model_->GetGpr(TO_INT(op2_)) operand uint256_t(immediate_);             \
+        const uint256_t& tmp = model_->GetGpr(TO_INT(op2_)) operand uint256_t(immediate_);      \
         uint256_t mask = tmp & uint256_t("0xFFFFFFFF");                                         \
         if (store_res)                                                                          \
             model_->SetGpr(TO_INT(op1_), mask);                                                 \
