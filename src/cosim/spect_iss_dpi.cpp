@@ -343,10 +343,10 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
-    uint32_t spect_dpi_load_hex_file(const char *path)
+    uint32_t spect_dpi_load_hex_file(const char *path, const uint32_t offset)
     {
         DPI_CALL_LOG_ENTER
-        spect::HexHandler::LoadHexFile(std::string(path), model->GetMemoryPtr());
+        spect::HexHandler::LoadHexFile(std::string(path), model->GetMemoryPtr(), offset);
         // TODO: Here it might be good to check that hex file spans out of
         //       memory.
         DPI_CALL_LOG_EXIT

@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -16,9 +16,23 @@
 class spect::HexHandler
 {
     public:
-        static void LoadHexFile(const std::string &path, uint32_t *mem);
-
-    private:
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Loads HEX file
+        /// @param path Path to HEX file to be loaded
+        /// @param mem Pointer to memory where to load the HEX file.
+        /// @param offset Offset from 'mem' (in byte addressing) where start loading HEX file:
+        ///         Interpretation depends on HEX file format:
+        ///                  DPI_HEX_ISS_WORD -
+        ///                      Has no effect
+        ///                 DPI_HEX_VERILOG_RAW_WORD -
+        ///                      Set to base address of the memory that you want to
+        ///                      preload (obtained via spect_dpi_get_mem_base).
+        ///                      This is usefull if you want to preload constant ROM
+        ///                      by HEX file which only contains constants, but not
+        ///                      their addresses. The same hex file can be loaded
+        /// @throw std::runtime_error when failed to open the file, or when it has invalid format
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        static void LoadHexFile(const std::string &path, uint32_t *mem, uint32_t offset);
 };
 
 #endif

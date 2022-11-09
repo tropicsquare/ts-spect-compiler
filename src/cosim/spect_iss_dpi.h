@@ -264,10 +264,21 @@ extern "C" {
      *  @brief Load HEX file to SPECT memory. This could be firmware or data RAM,
      *         constant ROM content.
      *  @param path Path to .hex file
+     *  @param offset Offset in the memory where to place the hex file.
+     *                Set based on HEX file format:
+     *                  DPI_HEX_ISS_WORD -
+     *                      Has no effect
+     *                 DPI_HEX_VERILOG_RAW_WORD -
+     *                      Set to base address of the memory that you want to
+     *                      preload (obtained via spect_dpi_get_mem_base).
+     *                      This is usefull if you want to preload constant ROM
+     *                      by HEX file which only contains constants, but not
+     *                      their addresses. The same hex file can be loaded
+     *                      to verilog memory model.
      *  @returns 0 - Program assembled and loaded correctly
      *           non-zero - Loading of assembly failed.
      */
-    uint32_t spect_dpi_load_hex_file(const char *path);
+    uint32_t spect_dpi_load_hex_file(const char *path, const uint32_t offset);
 
     /**
      *  @brief Execute single instruction of program, and remember how many clock cycles

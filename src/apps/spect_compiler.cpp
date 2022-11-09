@@ -70,16 +70,18 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    uint32_t first_addr = SPECT_INSTR_MEM_BASE;
+    comp = new spect::Compiler(SPECT_INSTR_MEM_BASE);
     if (options[FIRST_ADDR]) {
         std::stringstream ss;
         ss << std::hex << options[FIRST_ADDR].arg;
-        ss >> first_addr;
+        ss >> comp->first_addr_;
+    } else {
+        comp->Warning("'--first-address' undefined. First instruction will be placed at start of"
+                      " instruction memory.");
     }
 
     // All remaining arguments are input source files
     try {
-        comp = new spect::Compiler(first_addr);
         for (int i = 0; i < parse.nonOptionsCount(); ++i) {
             std::string path = parse.nonOption(i);
                 comp->Compile(path);

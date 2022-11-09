@@ -424,7 +424,10 @@ bool spect::CpuModel::HasChange()
 
 int spect::CpuModel::Step(int n)
 {
-    DebugInfo(VERBOSITY_HIGH, "Executing", n, "instructions:");
+    if (n > 0)
+        DebugInfo(VERBOSITY_HIGH, "Executing", n, "instructions:");
+    else
+        DebugInfo(VERBOSITY_HIGH, "Executing all instructions till end of program:");
 
     int cnt = 0;
     if (n == 0) {
