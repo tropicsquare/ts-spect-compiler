@@ -257,6 +257,7 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
     }
 
     spect::Instruction *new_instr = gold_instr->Clone();
+    std::cout << label << "\n";
     new_instr->s_label_ = label;
 
     // Calculate number of expected arguments (number of bitsin 1 in op_mask)
@@ -318,6 +319,7 @@ void spect::Compiler::Compile(std::string path)
 {
     SourceFile *sf = new spect::SourceFile(path, curr_addr_);
     Symbol *label;
+    Symbol *last_label;
     symbols_->curr_file_ = sf;
     files_[path] = sf;
 
@@ -332,6 +334,8 @@ void spect::Compiler::Compile(std::string path)
 
         // Parse Label
         label = ParseLabel(sf, line_buf, line_nr);
+        if (label)
+            last_label = label;
 
         if (line_buf.empty())
             continue;
@@ -346,7 +350,8 @@ void spect::Compiler::Compile(std::string path)
         if (ParseIncludeFile(sf, line_buf))
             continue;
 
-        spect::Instruction *new_instr = ParseInstruction(sf, line_buf, line_nr, label);
+        spect::Instruction *new_instr = ParseInstruction(sf, line_buf, line_nr, last_label);
+        last_label = nullptr;
 
         if (curr_addr_ >= SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE) {
             char buf[256];

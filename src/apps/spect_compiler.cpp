@@ -8,6 +8,7 @@
 **************************************************************************************************/
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <sstream>
 #include <exception>
@@ -21,7 +22,14 @@
 
 #include "OptionParser.h"
 
-enum  optionIndex { UNKNOWN, HELP, FIRST_ADDR, HEX_FORMAT, HEX_FILE};
+enum  optionIndex {
+    UNKNOWN,
+    HELP,
+    FIRST_ADDR,
+    HEX_FORMAT,
+    HEX_FILE,
+    DUMP_PROGRAM,
+};
 
 const option::Descriptor usage[] =
 {
@@ -33,6 +41,7 @@ const option::Descriptor usage[] =
                                                                             "                           1 - Hex file for Verilog model (address not included)\n"
                                                                             "                           2 - Hex file for Verilog model (address included).\n"},
     {HEX_FILE,         0,  ""  ,    "hex-file"      ,option::Arg::Optional, "  --hex-file=<file>       HEX file for simulator where code will be assembled."},
+    {DUMP_PROGRAM,     0,  ""  ,    "dump-program"  ,option::Arg::Optional, "  --dump-program=<file>   File where program to dump compiled program (.s file with addresses)\n"},
 
     {0,0,0,0,0,0}
 };
@@ -113,7 +122,12 @@ int main(int argc, char** argv)
 
     comp->CompileFinish();
 
-    comp->program_->Dump(std::cout);
+    if (options[DUMP_PROGRAM]) {
+        std::cout << "Dumping program to: " << options[DUMP_PROGRAM].arg << "\n";
+        std::ofstream ofs(options[DUMP_PROGRAM].arg, std::fstream::out);
+        comp->program_->Dump(ofs);
+        ofs.close();
+    }
 
 cleanup:
     delete comp;

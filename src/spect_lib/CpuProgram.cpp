@@ -75,8 +75,22 @@ void spect::CpuProgram::Dump(std::ostream &os)
 {
     using namespace spect;
 
-    for (auto const &instr : code_) {
+    for (size_t i = 0; i < code_.size(); i++) {
+        Instruction *instr = code_[i];
+
+        // Dump address
+        os << std::hex << "0x" << (first_addr_ + (4 * i)) << ": ";
+
+        // Dump labels
+        std::stringstream ss;
+        ss << std::left << std::setw(15);
+        if (instr->s_label_ != nullptr) {
+            ss << (instr->s_label_->identifier_ + ":");
+        } else {
+            ss << " ";
+        }
+        os << ss.str();
         instr->Dump(os);
-        os <<  std::endl;
+        os << "\n";
     }
 }
