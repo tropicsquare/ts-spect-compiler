@@ -29,9 +29,10 @@ spect::Compiler::Compiler(uint32_t first_addr) :
     if (first_addr < SPECT_INSTR_MEM_BASE ||
        (first_addr_ > (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE)) ) {
         char buf[256];
-        std::sprintf(buf, "First instruction placed at address 0x%04x which is not in Instruction Memory of SPECT. "
-                          "Place first instruction between: 0x%04x - 0x%04x", first_addr,
-                          SPECT_INSTR_MEM_BASE, SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - 4);
+        std::sprintf(buf, "First instruction placed at address 0x%04x which is not in Instruction "
+                          "Memory of SPECT. Place first instruction between: 0x%04x - 0x%04x",
+                          first_addr, SPECT_INSTR_MEM_BASE,
+                          SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - 4);
         Error(buf);
     }
 
@@ -167,7 +168,8 @@ void spect::Compiler::ParseArgument(spect::SourceFile *sf, int line_nr, spect::I
     }
 }
 
-spect::Symbol* spect::Compiler::ParseLabel(spect::SourceFile *sf, std::string &line_buf, int line_nr)
+spect::Symbol* spect::Compiler::ParseLabel(spect::SourceFile *sf, std::string &line_buf,
+                                           int line_nr)
 {
     if (std::regex_match(line_buf, std::regex("^" IDENT_REGEX ":.*"))) {
         std::string ident = line_buf.substr(0, line_buf.find(':'));
@@ -208,10 +210,12 @@ bool spect::Compiler::ParseConstant(spect::SourceFile *sf, std::string &line_buf
                                 ident.c_str(), s->f_->path_.c_str(), s->line_nr_);
                 ErrorAt(std::string(buf), sf, line_nr);
             } else {
-                symbols_->ResolveSymbol(s, SymbolType::CONSTANT, ParseValue(sf, line_nr, val, s_dummy));
+                symbols_->ResolveSymbol(s, SymbolType::CONSTANT,
+                                        ParseValue(sf, line_nr, val, s_dummy));
             }
         } else {
-            symbols_->AddSymbol(ident, SymbolType::CONSTANT, ParseValue(sf, line_nr, val, s_dummy), line_nr);
+            symbols_->AddSymbol(ident, SymbolType::CONSTANT,
+                                ParseValue(sf, line_nr, val, s_dummy), line_nr);
         }
 
         // TODO: Check s_dummy ??
@@ -227,7 +231,8 @@ bool spect::Compiler::ParseIncludeFile(spect::SourceFile *sf, std::string &line_
 
         // TODO: Make this universal across OS type!
         std::string new_file = sf->path_.substr(0, sf->path_.find_last_of("/")) + "/" +
-                               line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
+                                                   line_buf.substr(line_buf.find_last_of(' ') + 1,
+                                                line_buf.size() - 1);
         print_fnc("Loading included file: %s\n", new_file.c_str());
         Compile(new_file);
         return true;
@@ -297,8 +302,9 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
 
     if (arg_index <= exp_argc + skipped_args) {
         char buf[128];
-        std::sprintf(buf, "Missing arguments to instruction: %s. Expected %d arguments found only %d!",
-                        mnemonic.c_str(), exp_argc, arg_index - 1);
+        std::sprintf(buf, "Missing arguments to instruction: %s. "
+                          "Expected %d arguments found only %d!",
+                          mnemonic.c_str(), exp_argc, arg_index - 1);
         ErrorAt(std::string(buf), sf, line_nr);
     }
 
@@ -347,8 +353,10 @@ void spect::Compiler::Compile(std::string path)
             // TODO: Check this calculation!!!
             std::sprintf(buf, "Program does not fit into Instruction memory. "
                               "Address of first instruction: 0x%08x, "
-                              "Maximal program size till end of Instruction Memory: %d instructions",
-                            first_addr_, (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - first_addr_) / 4);
+                              "Maximal program size till end of Instruction Memory: "
+                              "%d instructions",
+                            first_addr_,
+                            (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - first_addr_) / 4);
             ErrorAt(std::string(buf), sf, line_nr);
         }
 
@@ -409,7 +417,9 @@ void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr
     if ((size_t)line_nr < sf->lines_.size())
         print_fnc("%d:%s\n", (line_nr + 1), sf->lines_[line_nr]);
 
-    std::string msg = std::string(80, '*') + std::string("\nCompilation failed\n") + std::string(80, '*');
+    std::string msg = std::string(80, '*') +
+                      std::string("\nCompilation failed\n") +
+                      std::string(80, '*');
     throw std::runtime_error(msg.c_str());
 }
 

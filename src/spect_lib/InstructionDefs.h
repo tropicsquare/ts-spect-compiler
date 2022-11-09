@@ -87,7 +87,6 @@
     name.kind = change_kind;                                                                    \
     name.obj = obj_id;                                                                          \
 
-// TODO: Check typecast without explciit masking is OK!
 #define PUT_GPR_TO_CHANGE(chn, old_or_new, gpr)                                                 \
     for (int i = 0; i < 8; i++)                                                                 \
         chn.old_or_new[i] = uint32_t(gpr >> (32 * i));                                          \
