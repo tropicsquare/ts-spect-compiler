@@ -29,6 +29,7 @@ enum  optionIndex {
     HEX_FORMAT,
     HEX_FILE,
     DUMP_PROGRAM,
+    DUMP_SYMBOLS
 };
 
 const option::Descriptor usage[] =
@@ -42,6 +43,7 @@ const option::Descriptor usage[] =
                                                                             "                           2 - Hex file for Verilog model (address included).\n"},
     {HEX_FILE,         0,  ""  ,    "hex-file"      ,option::Arg::Optional, "  --hex-file=<file>       HEX file for simulator where code will be assembled."},
     {DUMP_PROGRAM,     0,  ""  ,    "dump-program"  ,option::Arg::Optional, "  --dump-program=<file>   File where program to dump compiled program (.s file with addresses)\n"},
+    {DUMP_SYMBOLS,     0,  ""  ,    "dump-symbols"  ,option::Arg::Optional, "  --dump-symbols=<file>   File where dump all symbols found during compilation.\n"},
 
     {0,0,0,0,0,0}
 };
@@ -126,6 +128,13 @@ int main(int argc, char** argv)
         std::cout << "Dumping program to: " << options[DUMP_PROGRAM].arg << "\n";
         std::ofstream ofs(options[DUMP_PROGRAM].arg, std::fstream::out);
         comp->program_->Dump(ofs);
+        ofs.close();
+    }
+
+    if (options[DUMP_SYMBOLS]) {
+        std::cout << "Dumping symbols to: " << options[DUMP_SYMBOLS].arg << "\n";
+        std::ofstream ofs(options[DUMP_SYMBOLS].arg, std::fstream::out);
+        comp->symbols_->Dump(ofs);
         ofs.close();
     }
 

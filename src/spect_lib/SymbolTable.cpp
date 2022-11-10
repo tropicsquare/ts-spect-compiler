@@ -60,8 +60,10 @@ spect::Symbol* spect::SymbolTable::GetSymbol(const std::string &identifier)
     return nullptr;
 }
 
-void spect::SymbolTable::Dump(std::iostream os)
+void spect::SymbolTable::Dump(std::ostream& os)
 {
-    for (const auto &elem : symbol_map_)
-        os << elem.second;
+    for (const auto &elem : symbol_map_) {
+        Symbol *s = (Symbol*)elem.second;
+        os << elem.first << std::hex << " .eq 0x" << s->val_ << "\n";
+    }
 }

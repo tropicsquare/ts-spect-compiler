@@ -1,5 +1,5 @@
 /**************************************************************************************************
-** 
+**
 **
 ** TODO: License
 **
@@ -24,7 +24,7 @@ class spect::SymbolTable
         void ResolveSymbol(spect::Symbol *s, spect::SymbolType type, uint32_t val);
         Symbol* GetSymbol(const std::string &identifier);
         bool IsDefined(const std::string &identifier);
-        void Dump(std::iostream os);
+        void Dump(std::ostream& os);
         spect::SourceFile *curr_file_;
 
     private:
