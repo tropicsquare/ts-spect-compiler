@@ -22,33 +22,57 @@
 // Helper functions
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static uint256_t mask_32_lsb_bits(const uint256_t &val)
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Mask LSB part of number
+/// @param val Number to mask
+/// @param digits Number of digits (in hexadecimal) to mask (e.g. 8 = 32 bits, 6 = 24 bits)
+/// @returns Masked value
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static uint256_t mask_n_lsb_digits(const uint256_t &val, int digits)
 {
-    return val & uint256_t("0xFFFFFFFF");
+    std::string mask = std::string("0x") + std::string(digits, 'F');
+    return val & uint256_t(mask.c_str());
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// @returns True if 32 LSBs of number are zero, False otherwise
+///////////////////////////////////////////////////////////////////////////////////////////////////
 static bool is_32_lsb_bits_zero(const uint256_t &val)
 {
     return ((val & (uint256_t("0xFFFFFFFF"))) == uint256_t("0x000000000"));
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Binary logic operation on least significant bits of operands.
+/// @param lhs - LHS operand
+/// @param rhs - RHS operand
+/// @param active_digits - Number of LSBS / 4 (number of hex digits) to execute operation on.
+/// @param op - Operand to executed
+/// @returns lhs op rhs
+/// @note Bits 255:active_digits*4 are passed to result from lhs
+///////////////////////////////////////////////////////////////////////////////////////////////////
 template<class T>
-static uint256_t binary_logic_op_32_lsb(const uint256_t &lhs, const uint256_t &rhs,
-                                        const uint256_t &res, T&&op)
+static uint256_t binary_logic_op_lsb(const uint256_t &lhs, const uint256_t &rhs,
+                                     int active_digits, T&&op)
 {
-    // Logic operation on 32 LSBs between lhs and rhs and storing result to res.
-    // Keeps 256:32 of res intact.
-    uint256_t mask_a = mask_32_lsb_bits(lhs);
-    uint256_t mask_b = mask_32_lsb_bits(rhs);
+    // Mask higher digits than 'active_digits' from both operands
+    uint256_t mask_a = mask_n_lsb_digits(lhs, active_digits);
+    uint256_t mask_b = mask_n_lsb_digits(rhs, active_digits);
 
-    std::string mask_msb = std::string("0x") + std::string(56, 'F') + std::string(8, '0');
-    uint256_t mask_res = res & uint256_t(mask_msb.c_str());
+    // LHS corresponds to op2_, mask its 'active_digits' LSB bits, keep only upper bits
+    std::string mask_msb = std::string("0x") +
+                           std::string(64 - active_digits, 'F') +
+                           std::string(active_digits, '0');
+    uint256_t mask_res = lhs & uint256_t(mask_msb.c_str());
 
     uint256_t op_res = op(mask_a, mask_b);
     uint256_t rv = mask_res | op_res;
     return rv;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// @returns P25519 prime (2^255 - 19)
+///////////////////////////////////////////////////////////////////////////////////////////////////
 static uint512_t get_p_25519()
 {
     uint512_t tmp = uint512_t("0x1");
@@ -56,6 +80,9 @@ static uint512_t get_p_25519()
     return tmp - uint512_t("19");
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// @returns P256 prime (2^256 - 2^224 + 2^192 + 2^96 - 1)
+///////////////////////////////////////////////////////////////////////////////////////////////////
 static uint512_t get_p_256()
 {
     uint512_t msk = uint512_t("0x1");
@@ -88,7 +115,7 @@ static uint512_t get_p_256()
         PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
                                                                                                 \
         uint256_t add = model_->GetGpr(TO_INT(op2_)) operand model_->GetGpr(TO_INT(op3_));      \
-        uint256_t mask = mask_32_lsb_bits(add);                                                 \
+        uint256_t mask = mask_n_lsb_digits(add, 8);                                             \
         if (store_res)                                                                          \
             model_->SetGpr(TO_INT(op1_), mask);                                                 \
         model_->SetCpuFlag(CpuFlagType::ZERO, is_32_lsb_bits_zero(mask));                       \
@@ -117,9 +144,9 @@ IMPLEMENT_R_32_AIRTH_OP(InstructionCMP,-,false)
         PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
                                                                                                 \
         model_->SetGpr(TO_INT(op1_),                                                            \
-            binary_logic_op_32_lsb(model_->GetGpr(TO_INT(op2_)),                                \
+            binary_logic_op_lsb(model_->GetGpr(TO_INT(op2_)),                                   \
                                 model_->GetGpr(TO_INT(op3_)),                                   \
-                                model_->GetGpr(TO_INT(op1_)),                                   \
+                                8,                                                              \
                 [] (const uint256_t &lhs, const uint256_t &rhs) -> uint256_t {                  \
                     return lhs operand rhs;                                                     \
                 }                                                                               \
@@ -149,13 +176,13 @@ bool spect::InstructionNOT::Execute()
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
     model_->SetGpr( TO_INT(op1_),
-        binary_logic_op_32_lsb(model_->GetGpr(TO_INT(op2_)),
+        binary_logic_op_lsb(model_->GetGpr(TO_INT(op2_)),
                             model_->GetGpr(TO_INT(op3_)),
-                            model_->GetGpr(TO_INT(op1_)),
+                            8,
             [] (const uint256_t &lhs, const uint256_t &rhs) -> uint256_t {
                 // Need copy, since ~ modifies passed reference
                 uint256_t cpy = lhs;
-                return mask_32_lsb_bits(~cpy);
+                return mask_n_lsb_digits(~cpy, 8);
             }
         ));
     model_->SetCpuFlag(CpuFlagType::ZERO, is_32_lsb_bits_zero(model_->GetGpr(TO_INT(op1_))));
@@ -452,9 +479,9 @@ IMPLEMENT_I_32_AIRTH_OP(InstructionCMPI,-,false)
         PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
                                                                                                 \
         model_->SetGpr( TO_INT(op1_),                                                           \
-            binary_logic_op_32_lsb(model_->GetGpr(TO_INT(op2_)),                                \
+            binary_logic_op_lsb(model_->GetGpr(TO_INT(op2_)),                                   \
                                 uint256_t(immediate_),                                          \
-                                model_->GetGpr(TO_INT(op1_)),                                   \
+                                3,                                                              \
                 [] (const uint256_t &lhs, const uint256_t &rhs) -> uint256_t {                  \
                     return lhs operand rhs;                                                     \
                 }                                                                               \
