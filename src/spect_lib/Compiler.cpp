@@ -257,7 +257,7 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
     }
 
     spect::Instruction *new_instr = gold_instr->Clone();
-    std::cout << label << "\n";
+    //std::cout << label << "\n";
     new_instr->s_label_ = label;
 
     // Calculate number of expected arguments (number of bitsin 1 in op_mask)

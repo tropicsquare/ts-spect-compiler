@@ -354,7 +354,7 @@ uint32_t spect::CpuModel::GpkQueuePop(uint32_t index)
 {
     uint32_t rv = 0;
     if (!gpk_q_[index].empty()) {
-        uint32_t rv = gpk_q_[index].front();
+        rv = gpk_q_[index].front();
         gpk_q_[index].pop();
         DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", rv);
     } else
