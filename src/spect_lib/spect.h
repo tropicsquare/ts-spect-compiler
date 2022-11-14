@@ -18,6 +18,7 @@
 
 using math::wide_integer::uint256_t;
 using math::wide_integer::uint512_t;
+using math::wide_integer::int512_t;
 using math::wide_integer::uint1024_t;
 
 namespace spect {

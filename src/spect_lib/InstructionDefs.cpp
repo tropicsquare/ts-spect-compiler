@@ -94,6 +94,46 @@ static uint512_t get_p_256()
     return tmp;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/// @returns Checks if inputs to modular instruction inputs are less than prime modulus.
+///          This is pre-condition of HW, and if not met, its behavior is undefined.
+///////////////////////////////////////////////////////////////////////////////////////////////////
+static void check_modulo_conds(spect::CpuModel *model, spect::InstructionR *instr, uint256_t prime)
+{
+    uint256_t op2 = model->GetGpr(TO_INT(instr->op2_));
+    uint256_t op3 = model->GetGpr(TO_INT(instr->op3_));
+    if (op2 >= prime || op3 >= prime || prime == uint256_t("0x0") || prime == uint256_t("0x1"))
+    {
+        std::stringstream ss;
+        ss << "Error: Input operands are not valid -> Behavior of HW is undefined. ";
+        ss << "Following conditions are not met:";
+        model->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+        ss.str("");
+
+        if (op2 >= prime) {
+            ss << "    op2(" << instr->op2_ << ") < 0x" << std::hex << prime;
+            model->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+        }
+        ss.str("");
+
+        if (op3 >= prime) {
+            ss << "    op3(" << instr->op3_ << ") < 0x" << std::hex << prime;
+            model->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+        }
+        ss.str("");
+
+        if (prime == uint256_t("0x0")) {
+            ss << "    R31(" << prime << ") != 0";
+            model->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+        }
+
+        if (prime == uint256_t("0x1")) {
+            ss << "    R31(" << prime << ") != 1";
+            model->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+        }
+    }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -414,18 +454,21 @@ bool spect::InstructionSCB::Execute()
     return true;
 }
 
-#define IMPLEMENT_MODULAR_OP(classname,operation, mod_num)                                      \
+#define IMPLEMENT_MODULAR_OP(classname,operation, mod_num, check_ops)                           \
     bool spect::classname::Execute()                                                            \
     {                                                                                           \
         InstructionR::Execute();                                                                \
                                                                                                 \
+        if (check_ops)                                                                          \
+            check_modulo_conds(model_, this, mod_num);                                          \
+                                                                                                \
         DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));                                    \
         PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
                                                                                                 \
-        uint512_t op2 = (uint512_t)model_->GetGpr(TO_INT(op2_));                                \
-        uint512_t op3 = (uint512_t)model_->GetGpr(TO_INT(op3_));                                \
+        uint512_t op2 = (int512_t)model_->GetGpr(TO_INT(op2_));                                 \
+        uint512_t op3 = (int512_t)model_->GetGpr(TO_INT(op3_));                                 \
         uint512_t tmp = operation;                                                              \
-        model_->SetGpr(TO_INT(op1_), tmp % (uint512_t)mod_num);                                 \
+        model_->SetGpr(TO_INT(op1_), (uint256_t)(tmp % ((uint512_t)mod_num)));                  \
                                                                                                 \
         PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));                       \
         model_->ReportChange(ch_gpr);                                                           \
@@ -433,13 +476,42 @@ bool spect::InstructionSCB::Execute()
         return true;                                                                            \
     }
 
-IMPLEMENT_MODULAR_OP(InstructionMUL25519, (op2 * op3),          get_p_25519())
-IMPLEMENT_MODULAR_OP(InstructionMUL256,   (op2 * op3),          get_p_256())
-IMPLEMENT_MODULAR_OP(InstructionADDP,     (op2 + op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
-IMPLEMENT_MODULAR_OP(InstructionSUBP,     (op2 - op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
-IMPLEMENT_MODULAR_OP(InstructionMULP,     (op2 * op3),          model_->GetGpr(TO_INT(CpuGpr::R31)))
-IMPLEMENT_MODULAR_OP(InstructionREDP,    ((op2 << 256) | op3),  model_->GetGpr(TO_INT(CpuGpr::R31)))
+IMPLEMENT_MODULAR_OP(InstructionMUL25519, (op2 * op3),          get_p_25519()                          ,true)
+IMPLEMENT_MODULAR_OP(InstructionMUL256,   (op2 * op3),          get_p_256()                            ,true)
+IMPLEMENT_MODULAR_OP(InstructionADDP,     (op2 + op3),          model_->GetGpr(TO_INT(CpuGpr::R31))    ,true)
+IMPLEMENT_MODULAR_OP(InstructionMULP,     (op2 * op3),          model_->GetGpr(TO_INT(CpuGpr::R31))    ,false)
+IMPLEMENT_MODULAR_OP(InstructionREDP,    ((op2 << 256) | op3),  model_->GetGpr(TO_INT(CpuGpr::R31))    ,false)
 
+
+bool spect::InstructionSUBP::Execute()
+{
+    InstructionR::Execute();
+
+    DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
+    PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
+
+    uint512_t op2 = (uint512_t)model_->GetGpr(TO_INT(op2_));
+    uint512_t op3 = (uint512_t)model_->GetGpr(TO_INT(op3_));
+    uint256_t prime = model_->GetGpr(TO_INT(CpuGpr::R31));
+    check_modulo_conds(model_, this, prime);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // uint_wide_t screws up modulo negative number, we do dirty trick where we add the
+    // modulus to make sure that lhs operand is bigger than rhs. Since we put the restriction
+    // that op2 < r31 and op3 < r31, it is enough to add single R31 to lhs to make it bigger than
+    // rhs.
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    uint512_t lhs = op2;
+    if (op3 > op2)
+        lhs += (uint512_t)prime;
+    uint512_t tmp = lhs - op3;
+    model_->SetGpr(TO_INT(op1_), (uint256_t)(tmp % ((uint512_t)prime)));
+
+    PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
+    model_->ReportChange(ch_gpr);
+
+    return true;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
