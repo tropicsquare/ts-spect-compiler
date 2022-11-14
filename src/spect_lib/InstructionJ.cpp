@@ -10,13 +10,14 @@
 *
 *****************************************************************************/
 
+#include "CpuModel.h"
 #include "InstructionJ.h"
 #include "InstructionFactory.h"
 #include "Symbol.h"
 
 spect::InstructionJ::InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                                  uint16_t new_pc) :
-    Instruction(mnemonic, InstructionType::J, opcode, func, op_mask),
+                                  uint16_t new_pc, bool r31_dep) :
+    Instruction(mnemonic, InstructionType::J, opcode, func, op_mask, r31_dep),
     new_pc_(new_pc)
 {}
 
@@ -61,5 +62,22 @@ spect::Instruction* spect::InstructionJ::DisAssemble(uint32_t wrd)
 
 void spect::InstructionJ::Dump(std::ostream& os)
 {
-    os << new_pc_;
+    for (int i = 2; i >= 0; i--)
+        if (op_mask_ & (1 << i)) {
+            if (i == 2)
+                os << new_pc_;
+        }
+}
+
+bool spect::InstructionJ::Execute()
+{
+    model_->DebugInfo(VERBOSITY_MEDIUM, "Inputs before execution:");
+
+    if (op_mask_ & 0x4) {
+        std::stringstream ss;
+        ss << "    " << "NewPC:" << std::hex << "0x" << new_pc_;
+        model_->DebugInfo(VERBOSITY_MEDIUM, ss.str().c_str());
+    }
+
+    return true;
 }

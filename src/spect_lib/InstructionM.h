@@ -22,11 +22,12 @@ class spect::InstructionM : public Instruction
 {
     public:
         InstructionM(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                     CpuGpr op1, uint16_t addr);
+                     CpuGpr op1, uint16_t addr, bool r31_dep);
         void Dump(std::ostream& os);
         spect::Symbol* Relocate();
         uint32_t Assemble();
         static Instruction* DisAssemble(uint32_t wrd);
+        bool Execute();
 
         CpuGpr op1_;
         uint16_t addr_ : IENC_ADDR_BITS;

@@ -417,6 +417,8 @@ bool spect::InstructionSCB::Execute()
 #define IMPLEMENT_MODULAR_OP(classname,operation, mod_num)                                      \
     bool spect::classname::Execute()                                                            \
     {                                                                                           \
+        InstructionR::Execute();                                                                \
+                                                                                                \
         DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));                                    \
         PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));                       \
                                                                                                 \

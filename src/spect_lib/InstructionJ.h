@@ -21,11 +21,12 @@ class spect::InstructionJ : public Instruction
 {
     public:
         InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                     uint16_t new_pc);
+                     uint16_t new_pc, bool r31_dep);
         void Dump(std::ostream& os);
         spect::Symbol* Relocate();
         uint32_t Assemble();
         static Instruction* DisAssemble(uint32_t wrd);
+        bool Execute();
 
         uint16_t new_pc_ : IENC_NEW_PC_BITS;
 

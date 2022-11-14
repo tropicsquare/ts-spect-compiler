@@ -20,11 +20,12 @@ class spect::InstructionI : public Instruction
 {
     public:
         InstructionI(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                     CpuGpr op1, CpuGpr op2, uint16_t immediate);
+                     CpuGpr op1, CpuGpr op2, uint16_t immediate, bool r31_dep);
         void Dump(std::ostream& os);
         spect::Symbol* Relocate();
         uint32_t Assemble();
         static Instruction* DisAssemble(uint32_t wrd);
+        bool Execute();
 
         CpuGpr op1_;
         CpuGpr op2_;

@@ -10,13 +10,14 @@
 *
 *****************************************************************************/
 
+#include "CpuModel.h"
 #include "InstructionM.h"
 #include "InstructionFactory.h"
 #include "Symbol.h"
 
 spect::InstructionM::InstructionM(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                                  CpuGpr op1, uint16_t addr) :
-    Instruction(mnemonic, InstructionType::M, opcode, func, op_mask),
+                                  CpuGpr op1, uint16_t addr, bool r31_dep) :
+    Instruction(mnemonic, InstructionType::M, opcode, func, op_mask, r31_dep),
     op1_(op1),
     addr_(addr)
 {}
@@ -64,5 +65,30 @@ spect::Instruction* spect::InstructionM::DisAssemble(uint32_t wrd)
 
 void spect::InstructionM::Dump(std::ostream& os)
 {
-    os << op1_ << "," << addr_;
+    for (int i = 2; i >= 0; i--)
+        if (op_mask_ & (1 << i)) {
+            if (i == 2)
+                os << op1_;
+            else if (i == 1)
+                os << "," << addr_;
+        }
+}
+
+bool spect::InstructionM::Execute()
+{
+    model_->DebugInfo(VERBOSITY_MEDIUM, "Inputs before execution:");
+
+    if (op_mask_ & 0x4) {
+        std::stringstream ss;
+        ss << "    " << op1_ << ": " << std::hex << "0x" << model_->GetGpr(TO_INT(op1_));
+        model_->DebugInfo(VERBOSITY_MEDIUM, ss.str().c_str());
+    }
+
+    if (op_mask_ & 0x2) {
+        std::stringstream ss;
+        ss << "    " << "Addr:" << std::hex << "0x" << addr_;
+        model_->DebugInfo(VERBOSITY_MEDIUM, ss.str().c_str());
+    }
+
+    return true;
 }

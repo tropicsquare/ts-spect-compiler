@@ -29,7 +29,7 @@ class spect::Instruction
         /// @param op_mask Instruction operand mask (operands required in the '.s' file).
         ///////////////////////////////////////////////////////////////////////////////////////////
         Instruction(std::string mnemonic, InstructionType itype, uint32_t opcode,
-                    uint32_t func, int op_mask);
+                    uint32_t func, int op_mask, bool r31_dep);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Instruction destructor
@@ -113,6 +113,9 @@ class spect::Instruction
 
         // Symbol with instruction label from .s file
         spect::Symbol *s_label_ = nullptr;
+
+        // True when instruction depends on register 31 content
+        bool r31_dep_;
 
     public:
         // SPECT Model attached to the instruction
