@@ -104,6 +104,11 @@ class spect::CpuSimulator
         void PrintSymbols();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Set Object to a value
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void SetObject(std::string object, std::string value);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Starts the CPU simulator
         /// @param batch_mode True  - Start in batch mode
         ///                   False - Start in interactive mode
@@ -129,8 +134,6 @@ class spect::CpuSimulator
 
         // Objects handling CLI and interactive simulation
         cli::Cli *cli_;
-        //cli::LoopScheduler *scheduler_;
-        //cli::CliLocalTerminalSession *session_;
 
     private:
         // Array of breakpoints break-points

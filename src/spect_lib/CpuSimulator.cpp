@@ -215,6 +215,31 @@ void spect::CpuSimulator::PrintSymbols()
     compiler_->symbols_->Print(std::cout);
 }
 
+void spect::CpuSimulator::SetObject(std::string object, std::string value)
+{
+    int index;
+    std::stringstream ss;
+    if (std::regex_match(object, std::regex("^" OP_REGEX))) {
+        std::string i_str = object.substr(1, object.size() - 1);
+        ss << i_str;
+        ss >> index;
+        model_->SetGpr(index, uint256_t(value.c_str()));
+
+    } else if (std::regex_match(object, std::regex("^mem\\[" NUM_REGEX "\\]"))) {
+        int from = object.find("[");
+        int to = object.find("]");
+        std::string i_str = object.substr(from + 1, to - from - 1);
+        ss << std::hex << i_str;
+        ss >> index;
+        printf("I_STR is: %s, Index is: %d\n", i_str.c_str(), index);
+        std::stringstream ss_v;
+        ss_v << std::hex << value;
+        uint32_t i_val;
+        ss_v >> i_val;
+        model_->SetMemory(index, i_val);
+    }
+}
+
 void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
 {
     menu->Insert("info", [&](std::ostream &out, std::string type){
@@ -234,12 +259,12 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                         std::cout << "Unknown object: " << type << "\n";
                  },
                 "Print information about:\n"
-                "           info breakpoints   - Breakpoints\n"
-                "           info registers     - CPU Registers\n"
-                "           info flags         - CPU Flags\n"
-                "           info pc            - Program counter\n"
-                "           info rar           - Return address register stack\n"
-                "           info symbols       - Symbol table\n");
+                "           info breakpoints     - Breakpoints\n"
+                "           info registers       - CPU Registers\n"
+                "           info flags           - CPU Flags\n"
+                "           info pc              - Program counter\n"
+                "           info rar             - Return address register stack\n"
+                "           info symbols         - Symbol table\n");
 
 
     menu->Insert("break", [&](std::ostream &out, std::string breakpoint){
@@ -274,16 +299,19 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                     }
                  },
                 "Add breakpoint:\n"
-                "           break <label>        - Put breakpoint at position of <label>\n"
-                "           break address        - Put breakpoint at absolute address\n"
-                "           break -+number       - Put breakpoint +- n instructions from current PC.\n");
+                "            break <label>       - Put breakpoint at position of <label>\n"
+                "            break address       - Put breakpoint at absolute address\n"
+                "            break -+number      - Put breakpoint +- n instructions from current PC.\n");
+
+     menu->Insert("delete", [&](std::ostream &out){
+                        breakpoints_.clear();
+                 },
+                "Delete all breakpoints.\n");
 
     menu->Insert("delete", [&](std::ostream &out, std::string breakpoint){
                     std::stringstream ss;
 
-                    if (breakpoint == std::string("")) {
-                        breakpoints_.clear();
-                    } else if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
+                    if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
                         ss << breakpoint;
                         uint16_t bp_address;
                         ss >> bp_address;
@@ -293,9 +321,42 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                     }
                  },
                 "Delete breakpoints:\n"
-                "   delete              - Delete all breakpoints.\n"
-                "   delete <label>      - Delete breakpoint at <label>.\n"
-                "   delete address      - Delete breakpoint at address.\n");
+                "            delete <label>      - Delete breakpoint at <label>.\n"
+                "            delete address      - Delete breakpoint at address.\n");
+
+    menu->Insert("jump", [&](std::ostream &out, std::string breakpoint){
+                    std::stringstream ss;
+
+                    if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
+                        ss << breakpoint;
+                        uint16_t bp_address;
+                        ss >> bp_address;
+                        model_->SetPc(bp_address);
+                    } else {
+                        Symbol *s = compiler_->symbols_->GetSymbol(breakpoint);
+                        if (s)
+                            model_->SetPc(s->val_);
+                        else
+                            std::cout << "Symbol '" << breakpoint << "' undefined!\n";
+                    }
+                 },
+                "Delete breakpoints:\n"
+                "            jump <label>        - Set PC to position of <label>.\n"
+                "            jump address        - Set PC to address.\n");
+
+    menu->Insert("get", [&](std::ostream &out, std::string object, std::string value){
+                    // TODO: Add support for GET
+                },
+                "Get object value:\n"
+                "            get RX <value>             - Get GPR register value\n"
+                "            get mem[address] <value>   - Get value at address.\n");
+
+    menu->Insert("set", [&](std::ostream &out, std::string object, std::string value){
+                    SetObject(object, value);
+                },
+                "Set object to a value:\n"
+                "            set RX <value>             - Set GPR register to a value.\n"
+                "            set mem[address] <value>   - Set memory address to value\n");
 
     menu->Insert("run", [&](std::ostream &out){
                     CmdRun();
@@ -311,13 +372,13 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                         return;
                     model_->Step(1);
                 },
-                 "Step");
+                 "Step single instruction.");
     menu->Insert("step", [&](std::ostream &out, int n){
                     if (CheckFinished())
                         return;
                     model_->Step(n);
                 },
-                 "Step (number of instructions)");
+                 "Step N instructions.");
 
     menu->Insert("start", [&](std::ostream &out){
                     model_->Reset();
