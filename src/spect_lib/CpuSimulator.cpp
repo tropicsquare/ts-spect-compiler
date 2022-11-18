@@ -78,7 +78,8 @@ bool spect::CpuSimulator::AddBreakpoint(uint16_t address)
         std::cout << "Breakpoint already exists at: 0x" << std::hex << address << std::endl;
         return false;
     }
-    std::cout << "Adding breakpoint at address: 0x" << std::hex << address << std::endl;
+    std::cout << "Adding breakpoint at:\n";
+    std::cout << "    address: 0x" << std::hex << address << std::endl;
     breakpoints_.push_back(address);
     return true;
 }
@@ -102,8 +103,8 @@ bool spect::CpuSimulator::AddBreakpoint(std::string label)
         return false;
     }
 
-    std::cout << "Adding breakpoint to label: " << label;
-    std::cout  << ", address: 0x" << address << "\n";
+    std::cout << "Adding breakpoint at:\n";
+    std::cout << "    " << label << ", address: 0x" << address << "\n";
     breakpoints_.push_back(address);
 
     return true;
@@ -113,13 +114,37 @@ bool spect::CpuSimulator::RemoveBreakPoint(uint32_t address)
 {
     for (auto it = breakpoints_.begin(); it != breakpoints_.end(); it++)
         if (*it == address) {
-            std::cout << "Removing breakpoint at: 0x" << address << std::endl;
+            std::cout << "Removing breakpoint at:\n";
+            std::cout << "    0x" << address << "\n";
             breakpoints_.erase(it);
             return true;
         }
-    std::cout << "No breakpoint exists at: 0x" << address << std::endl;
+    std::cout << "No breakpoint exists at:\n";
+    std::cout << "0x" << address << "\n";
     return false;
 }
+
+bool spect::CpuSimulator::RemoveBreakPoint(std::string label)
+{
+    Symbol *s = compiler_->symbols_->GetSymbol(label);
+    if (s == nullptr) {
+        std::cout << "Label '" << label << "' does not exist. Can't remove breakpoint!\n";
+        return false;
+    }
+
+    for (auto it = breakpoints_.begin(); it != breakpoints_.end(); it++)
+        if (*it == s->val_) {
+            std::cout << "Removing breakpoint at:\n";
+            std::cout << "    " << label << ", address: 0x" << s->val_ << "\n";
+            breakpoints_.erase(it);
+            return true;
+        }
+    std::cout << "No breakpoint exists at:\n";
+    std::cout << "    " << label << ", address: 0x" << s->val_ << "\n";
+
+    return false;
+}
+
 
 bool spect::CpuSimulator::IsBreakpointAt(uint32_t address)
 {
@@ -249,10 +274,28 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                     }
                  },
                 "Add breakpoint:\n"
-                "           break symbol-name  - Put breakpoint at position of label\n"
-                "           break address      - Put breakpoint at absolute address\n"
-                "           break -+number     - Put breakpoint +- n instructions from current PC.\n");
+                "           break <label>        - Put breakpoint at position of <label>\n"
+                "           break address        - Put breakpoint at absolute address\n"
+                "           break -+number       - Put breakpoint +- n instructions from current PC.\n");
 
+    menu->Insert("delete", [&](std::ostream &out, std::string breakpoint){
+                    std::stringstream ss;
+
+                    if (breakpoint == std::string("")) {
+                        breakpoints_.clear();
+                    } else if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
+                        ss << breakpoint;
+                        uint16_t bp_address;
+                        ss >> bp_address;
+                        RemoveBreakPoint(bp_address);
+                    } else {
+                        RemoveBreakPoint(breakpoint);
+                    }
+                 },
+                "Delete breakpoints:\n"
+                "   delete              - Delete all breakpoints.\n"
+                "   delete <label>      - Delete breakpoint at <label>.\n"
+                "   delete address      - Delete breakpoint at address.\n");
 
     menu->Insert("run", [&](std::ostream &out){
                     CmdRun();
