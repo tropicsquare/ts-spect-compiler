@@ -170,17 +170,15 @@ namespace spect {
 
     #define MODEL_LABEL "SPECT_MODEL: "
 
-    /*
-    #define CALL_WITH_EXCEPTION_HANDLER (fnc, ret_code_var, err_handle_symbol) do { \
-        try {                                                                       \
-            fnc;                                                                    \
-        } catch(std::runtime_error &err) {                                          \
-            std::cout << err.what() << std::endl;                                   \
-            ret_code_var = 1;                                                       \
-            goto err_handle_symbol;                                                 \
-        }                                                                           \
-    } while (0);
-    */
+#if defined(__has_cpp_attribute)
+    #if 	__has_cpp_attribute(maybe_unused)
+        #define A_UNUSED [[maybe_unused]]
+    #else
+        #define A_UNUSED __attribute__((unused))
+    #endif
+#else
+    #define A_UNUSED __attribute__((unused))
+#endif
 }
 
 #endif

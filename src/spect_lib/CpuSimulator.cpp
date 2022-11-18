@@ -208,7 +208,7 @@ void spect::CpuSimulator::PrintSymbols()
 // Command functions
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void spect::CpuSimulator::CmdInfo(std::ostream &out, std::string arg1)
+void spect::CpuSimulator::CmdInfo(A_UNUSED std::ostream &out, std::string arg1)
 {
     if (arg1 == "breakpoints")
         PrintBreakpoints();
@@ -226,7 +226,7 @@ void spect::CpuSimulator::CmdInfo(std::ostream &out, std::string arg1)
         std::cout << "Unknown object: " << arg1 << "\n";
 }
 
-void spect::CpuSimulator::CmdBreak(std::ostream &out, std::string arg1)
+void spect::CpuSimulator::CmdBreak(A_UNUSED std::ostream &out, std::string arg1)
 {
     std::stringstream ss;
 
@@ -259,7 +259,7 @@ void spect::CpuSimulator::CmdBreak(std::ostream &out, std::string arg1)
     }
 }
 
-void spect::CpuSimulator::CmdRun(std::ostream &out)
+void spect::CpuSimulator::CmdRun(A_UNUSED std::ostream &out)
 {
     if (CheckFinished())
         return;
@@ -283,7 +283,7 @@ void spect::CpuSimulator::CmdRun(std::ostream &out)
         std::cout << "Program execution finished!\n";
 }
 
-void spect::CpuSimulator::CmdDelete(std::ostream &out, std::string arg1, bool all)
+void spect::CpuSimulator::CmdDelete(A_UNUSED std::ostream &out, std::string arg1, bool all)
 {
     std::stringstream ss;
 
@@ -305,7 +305,7 @@ void spect::CpuSimulator::CmdDelete(std::ostream &out, std::string arg1, bool al
     }
 }
 
-void spect::CpuSimulator::CmdJump(std::ostream &out, std::string arg1)
+void spect::CpuSimulator::CmdJump(A_UNUSED std::ostream &out, std::string arg1)
 {
     std::stringstream ss;
 
@@ -323,7 +323,7 @@ void spect::CpuSimulator::CmdJump(std::ostream &out, std::string arg1)
     }
 }
 
-void spect::CpuSimulator::CmdGet(std::ostream &out, std::string arg1)
+void spect::CpuSimulator::CmdGet(A_UNUSED std::ostream &out, std::string arg1)
 {
     if (std::regex_match(arg1, std::regex("^" OP_REGEX))) {
         std::string i_str = arg1.substr(1, arg1.size() - 1);
@@ -354,9 +354,8 @@ void spect::CpuSimulator::CmdGet(std::ostream &out, std::string arg1)
     }
 }
 
-void spect::CpuSimulator::CmdSet(std::ostream &out, std::string arg1, std::string arg2)
+void spect::CpuSimulator::CmdSet(A_UNUSED std::ostream &out, std::string arg1, std::string arg2)
 {
-    int index;
     std::stringstream ss;
 
     if (std::regex_match(arg1, std::regex("^" OP_REGEX))) {
@@ -371,14 +370,14 @@ void spect::CpuSimulator::CmdSet(std::ostream &out, std::string arg1, std::strin
     }
 }
 
-void spect::CpuSimulator::CmdLoad(std::ostream &out, std::string arg1, uint32_t offset)
+void spect::CpuSimulator::CmdLoad(A_UNUSED std::ostream &out, std::string arg1, uint32_t offset)
 {
     uint32_t *mem = model_->GetMemoryPtr();
     std::cout << "Loading " << arg1 << " to SPECT memory!\n";
     HexHandler::LoadHexFile(arg1, mem, offset);
 }
 
-void spect::CpuSimulator::CmdStep(std::ostream &out, int n)
+void spect::CpuSimulator::CmdStep(A_UNUSED std::ostream &out, int n)
 {
     if (CheckFinished())
         return;
@@ -387,7 +386,7 @@ void spect::CpuSimulator::CmdStep(std::ostream &out, int n)
     model_->Step(n);
 }
 
-void spect::CpuSimulator::CmdStart(std::ostream &out)
+void spect::CpuSimulator::CmdStart(A_UNUSED std::ostream &out)
 {
     model_->Reset();
     model_->Start();
@@ -503,7 +502,7 @@ void spect::CpuSimulator::Start(bool batch_mode, std::string cmd_file)
         cli::CliLocalTerminalSession session(*cli_, scheduler, std::cout);
 
         session.ExitAction(
-            [&scheduler](auto& out)
+            [&scheduler](A_UNUSED auto& out)
             {
                 scheduler.Stop();
             }
