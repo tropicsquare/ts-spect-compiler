@@ -37,7 +37,7 @@ spect::CpuModel::~CpuModel()
 void spect::CpuModel::Start()
 {
     DebugInfo(VERBOSITY_LOW, "Starting program execution...");
-    DebugInfo(VERBOSITY_LOW, "First instruction address:", start_pc_);
+    DebugInfo(VERBOSITY_LOW, "First instruction address:", tohexs(start_pc_, 4));
     SetPc(start_pc_);
 
     DebugInfo(VERBOSITY_MEDIUM, "SPECT is clearing STATUS[IDLE] = 0.");
@@ -75,13 +75,14 @@ bool spect::CpuModel::IsFinished()
 
 void spect::CpuModel::SetStartPc(uint16_t start_pc)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "Setting Start PC to:", start_pc);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting Start PC to:", tohexs(start_pc, 4));
     start_pc_ = start_pc;
 }
 
 void spect::CpuModel::SetMemory(uint16_t address, uint32_t data)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "Setting memory, address:", address, "data:", data);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting memory, address:", tohexs(address, 4),
+                                 "data:", tohexs(data, 8));
 
     memory_[address >> 2] = data;
 
@@ -103,7 +104,8 @@ uint32_t spect::CpuModel::GetMemory(uint16_t address)
         rv = rdata[0];
     }
 
-    DebugInfo(VERBOSITY_MEDIUM, "Getting memory, address:", address, "data:", rv);
+    DebugInfo(VERBOSITY_MEDIUM, "Getting memory, address:", tohexs(address, 4),
+                                    "data:", tohexs(rv, 8));
 
     return rv;
 }
@@ -115,7 +117,7 @@ uint32_t* spect::CpuModel::GetMemoryPtr()
 
 uint32_t spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "AHB Write", address, "data:", data);
+    DebugInfo(VERBOSITY_MEDIUM, "AHB Write", tohexs(address, 4), "data:", tohexs(data, 8));
 
     DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
     ch_mem.old_val[0] = memory_[address >> 2];
@@ -159,7 +161,7 @@ uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
         rv = rdata[0];
     }
 
-    DebugInfo(VERBOSITY_MEDIUM, "AHB Read", address, "data:", rv);
+    DebugInfo(VERBOSITY_MEDIUM, "AHB Read", tohexs(address, 4), "data:", tohexs(rv, 8));
     return rv;
 }
 
@@ -170,14 +172,14 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
         IsWithinMem(CpuMemory::CONST_ROM, address))
         rv = memory_[address >> 2];
 
-    DebugInfo(VERBOSITY_MEDIUM, "Core Read", address, "data:", rv);
+    DebugInfo(VERBOSITY_MEDIUM, "Core Read", tohexs(address, 4), "data:", tohexs(rv, 8));
 
     return rv;
 }
 
 uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "Core Write", address, "data:", data);
+    DebugInfo(VERBOSITY_MEDIUM, "Core Write", tohexs(address, 4), "data:", tohexs(data, 8));
 
     uint32_t written = 0;
     DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
@@ -198,7 +200,7 @@ uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 
 uint32_t spect::CpuModel::ReadMemoryCoreFetch(uint16_t address)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "Fetching instruction, address: ", address);
+    DebugInfo(VERBOSITY_MEDIUM, "Fetching instruction, address: ", tohexs(address, 4));
     if (IsWithinMem(CpuMemory::INSTR_MEM, address)) {
         return memory_[address >> 2];
     }
@@ -212,9 +214,9 @@ const uint256_t& spect::CpuModel::GetGpr(int index)
 
 void spect::CpuModel::SetGpr(int index, const uint256_t &val)
 {
-    char reg[4] = {0};
-    sprintf(reg, "R%d", index);
-    DebugInfo(VERBOSITY_MEDIUM, "Setting", reg, "to", val);
+    std::stringstream ss;
+    ss << static_cast<CpuGpr>(index);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting", ss.str(), "to", tohexs(val));
     gpr_[index] = val;
 }
 
@@ -225,7 +227,7 @@ uint16_t spect::CpuModel::GetPc()
 
 void spect::CpuModel::SetPc(uint16_t val)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "Setting PC to", val);
+    DebugInfo(VERBOSITY_MEDIUM, "Setting PC to", tohexs(val, 4));
     pc_ = val;
 }
 
@@ -275,7 +277,7 @@ void spect::CpuModel::SetSrr(const uint256_t &val)
 
 void spect::CpuModel::RarPush(uint16_t ret_addr)
 {
-    DebugInfo(VERBOSITY_MEDIUM, "Pushing", ret_addr, "to RAR stack.");
+    DebugInfo(VERBOSITY_MEDIUM, "Pushing", tohexs(ret_addr, 4), "to RAR stack.");
 
     if (GetRarSp() == SPECT_RAR_DEPTH)
         DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack overflow");
@@ -292,7 +294,7 @@ uint16_t spect::CpuModel::RarPop()
     SetRarSp(GetRarSp() - 1);
     uint16_t rv = GetRarAt(GetRarSp());
 
-    DebugInfo(VERBOSITY_MEDIUM, "Poping ", rv, "from RAR stack.");
+    DebugInfo(VERBOSITY_MEDIUM, "Poping ", tohexs(rv, 4), "from RAR stack.");
 
     return rv;
 }
@@ -328,7 +330,7 @@ bool spect::CpuModel::GetInterrrupt(CpuIntType int_type)
 
 void spect::CpuModel::GrvQueuePush(uint32_t data)
 {
-    DebugInfo(VERBOSITY_HIGH, "Pushing to GRV queue:", data);
+    DebugInfo(VERBOSITY_HIGH, "Pushing to GRV queue:", tohexs(data, 8));
     grv_q_.push(data);
 }
 
@@ -338,7 +340,7 @@ uint32_t spect::CpuModel::GrvQueuePop()
     if (!grv_q_.empty()) {
         rv = grv_q_.front();
         grv_q_.pop();
-        DebugInfo(VERBOSITY_HIGH, "Popping from GRV queue:", rv);
+        DebugInfo(VERBOSITY_HIGH, "Popping from GRV queue:", tohexs(rv, 8));
     } else
         DebugInfo(VERBOSITY_LOW, "Popping from empty GRV queue, returning 0");
     return rv;
@@ -356,7 +358,7 @@ uint32_t spect::CpuModel::GpkQueuePop(uint32_t index)
     if (!gpk_q_[index].empty()) {
         rv = gpk_q_[index].front();
         gpk_q_[index].pop();
-        DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", rv);
+        DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", tohexs(rv, 8));
     } else
         DebugInfo(VERBOSITY_LOW, "Popping from empty GPK queue", index, ": returning 0");
     return rv;
@@ -411,7 +413,7 @@ void spect::CpuModel::PrintHashContext(uint32_t verbosity_level)
     for (int i = 0; i < 8; i++) {
         std::stringstream ss;
         ss << "W[" << i << "] = ";
-        ss << std::hex << std::setw(16) << sha_512_.getContext(i);
+        ss << tohexs(sha_512_.getContext(i), 16);
         DebugInfo(verbosity_level, ss.str().c_str());
     }
 }
@@ -537,7 +539,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 {
     uint32_t wrd = ReadMemoryCoreFetch(GetPc());
 
-    DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", wrd);
+    DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", tohexs(wrd, 8));
     Instruction *instr = spect::Instruction::DisAssemble(wrd);
 
     // Detect invalid instruction and finish

@@ -104,11 +104,6 @@ class spect::CpuSimulator
         void PrintSymbols();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Set Object to a value
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        void SetObject(std::string object, std::string value);
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Starts the CPU simulator
         /// @param batch_mode True  - Start in batch mode
         ///                   False - Start in interactive mode
@@ -121,11 +116,6 @@ class spect::CpuSimulator
         ///////////////////////////////////////////////////////////////////////////////////////////
         bool CheckFinished();
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Run the program
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        void CmdRun();
-
         // Reference to CPU model executing the code
         CpuModel *model_;
 
@@ -136,12 +126,24 @@ class spect::CpuSimulator
         cli::Cli *cli_;
 
     private:
+
+        // Functions to execute individual commands
+        void CmdInfo(std::ostream &out, std::string arg1);
+        void CmdBreak(std::ostream &out, std::string arg1);
+        void CmdRun(std::ostream &out);
+        void CmdDelete(std::ostream &out, std::string arg1, bool all);
+        void CmdJump(std::ostream &out, std::string arg1);
+        void CmdStep(std::ostream &out, int n);
+        void CmdStart(std::ostream &out);
+        void CmdSet(std::ostream &out, std::string arg1, std::string arg2);
+
         // Array of breakpoints break-points
         std::vector<uint32_t> breakpoints_;
 
         // Indication model execution is in progress
         bool program_running_ = false;
 
+        // Create commands fo interactive CLI
         void BuildCliCommands(std::unique_ptr<cli::Menu> &menu);
 
 };

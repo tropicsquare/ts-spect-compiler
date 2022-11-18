@@ -48,30 +48,6 @@ bool spect::CpuSimulator::CheckFinished()
     return false;
 }
 
-void spect::CpuSimulator::CmdRun()
-{
-    if (CheckFinished())
-        return;
-
-    if (!program_running_) {
-        model_->Reset();
-        model_->Start();
-        program_running_ = true;
-    }
-    do {
-        model_->StepSingle(0);
-        auto pc = model_->GetPc();
-        if (IsBreakpointAt(pc)) {
-            std::cout << "Hit Breakpoint:\n";
-            PrintBreakpoint(pc);
-            break;
-        }
-    } while (!model_->IsFinished());
-
-    if (model_->IsFinished())
-        std::cout << "Program execution finished!\n";
-}
-
 bool spect::CpuSimulator::AddBreakpoint(uint16_t address)
 {
     if (IsBreakpointAt(address)) {
@@ -145,7 +121,6 @@ bool spect::CpuSimulator::RemoveBreakPoint(std::string label)
     return false;
 }
 
-
 bool spect::CpuSimulator::IsBreakpointAt(uint32_t address)
 {
     for (const uint32_t bp : breakpoints_)
@@ -215,48 +190,161 @@ void spect::CpuSimulator::PrintSymbols()
     compiler_->symbols_->Print(std::cout);
 }
 
-void spect::CpuSimulator::SetObject(std::string object, std::string value)
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Command functions
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void spect::CpuSimulator::CmdInfo(std::ostream &out, std::string arg1)
+{
+    if (arg1 == "breakpoints")
+        PrintBreakpoints();
+    else if (arg1 == "registers")
+        PrintGprRegisters();
+    else if (arg1 == "flags")
+        PrintFlags();
+    else if (arg1 == "rar")
+        PrintRar();
+    else if (arg1 == "pc")
+        PrintPc();
+    else if (arg1 == "symbols")
+        PrintSymbols();
+    else
+        std::cout << "Unknown object: " << arg1 << "\n";
+}
+
+void spect::CpuSimulator::CmdBreak(std::ostream &out, std::string arg1)
+{
+    std::stringstream ss;
+
+    // offset relative to current PC
+    if (arg1.size() > 0 && (arg1[0] == '-' || arg1[0] == '+')) {
+        uint16_t offset;
+        ss << arg1.substr(1, arg1.size() - 1);
+        ss >> offset;
+
+        if (offset % 4 != 0) {
+            std::cout << "Can't place breakpoint to 0x4 non-aligned address!\n";
+            return;
+        }
+
+        uint16_t bp_address = model_->GetPc() + offset;
+        if (arg1[0] == '-')
+            bp_address = model_->GetPc() + offset;
+        AddBreakpoint(bp_address);
+
+    // Absolute address
+    } else if (std::regex_match(arg1, std::regex("^" VAL_REGEX) )) {
+        ss << arg1;
+        uint16_t bp_address;
+        ss >> bp_address;
+        AddBreakpoint(bp_address);
+
+    // Symbol
+    } else {
+        AddBreakpoint(arg1);
+    }
+}
+
+void spect::CpuSimulator::CmdRun(std::ostream &out)
+{
+    if (CheckFinished())
+        return;
+
+    if (!program_running_) {
+        model_->Reset();
+        model_->Start();
+        program_running_ = true;
+    }
+    do {
+        model_->StepSingle(0);
+        auto pc = model_->GetPc();
+        if (IsBreakpointAt(pc)) {
+            std::cout << "Hit Breakpoint:\n";
+            PrintBreakpoint(pc);
+            break;
+        }
+    } while (!model_->IsFinished());
+
+    if (model_->IsFinished())
+        std::cout << "Program execution finished!\n";
+}
+
+void spect::CpuSimulator::CmdDelete(std::ostream &out, std::string arg1, bool all)
+{
+    std::stringstream ss;
+
+    if (all) {
+        if (arg1.size() == 0)
+            std::cout << "No breakpoint defined!:\n";
+        else
+            for (const uint32_t &bp : arg1)
+                RemoveBreakPoint(bp);
+    } else {
+        if (std::regex_match(arg1, std::regex("^" VAL_REGEX) )) {
+            ss << arg1;
+            uint16_t bp_address;
+            ss >> bp_address;
+            RemoveBreakPoint(bp_address);
+        } else {
+            RemoveBreakPoint(arg1);
+        }
+    }
+}
+
+void spect::CpuSimulator::CmdJump(std::ostream &out, std::string arg1)
+{
+    std::stringstream ss;
+
+    if (std::regex_match(arg1, std::regex("^" VAL_REGEX) )) {
+        ss << arg1;
+        uint16_t bp_address;
+        ss >> bp_address;
+        model_->SetPc(bp_address);
+    } else {
+        Symbol *s = compiler_->symbols_->GetSymbol(arg1);
+        if (s)
+            model_->SetPc(s->val_);
+        else
+            std::cout << "Symbol '" << arg1 << "' undefined!\n";
+    }
+}
+
+void spect::CpuSimulator::CmdSet(std::ostream &out, std::string arg1, std::string arg2)
 {
     int index;
     std::stringstream ss;
-    if (std::regex_match(object, std::regex("^" OP_REGEX))) {
-        std::string i_str = object.substr(1, object.size() - 1);
-        ss << i_str;
-        ss >> index;
-        model_->SetGpr(index, uint256_t(value.c_str()));
 
-    } else if (std::regex_match(object, std::regex("^mem\\[" NUM_REGEX "\\]"))) {
-        int from = object.find("[");
-        int to = object.find("]");
-        std::string i_str = object.substr(from + 1, to - from - 1);
-        ss << std::hex << i_str;
-        ss >> index;
-        printf("I_STR is: %s, Index is: %d\n", i_str.c_str(), index);
-        std::stringstream ss_v;
-        ss_v << std::hex << value;
-        uint32_t i_val;
-        ss_v >> i_val;
-        model_->SetMemory(index, i_val);
+    if (std::regex_match(arg1, std::regex("^" OP_REGEX))) {
+        std::string i_str = arg1.substr(1, arg1.size() - 1);
+        model_->SetGpr(stoint(i_str), uint256_t(arg2.c_str()));
+
+    } else if (std::regex_match(arg1, std::regex("^mem\\[" NUM_REGEX "\\]"))) {
+        int from = arg1.find("[");
+        int to = arg1.find("]");
+        std::string i_str = arg1.substr(from + 1, to - from - 1);
+        model_->SetMemory(stoint(i_str), stoint(arg2));
     }
+}
+
+void spect::CpuSimulator::CmdStep(std::ostream &out, int n)
+{
+    if (CheckFinished())
+        return;
+    model_->Step(n);
+}
+
+void spect::CpuSimulator::CmdStart(std::ostream &out)
+{
+    model_->Reset();
+    model_->Start();
+    program_running_ = true;
 }
 
 void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
 {
-    menu->Insert("info", [&](std::ostream &out, std::string type){
-                    if (type == "breakpoints")
-                        PrintBreakpoints();
-                    else if (type == "registers")
-                        PrintGprRegisters();
-                    else if (type == "flags")
-                        PrintFlags();
-                    else if (type == "rar")
-                        PrintRar();
-                    else if (type == "pc")
-                        PrintPc();
-                    else if (type == "symbols")
-                        PrintSymbols();
-                    else
-                        std::cout << "Unknown object: " << type << "\n";
+    menu->Insert("info", [&](std::ostream &out, std::string arg1){
+                    CmdInfo(out, arg1);
                  },
                 "Print information about:\n"
                 "           info breakpoints     - Breakpoints\n"
@@ -266,37 +354,8 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                 "           info rar             - Return address register stack\n"
                 "           info symbols         - Symbol table\n");
 
-
-    menu->Insert("break", [&](std::ostream &out, std::string breakpoint){
-                    std::stringstream ss;
-
-                    // offset relative to current PC
-                    if (breakpoint.size() > 0 && (breakpoint[0] == '-' || breakpoint[0] == '+')) {
-                        uint16_t offset;
-                        ss << breakpoint.substr(1, breakpoint.size() - 1);
-                        ss >> offset;
-
-                        if (offset % 4 != 0) {
-                            std::cout << "Can't place breakpoint to 0x4 non-aligned address!\n";
-                            return;
-                        }
-
-                        uint16_t bp_address = model_->GetPc() + offset;
-                        if (breakpoint[0] == '-')
-                            bp_address = model_->GetPc() + offset;
-                        AddBreakpoint(bp_address);
-
-                    // Absolute address
-                    } else if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
-                        ss << breakpoint;
-                        uint16_t bp_address;
-                        ss >> bp_address;
-                        AddBreakpoint(bp_address);
-
-                    // Symbol
-                    } else {
-                        AddBreakpoint(breakpoint);
-                    }
+    menu->Insert("break", [&](std::ostream &out, std::string arg1){
+                    CmdBreak(out, arg1);
                  },
                 "Add breakpoint:\n"
                 "            break <label>       - Put breakpoint at position of <label>\n"
@@ -304,86 +363,60 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                 "            break -+number      - Put breakpoint +- n instructions from current PC.\n");
 
      menu->Insert("delete", [&](std::ostream &out){
-                        breakpoints_.clear();
+                    CmdDelete(out, std::string(""), true);
                  },
                 "Delete all breakpoints.\n");
 
-    menu->Insert("delete", [&](std::ostream &out, std::string breakpoint){
-                    std::stringstream ss;
-
-                    if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
-                        ss << breakpoint;
-                        uint16_t bp_address;
-                        ss >> bp_address;
-                        RemoveBreakPoint(bp_address);
-                    } else {
-                        RemoveBreakPoint(breakpoint);
-                    }
+    menu->Insert("delete", [&](std::ostream &out, std::string arg1){
+                    CmdDelete(out, arg1, false);
                  },
                 "Delete breakpoints:\n"
                 "            delete <label>      - Delete breakpoint at <label>.\n"
                 "            delete address      - Delete breakpoint at address.\n");
 
-    menu->Insert("jump", [&](std::ostream &out, std::string breakpoint){
-                    std::stringstream ss;
-
-                    if (std::regex_match(breakpoint, std::regex("^" VAL_REGEX) )) {
-                        ss << breakpoint;
-                        uint16_t bp_address;
-                        ss >> bp_address;
-                        model_->SetPc(bp_address);
-                    } else {
-                        Symbol *s = compiler_->symbols_->GetSymbol(breakpoint);
-                        if (s)
-                            model_->SetPc(s->val_);
-                        else
-                            std::cout << "Symbol '" << breakpoint << "' undefined!\n";
-                    }
+    menu->Insert("jump", [&](std::ostream &out, std::string arg1){
+                    CmdJump(out, arg1);
                  },
                 "Delete breakpoints:\n"
                 "            jump <label>        - Set PC to position of <label>.\n"
                 "            jump address        - Set PC to address.\n");
 
-    menu->Insert("get", [&](std::ostream &out, std::string object, std::string value){
+    menu->Insert("get", [&](std::ostream &out, std::string arg1, std::string arg2){
                     // TODO: Add support for GET
                 },
                 "Get object value:\n"
                 "            get RX <value>             - Get GPR register value\n"
                 "            get mem[address] <value>   - Get value at address.\n");
 
-    menu->Insert("set", [&](std::ostream &out, std::string object, std::string value){
-                    SetObject(object, value);
+    menu->Insert("set", [&](std::ostream &out, std::string arg1, std::string arg2){
+                    CmdSet(out, arg1, arg2);
                 },
                 "Set object to a value:\n"
                 "            set RX <value>             - Set GPR register to a value.\n"
                 "            set mem[address] <value>   - Set memory address to value\n");
 
     menu->Insert("run", [&](std::ostream &out){
-                    CmdRun();
+                    CmdRun(out);
                  },
                 "Run program.");
+
     menu->Insert("r", [&](std::ostream &out){
-                    CmdRun();
+                    CmdRun(out);
                 },
                  "Run program.");
 
     menu->Insert("s", [&](std::ostream &out){
-                    if (CheckFinished())
-                        return;
-                    model_->Step(1);
+                    CmdStep(out, 1);
                 },
                  "Step single instruction.");
+
     menu->Insert("step", [&](std::ostream &out, int n){
-                    if (CheckFinished())
-                        return;
-                    model_->Step(n);
+                    CmdStep(out, n);
                 },
                  "Step N instructions.");
 
     menu->Insert("start", [&](std::ostream &out){
-                    model_->Reset();
-                    model_->Start();
-                    program_running_ = true;
+                    CmdStart(out);
                 },
                  "Start execution of program (Reset SPECT and load Start PC)");
 

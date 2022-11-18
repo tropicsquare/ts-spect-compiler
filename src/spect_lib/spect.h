@@ -142,6 +142,10 @@ namespace spect {
     class SymbolTable;
     class SourceFile;
 
+    uint32_t stoint(std::string str);
+    std::string tohexs(uint64_t i, int width);
+    std::string tohexs(uint256_t val);
+
     #define TO_INT(x) static_cast<int>(x)
     #define TO_CPU_GPR(x) static_cast<spect::CpuGpr>(x)
 

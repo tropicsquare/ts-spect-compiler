@@ -100,7 +100,7 @@ spect::CpuGpr spect::Compiler::ParseOp(spect::SourceFile *sf, int line_nr, std::
 {
     if (std::regex_match(arg, std::regex("^" OP_REGEX))) {
         arg.erase(0, 1);
-        return static_cast<spect::CpuGpr>(stoi(arg));
+        return static_cast<spect::CpuGpr>(stoint(arg));
     } else {
         char buf[128];
         std::sprintf(buf, "Invalid operand: '%s'. Valid operands: R0, R1 ... R31", arg.c_str());
