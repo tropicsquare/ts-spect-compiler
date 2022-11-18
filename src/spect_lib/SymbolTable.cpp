@@ -60,10 +60,38 @@ spect::Symbol* spect::SymbolTable::GetSymbol(const std::string &identifier)
     return nullptr;
 }
 
+spect::Symbol* spect::SymbolTable::GetSymbol(const uint32_t val, spect::SymbolType type)
+{
+    for (const auto &elem : symbol_map_) {
+        Symbol *s = (Symbol*)elem.second;
+        if (s->val_ == val && s->type_ == type)
+            return s;
+    }
+    return nullptr;
+}
+
 void spect::SymbolTable::Dump(std::ostream& os)
 {
     for (const auto &elem : symbol_map_) {
         Symbol *s = (Symbol*)elem.second;
-        os << elem.first << std::hex << " .eq 0x" << s->val_ << "\n";
+        os << elem.first << std::hex << " .eq 0x" << s->val_;
+        os << "     ; " << s->type_ << "\n";
+    }
+}
+
+void spect::SymbolTable::Print(std::ostream& os)
+{
+    using namespace std;
+
+    os << hex << setw(4);
+    for (const auto &elem : symbol_map_) {
+        Symbol *s = (Symbol*)elem.second;
+        os << "    ";
+        os << left  << setw(15) << elem.first << " = ";
+        stringstream ss;
+        ss << "0x" << hex << s->val_;
+        os << left << setw(10) << ss.str();
+        os << " - " << s->type_;
+        os << "\n";
     }
 }

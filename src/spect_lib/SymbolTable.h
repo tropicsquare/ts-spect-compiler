@@ -23,8 +23,10 @@ class spect::SymbolTable
         Symbol* AddSymbol(std::string identifier, spect::SymbolType type, uint32_t val, int line_nr);
         void ResolveSymbol(spect::Symbol *s, spect::SymbolType type, uint32_t val);
         Symbol* GetSymbol(const std::string &identifier);
+        Symbol* GetSymbol(const uint32_t val, spect::SymbolType type);
         bool IsDefined(const std::string &identifier);
         void Dump(std::ostream& os);
+        void Print(std::ostream& os);
         spect::SourceFile *curr_file_;
 
     private:

@@ -98,6 +98,8 @@ namespace spect {
         UNKNOWN
     };
 
+    std::ostream& operator << ( std::ostream& os, const spect::SymbolType& symbol_type);
+
     enum class HexFileType {
 
         // Instruction set simulator compatible. Word addressing
@@ -131,6 +133,7 @@ namespace spect {
     SPECT_SUM_INSTRUCTIONS
 
     class CpuModel;
+    class CpuSimulator;
     class CpuProgram;
     class HexHandler;
 

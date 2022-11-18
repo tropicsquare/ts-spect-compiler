@@ -18,6 +18,7 @@ add_library (SPECT STATIC
 
     CpuModel.cpp
     CpuProgram.cpp
+    CpuSimulator.cpp
 
     HexHandler.cpp
 

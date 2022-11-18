@@ -8,10 +8,12 @@
 
 #include "OptionParser.h"
 
+#include "CpuSimulator.h"
 #include "Compiler.h"
 #include "CpuModel.h"
 #include "CpuProgram.h"
 #include "HexHandler.h"
+
 
 enum  optionIndex {
     UNKNOWN,
@@ -20,6 +22,7 @@ enum  optionIndex {
     FIRST_ADDR,
     START_PC,
     CMD_FILE,
+    SHELL,
     INSTRUCTION_MEM_HEX,
     CONST_ROM_HEX,
     DATA_RAM_IN_HEX,
@@ -35,7 +38,8 @@ const option::Descriptor usage[] =
                                                                                                                            "option only when loading program via '--program' switch. Option is ignored"
                                                                                                                            "when loading program from HEX file.\n" },
     {START_PC,              0,  ""  ,    "start-pc"             ,option::Arg::Optional,     "  --start-pc=<addr>            Address of first instruction to be executed by model.\n"},
-    {CMD_FILE,              0,  ""  ,    "cmd-file"             ,option::Arg::Optional,     "  --cmd-file=<file>            Command file to be executed by Instruction simulator.\n"},
+    {CMD_FILE,              0,  ""  ,    "cmd-file"             ,option::Arg::Optional,     "  --cmd-file=<file>            Execute file with simulator shell commands.\n"},
+    {SHELL,                 0,  ""  ,    "shell"                ,option::Arg::Optional,     "  --shell                      Launch simulator in the interactive shell.\n"},
     {INSTRUCTION_MEM_HEX,   0,  ""  ,    "instruction-mem"      ,option::Arg::Optional,     "  --instruction-mem=<hex-file> Program (assembled) to be loaded to instruction memory.\n"},
     {CONST_ROM_HEX,         0,  ""  ,    "const-rom"            ,option::Arg::Optional,     "  --const-rom=<hex-file>       Content of Constant ROM to be loaded.\n"},
     {DATA_RAM_IN_HEX,       0,  ""  ,    "data-ram-in"          ,option::Arg::Optional,     "  --data-ram-in=<hex-file>     Content of Data RAM IN to be loaded.\n"},
@@ -44,8 +48,22 @@ const option::Descriptor usage[] =
     {0,0,0,0,0,0}
 };
 
-spect::Compiler *comp = nullptr;
-spect::CpuModel *model = nullptr;
+#define EXEC_WITH_ERR_HANDLER(code)                                                                 \
+    try {                                                                                           \
+            code                                                                                    \
+        } catch(std::runtime_error &err) {                                                          \
+            std::cout << err.what() << std::endl;                                                   \
+            program_exit(1);                                                                        \
+        }                                                                                           \
+
+spect::CpuSimulator *simulator;
+
+void program_exit(int ret_code)
+{
+    delete simulator;
+    exit(ret_code);
+}
+
 
 int main(int argc, char** argv)
 {
@@ -53,7 +71,6 @@ int main(int argc, char** argv)
     option::Stats  stats(usage, argc, argv);
     option::Option options[stats.options_max], buffer[stats.buffer_max];
     option::Parser parse(usage, argc, argv, options, buffer);
-    int ret_code = 0;
 
     if (parse.error()) {
         option::printUsage(std::cout, usage);
@@ -77,106 +94,103 @@ int main(int argc, char** argv)
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Initialize objects
+    // Initialize CPU simulator
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    model = new spect::CpuModel(false);
-    comp = new spect::Compiler(SPECT_INSTR_MEM_BASE);
-    uint32_t start_pc = SPECT_INSTR_MEM_BASE;
-    std::cout << "1" << std::endl;
+    simulator = new spect::CpuSimulator();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Compile the program if '.s' file passed on Command line and Preload memories
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    uint32_t *m_mem = simulator->model_->GetMemoryPtr();
 
     if (options[PROGRAM] && options[FIRST_ADDR]) {
         std::stringstream ss;
         ss << std::hex << options[FIRST_ADDR].arg;
-        ss >> comp->first_addr_ ;
+        ss >> simulator->compiler_->first_addr_ ;
     } else {
-        comp->Warning("'--first-address' undefined, and program loaded via '--program'."
-                      "First instruction will be placed at start of Instruction memory.");
+        simulator->compiler_->Warning(
+            "'--first-address' undefined, and program loaded via '--program'."
+            "First instruction will be placed at start of Instruction memory.");
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Compile and/or preload memories
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    uint32_t *m_mem = model->GetMemoryPtr();
 
     if (options[INSTRUCTION_MEM_HEX]) {
         if (options[PROGRAM]) {
-            comp->Error("Instruction model invoked with both '--program' and '--instruction-mem'."
-                        "Use only one source of program (either HEX or .s file)");
+            simulator->compiler_->Error(
+                "Instruction model invoked with both '--program' and '--instruction-mem'."
+                "Use only one source of program (either HEX or .s file)");
         }
-        try {
+        EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[INSTRUCTION_MEM_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_INSTR_MEM_BASE);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
-        }
+        })
     }
 
     if (options[PROGRAM]) {
         std::stringstream ss;
         ss << options[PROGRAM].arg;
-        try {
-            comp->Compile(ss.str());
-            uint32_t *p_start = m_mem + (comp->program_->first_addr_ >> 2);
-            comp->program_->Assemble(p_start);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
-        }
+        EXEC_WITH_ERR_HANDLER({
+            std::string line = std::string(80, '*') + std::string("\n");
+            simulator->compiler_->print_fnc(line.c_str());
+            simulator->compiler_->print_fnc("Launching SPECT compiler...\n");
+            simulator->compiler_->print_fnc(line.c_str());
+            simulator->compiler_->Compile(ss.str());
+            simulator->compiler_->CompileFinish();
+            uint32_t *p_start = m_mem + (simulator->compiler_->program_->first_addr_ >> 2);
+            simulator->compiler_->program_->Assemble(p_start);
+        })
     }
 
     if (options[CONST_ROM_HEX]) {
-        try {
+        EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[CONST_ROM_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_CONST_ROM_BASE);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
-        }
+        })
     }
 
     if (options[DATA_RAM_IN_HEX]) {
-        try {
+        EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[DATA_RAM_IN_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_DATA_RAM_IN_BASE);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
-        }
+        })
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Configure start address
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    uint32_t start_pc = SPECT_INSTR_MEM_BASE;
     if (options[PROGRAM]) {
-        if (comp->symbols_->IsDefined(START_SYMBOL))
-            start_pc = comp->symbols_->GetSymbol(START_SYMBOL)->val_;
+        if (simulator->compiler_->symbols_->IsDefined(START_SYMBOL))
+            start_pc = simulator->compiler_->symbols_->GetSymbol(START_SYMBOL)->val_;
         if (options[START_PC])
-            comp->Warning("'_start' symbol defined in .s file and '--start-pc' switch is used."
-                          " Using '--start-pc' as address of first executed instruction.");
+            simulator->compiler_->Warning(
+                "'_start' symbol defined in .s file and '--start-pc' switch is used."
+                " Using '--start-pc' as address of first executed instruction.");
     }
     if (options[START_PC]) {
         std::stringstream ss;
         ss << std::hex << options[START_PC].arg;
         ss >> start_pc;
     }
-    model->SetStartPc(start_pc);
+    simulator->model_->SetStartPc(start_pc);
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Reset the model
+    // Run the simulator:
+    //      --shell argument - Keep in shell
+    //      --cmd-file       - Load commands from cmd-file
+    // If --shell is not specified, then run batch and exit.
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    model->verbosity_ = VERBOSITY_HIGH;
-    model->Reset();
-    model->Start();
 
-    model->Step(0);
+    bool batch_mode = true;
+    std::string cmd_file = std::string("");
 
-cleanup:
-    delete model;
-    delete comp;
-    return ret_code;
+    if (options[SHELL])
+        batch_mode = false;
+
+    if (options[CMD_FILE])
+        cmd_file = std::string(options[CMD_FILE].arg);
+
+    simulator->Start(batch_mode, cmd_file.c_str());
+
+    return 0;
 }
