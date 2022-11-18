@@ -17,8 +17,8 @@
 #include <iostream>
 
 spect::InstructionR::InstructionR(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                                  CpuGpr op1, CpuGpr op2, CpuGpr op3, bool r31_dep) :
-    Instruction(mnemonic, InstructionType::R, opcode, func, op_mask, r31_dep),
+                                  CpuGpr op1, CpuGpr op2, CpuGpr op3, bool r31_dep, bool c_time) :
+    Instruction(mnemonic, InstructionType::R, opcode, func, op_mask, r31_dep, c_time),
     op1_(op1),
     op2_(op2),
     op3_(op3)

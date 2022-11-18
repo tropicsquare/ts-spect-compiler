@@ -16,8 +16,8 @@
 #include "Symbol.h"
 
 spect::InstructionM::InstructionM(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                                  CpuGpr op1, uint16_t addr, bool r31_dep) :
-    Instruction(mnemonic, InstructionType::M, opcode, func, op_mask, r31_dep),
+                                  CpuGpr op1, uint16_t addr, bool r31_dep, bool c_time) :
+    Instruction(mnemonic, InstructionType::M, opcode, func, op_mask, r31_dep, c_time),
     op1_(op1),
     addr_(addr)
 {}

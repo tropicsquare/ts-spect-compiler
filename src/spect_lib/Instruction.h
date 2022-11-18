@@ -27,9 +27,11 @@ class spect::Instruction
         /// @param opcode Instruction op-code (see SPECT Design specification)
         /// @param func Intsruction function (see SPECT Design specification)
         /// @param op_mask Instruction operand mask (operands required in the '.s' file).
+        /// @param r31_dep True - Instruction depends on content of register 31, False otherwise.
+        /// @param c_time True - Instruction shall execute in constant time, False otherwise.
         ///////////////////////////////////////////////////////////////////////////////////////////
         Instruction(std::string mnemonic, InstructionType itype, uint32_t opcode,
-                    uint32_t func, int op_mask, bool r31_dep);
+                    uint32_t func, int op_mask, bool r31_dep, bool c_time);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Instruction destructor
@@ -116,6 +118,9 @@ class spect::Instruction
 
         // True when instruction depends on register 31 content
         bool r31_dep_;
+
+        // Instruction executes in constant time
+        bool c_time_;
 
     public:
         // SPECT Model attached to the instruction

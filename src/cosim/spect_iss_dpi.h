@@ -285,10 +285,12 @@ extern "C" {
      *         execution of instruction with this mnemonic took.
      *  @param cycle_count Number of clock cycles it took to execute this instruction.
      *  @returns 0 - Instruction executed, and 'cycle_count' is equal to 'cycle_count' during
-     *               previous execution of instruction with the same mnemonic. Returned also
-     *               if instruction with the same mnemonic is executed first time since
-     *               model initialization or, if the instruction was previously executed
-     *               with 'cycle_count' = 0.
+     *               previous execution of instruction with the same mnemonic.
+     *               Returned also if:
+     *                  1. Instruction with the same mnemonic is executed first time since
+     *                     model initialization.
+     *                  2. The instruction was previously executed with 'cycle_count' = 0.
+     *                  3. Instruction shall not be executed in constant time.
      *           N - Number of instructions previous execution of instruction with the same
      *               took.
      */

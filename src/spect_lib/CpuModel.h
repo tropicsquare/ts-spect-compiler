@@ -75,10 +75,12 @@ class spect::CpuModel
         /// @brief Execute single instruction of program
         /// @param cycles Number of clock cycles it took to the actual HW to execute it.
         /// @returns 0 - Instruction executed, and 'cycles' is equal to 'cycles' during
-        ///              previous execution of instruction with the same mnemonic. Returned also
-        ///              if instruction with the same mnemonic is executed first time since
-        ///              model initialization or, if the instruction was previously executed
-        ///              with 'cycles' = 0.
+        ///              previous execution of instruction with the same mnemonic.
+        ///              Returned also if:
+        ///                 1. Instruction with the same mnemonic is executed first time since
+        ///                    model initialization.,
+        ///                 2. The instruction was previously executed with 'cycles' = 0.
+        ///                 3. Instruction has attribute 'c_time' set to false.
         ///          N - Number of instructions previous execution of instruction with the same
         ///              took.
         ///////////////////////////////////////////////////////////////////////////////////////////

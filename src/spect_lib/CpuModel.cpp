@@ -560,12 +560,17 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     // Check last execution time of instruction with the same mnemonic
     // Hold execution time of instruction per-mnemonic in Instruction Factory.
-    // Ignore cases where instruction is executed first time (gold->cycles_ == 0)
-    // or we stop measurement for whatever reason (cycles == 0).
+    // Ignore cases where:
+    //      1. Instruction is executed first time (gold->cycles_ == 0)
+    //      2. We stop measurement for whatever reason (cycles == 0).
+    //      3. Instruction has 'c_time' = false. Such instruction can last
+    //         variable amount of clock cycles.
     int rv = 0;
     Instruction *gold = spect::InstructionFactory::GetInstruction(instr->mnemonic_);
     if (cycles > 0 && gold->cycles_ > 0 && cycles != gold->cycles_)
         rv = gold->cycles_;
+    if (!gold->c_time_)
+        rv = 0;
 
     gold->cycles_ = cycles;
 

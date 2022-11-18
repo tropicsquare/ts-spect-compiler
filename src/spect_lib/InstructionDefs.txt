@@ -1,54 +1,54 @@
-TYPE          MNEMONIC         OPCODE        FUNC       OPERAND MASK     Depends on R31
-----------------------------------------------------------------------------------------
-R               ADD            0b0001        0b001          0b111           false
-R               SUB            0b0010        0b001          0b111           false
-R               CMP            0b0100        0b001          0b011           false
-R               AND            0b0001        0b010          0b111           false
-R                OR            0b0010        0b010          0b111           false
-R               XOR            0b0100        0b010          0b111           false
-R               NOT            0b1000        0b010          0b110           false
-R               LSL            0b0001        0b100          0b110           false
-R               LSR            0b0010        0b100          0b110           false
-R               ROL            0b0101        0b100          0b110           false
-R               ROR            0b0110        0b100          0b110           false
-R              ROL8            0b1001        0b100          0b110           false
-R              ROR8            0b1010        0b100          0b110           false
-R               SWE            0b1100        0b100          0b110           false
-R               MOV            0b0001        0b101          0b110           false
-R             CSWAP            0b0011        0b101          0b110           false
-R              HASH            0b0101        0b111          0b110           false
-R               GRV            0b1001        0b111          0b100           false
-R               SCB            0b1111        0b111          0b111           false
-R          MUL25519            0b0011        0b110          0b111           false
-R            MUL256            0b0111        0b110          0b111           false
-R              ADDP            0b1101        0b110          0b111           true
-R              SUBP            0b1110        0b110          0b111           true
-R              MULP            0b1111        0b110          0b111           true
-R              REDP            0b1100        0b110          0b111           true
+TYPE          MNEMONIC         OPCODE        FUNC       OPERAND MASK     Depends on R31     Constant Time
+----------------------------------------------------------------------------------------------------------
+R               ADD            0b0001        0b001          0b111           false               true
+R               SUB            0b0010        0b001          0b111           false               true
+R               CMP            0b0100        0b001          0b011           false               true
+R               AND            0b0001        0b010          0b111           false               true
+R                OR            0b0010        0b010          0b111           false               true
+R               XOR            0b0100        0b010          0b111           false               true
+R               NOT            0b1000        0b010          0b110           false               true
+R               LSL            0b0001        0b100          0b110           false               true
+R               LSR            0b0010        0b100          0b110           false               true
+R               ROL            0b0101        0b100          0b110           false               true
+R               ROR            0b0110        0b100          0b110           false               true
+R              ROL8            0b1001        0b100          0b110           false               true
+R              ROR8            0b1010        0b100          0b110           false               true
+R               SWE            0b1100        0b100          0b110           false               true
+R               MOV            0b0001        0b101          0b110           false               true
+R             CSWAP            0b0011        0b101          0b110           false               true
+R              HASH            0b0101        0b111          0b110           false               true
+R               GRV            0b1001        0b111          0b100           false               false
+R               SCB            0b1111        0b111          0b111           false               true
+R          MUL25519            0b0011        0b110          0b111           false               true
+R            MUL256            0b0111        0b110          0b111           false               true
+R              ADDP            0b1101        0b110          0b111           true                true
+R              SUBP            0b1110        0b110          0b111           true                true
+R              MULP            0b1111        0b110          0b111           true                true
+R              REDP            0b1100        0b110          0b111           true                true
 
 
-I              ADDI            0b0001        0b001          0b111           false
-I              SUBI            0b0010        0b001          0b111           false
-I              CMPI            0b0100        0b001          0b011           false
-I              ANDI            0b0001        0b010          0b111           false
-I               ORI            0b0010        0b010          0b111           false
-I              XORI            0b0100        0b010          0b111           false
-I              CMPA            0b1000        0b101          0b011           false
-I              MOVI            0b0001        0b101          0b101           false
-I           HASH_IT            0b0110        0b111          0b000           false
-I               GPK            0b1010        0b111          0b101           false
+I              ADDI            0b0001        0b001          0b111           false               true
+I              SUBI            0b0010        0b001          0b111           false               true
+I              CMPI            0b0100        0b001          0b011           false               true
+I              ANDI            0b0001        0b010          0b111           false               true
+I               ORI            0b0010        0b010          0b111           false               true
+I              XORI            0b0100        0b010          0b111           false               true
+I              CMPA            0b1000        0b101          0b011           false               true
+I              MOVI            0b0001        0b101          0b101           false               true
+I           HASH_IT            0b0110        0b111          0b000           false               true
+I               GPK            0b1010        0b111          0b101           false               false
 
 
-M                LD            0b0010        0b101          0b110           false
-M                ST            0b0100        0b101          0b110           false
+M                LD            0b0010        0b101          0b110           false               true
+M                ST            0b0100        0b101          0b110           false               true
 
 
-J              CALL            0b0001        0b000          0b100           false
-J               RET            0b0010        0b000          0b000           false
-J               BRZ            0b0100        0b000          0b100           false
-J              BRNZ            0b0101        0b000          0b100           false
-J               BRC            0b0110        0b000          0b100           false
-J              BRNC            0b0111        0b000          0b100           false
-J               JMP            0b1100        0b000          0b100           false
-J               END            0b1001        0b111          0b000           false
-J               NOP            0b1010        0b111          0b000           false
+J              CALL            0b0001        0b000          0b100           false               true
+J               RET            0b0010        0b000          0b000           false               true
+J               BRZ            0b0100        0b000          0b100           false               true
+J              BRNZ            0b0101        0b000          0b100           false               true
+J               BRC            0b0110        0b000          0b100           false               true
+J              BRNC            0b0111        0b000          0b100           false               true
+J               JMP            0b1100        0b000          0b100           false               true
+J               END            0b1001        0b111          0b000           false               true
+J               NOP            0b1010        0b111          0b000           false               true

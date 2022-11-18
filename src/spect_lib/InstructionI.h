@@ -20,7 +20,7 @@ class spect::InstructionI : public Instruction
 {
     public:
         InstructionI(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                     CpuGpr op1, CpuGpr op2, uint16_t immediate, bool r31_dep);
+                     CpuGpr op1, CpuGpr op2, uint16_t immediate, bool r31_dep, bool c_time);
         void Dump(std::ostream& os);
         spect::Symbol* Relocate();
         uint32_t Assemble();

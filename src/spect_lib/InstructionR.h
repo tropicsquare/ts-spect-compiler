@@ -21,7 +21,7 @@ class spect::InstructionR : public Instruction
 {
     public:
         InstructionR(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                     CpuGpr op1, CpuGpr op2, CpuGpr op3, bool r31_dep);
+                     CpuGpr op1, CpuGpr op2, CpuGpr op3, bool r31_dep, bool c_time);
         void Dump(std::ostream& os);
         spect::Symbol* Relocate();
         uint32_t Assemble();
