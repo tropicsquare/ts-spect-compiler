@@ -39,17 +39,15 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem, uint
                 uint32_t addr;
                 line.erase(0,1);
                 std::istringstream iss(line);
-                if (!(iss >> std::hex >> addr >> val)) {
-                    throw std::runtime_error("Unable to read line:" + line + " from file: " + path);
-                }
+                if (!(iss >> std::hex >> addr >> val))
+                    throw std::runtime_error("Unable to read line:" + line + " from file: " + path + "\n");
                 mem_c[addr >> 2] = val;
 
             // No address in hex file
             } else {
                 std::istringstream iss(line);
-                if (!(iss >> val)) {
-                    throw std::runtime_error("Unable to read line:" + line + " from file: " + path);
-                }
+                if (!(iss >> std::hex >> val))
+                    throw std::runtime_error("Unable to read line:" + line + " from file: " + path + "\n");
                 *mem_c = val;
                 mem_c++;
             }

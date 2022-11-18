@@ -48,6 +48,16 @@ bool spect::CpuSimulator::CheckFinished()
     return false;
 }
 
+bool spect::CpuSimulator::CheckRunning()
+{
+    if (!program_running_) {
+        std::cout << "Program is not running. Start the program with 'start',\n";
+        std::cout << "or run it till first breakpoint by 'run' command.\n";
+        return false;
+    }
+    return true;
+}
+
 bool spect::CpuSimulator::AddBreakpoint(uint16_t address)
 {
     if (IsBreakpointAt(address)) {
@@ -310,6 +320,35 @@ void spect::CpuSimulator::CmdJump(std::ostream &out, std::string arg1)
     }
 }
 
+void spect::CpuSimulator::CmdGet(std::ostream &out, std::string arg1)
+{
+    if (std::regex_match(arg1, std::regex("^" OP_REGEX))) {
+        std::string i_str = arg1.substr(1, arg1.size() - 1);
+        out << tohexs(model_->GetGpr(stoint(i_str))) << "\n";
+
+    } else if (std::regex_match(arg1, std::regex("^mem\\[" NUM_REGEX "\\]\\+" NUM_REGEX "?"))) {
+        // Check if multiple addresses should be shown
+        int n_pos = 1;
+        if (arg1.find('+') != std::string::npos)
+            n_pos = stoint(arg1.substr(arg1.find('+') + 1, arg1.size() - 1));
+
+        // Parse out base address
+        int b_low = arg1.find("[");
+        int b_high = arg1.find("]");
+        std::string i_str = arg1.substr(b_low + 1, b_high - b_low - 1);
+
+        // temporarily disable verbosity, to print data in HEX-like format
+        int tmp_verbosity = model_->verbosity_;
+        model_->verbosity_ = 0;
+        uint32_t base_addr = stoint(i_str);
+        for (uint32_t addr = base_addr; addr < (base_addr + (4 * n_pos)); addr += 4) {
+            out << "@" << tohexs(addr, 4) << ": ";
+            out << tohexs(model_->GetMemory(addr), 8) << "\n";
+        }
+        model_->verbosity_ = tmp_verbosity;
+    }
+}
+
 void spect::CpuSimulator::CmdSet(std::ostream &out, std::string arg1, std::string arg2)
 {
     int index;
@@ -330,6 +369,8 @@ void spect::CpuSimulator::CmdSet(std::ostream &out, std::string arg1, std::strin
 void spect::CpuSimulator::CmdStep(std::ostream &out, int n)
 {
     if (CheckFinished())
+        return;
+    if (!CheckRunning())
         return;
     model_->Step(n);
 }
@@ -381,19 +422,20 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                 "            jump <label>        - Set PC to position of <label>.\n"
                 "            jump address        - Set PC to address.\n");
 
-    menu->Insert("get", [&](std::ostream &out, std::string arg1, std::string arg2){
-                    // TODO: Add support for GET
+    menu->Insert("get", [&](std::ostream &out, std::string arg1){
+                    CmdGet(out, arg1);
                 },
                 "Get object value:\n"
-                "            get RX <value>             - Get GPR register value\n"
-                "            get mem[address] <value>   - Get value at address.\n");
+                "            get RX                - Get GPR register X value.\n"
+                "            get mem[address]      - Get value at memory address.\n"
+                "            get mem[address]+X    - Get value at memory address + X next addresses\n");
 
     menu->Insert("set", [&](std::ostream &out, std::string arg1, std::string arg2){
                     CmdSet(out, arg1, arg2);
                 },
                 "Set object to a value:\n"
-                "            set RX <value>             - Set GPR register to a value.\n"
-                "            set mem[address] <value>   - Set memory address to value\n");
+                "            set RX <value>             - Set GPR register X to <value>.\n"
+                "            set mem[address] <value>   - Set memory address to <value>\n");
 
     menu->Insert("run", [&](std::ostream &out){
                     CmdRun(out);

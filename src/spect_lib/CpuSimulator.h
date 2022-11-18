@@ -116,6 +116,11 @@ class spect::CpuSimulator
         ///////////////////////////////////////////////////////////////////////////////////////////
         bool CheckFinished();
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @returns True if program is running
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        bool CheckRunning();
+
         // Reference to CPU model executing the code
         CpuModel *model_;
 
@@ -136,6 +141,7 @@ class spect::CpuSimulator
         void CmdStep(std::ostream &out, int n);
         void CmdStart(std::ostream &out);
         void CmdSet(std::ostream &out, std::string arg1, std::string arg2);
+        void CmdGet(std::ostream &out, std::string arg1);
 
         // Array of breakpoints break-points
         std::vector<uint32_t> breakpoints_;
