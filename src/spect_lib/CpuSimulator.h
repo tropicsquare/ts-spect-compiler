@@ -109,7 +109,13 @@ class spect::CpuSimulator
         ///                   False - Start in interactive mode
         /// @param file Command file to be executed by the simulator.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Start(bool batch_mode, const char* cmd_file);
+        void Start(bool batch_mode, std::string cmd_file);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Starts the CPU simulator
+        /// @param path Path to command file
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void ExecCmdFile(std::string path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @returns True if program has already finished
@@ -142,6 +148,7 @@ class spect::CpuSimulator
         void CmdStart(std::ostream &out);
         void CmdSet(std::ostream &out, std::string arg1, std::string arg2);
         void CmdGet(std::ostream &out, std::string arg1);
+        void CmdLoad(std::ostream &out, std::string arg1, uint32_t offset);
 
         // Array of breakpoints break-points
         std::vector<uint32_t> breakpoints_;
@@ -151,6 +158,9 @@ class spect::CpuSimulator
 
         // Create commands fo interactive CLI
         void BuildCliCommands(std::unique_ptr<cli::Menu> &menu);
+
+        // Execute command file
+        void ExecCmdFile(std::string path, cli::CliLocalTerminalSession &session);
 
 };
 

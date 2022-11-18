@@ -7,11 +7,14 @@
 **************************************************************************************************/
 
 #include <regex>
+#include <fstream>
+#include <iostream>
 
 #include "spect.h"
 #include "CpuModel.h"
 #include "Compiler.h"
 #include "CpuSimulator.h"
+#include "HexHandler.h"
 
 spect::CpuSimulator::CpuSimulator()
 {
@@ -326,7 +329,7 @@ void spect::CpuSimulator::CmdGet(std::ostream &out, std::string arg1)
         std::string i_str = arg1.substr(1, arg1.size() - 1);
         out << tohexs(model_->GetGpr(stoint(i_str))) << "\n";
 
-    } else if (std::regex_match(arg1, std::regex("^mem\\[" NUM_REGEX "\\]\\+" NUM_REGEX "?"))) {
+    } else if (std::regex_match(arg1, std::regex("^mem\\[" NUM_REGEX "\\](\\+" NUM_REGEX ")?"))) {
         // Check if multiple addresses should be shown
         int n_pos = 1;
         if (arg1.find('+') != std::string::npos)
@@ -340,12 +343,14 @@ void spect::CpuSimulator::CmdGet(std::ostream &out, std::string arg1)
         // temporarily disable verbosity, to print data in HEX-like format
         int tmp_verbosity = model_->verbosity_;
         model_->verbosity_ = 0;
-        uint32_t base_addr = stoint(i_str);
-        for (uint32_t addr = base_addr; addr < (base_addr + (4 * n_pos)); addr += 4) {
+        uint16_t base_addr = stoint(i_str);
+        for (uint16_t addr = base_addr; addr < (base_addr + (4 * n_pos)); addr += 4) {
             out << "@" << tohexs(addr, 4) << ": ";
             out << tohexs(model_->GetMemory(addr), 8) << "\n";
         }
         model_->verbosity_ = tmp_verbosity;
+    } else {
+        std::cout << "Invalid object: " << arg1 << "\n";
     }
 }
 
@@ -364,6 +369,13 @@ void spect::CpuSimulator::CmdSet(std::ostream &out, std::string arg1, std::strin
         std::string i_str = arg1.substr(from + 1, to - from - 1);
         model_->SetMemory(stoint(i_str), stoint(arg2));
     }
+}
+
+void spect::CpuSimulator::CmdLoad(std::ostream &out, std::string arg1, uint32_t offset)
+{
+    uint32_t *mem = model_->GetMemoryPtr();
+    std::cout << "Loading " << arg1 << " to SPECT memory!\n";
+    HexHandler::LoadHexFile(arg1, mem, offset);
 }
 
 void spect::CpuSimulator::CmdStep(std::ostream &out, int n)
@@ -437,6 +449,18 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                 "            set RX <value>             - Set GPR register X to <value>.\n"
                 "            set mem[address] <value>   - Set memory address to <value>\n");
 
+    menu->Insert("load", [&](std::ostream &out, std::string arg1){
+                    CmdLoad(out, arg1, 0);
+                 },
+                "Load file to SPECT memory. Place at address from HEX file.\n"
+                "           load <hex-file>               - Load HEX file.");
+
+    menu->Insert("load", [&](std::ostream &out, std::string arg1, std::string arg2){
+                    CmdLoad(out, arg1, stoint(arg2));
+                 },
+                "Load file to SPECT memory. Place at address from HEX file + offset:\n"
+                "           load <hex-file> <offset>      - Load HEX file.");
+
     menu->Insert("run", [&](std::ostream &out){
                     CmdRun(out);
                  },
@@ -464,7 +488,7 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
 
 }
 
-void spect::CpuSimulator::Start(bool batch_mode, const char* cmd_file)
+void spect::CpuSimulator::Start(bool batch_mode, std::string cmd_file)
 {
     if (batch_mode) {
         model_->Reset();
@@ -484,6 +508,27 @@ void spect::CpuSimulator::Start(bool batch_mode, const char* cmd_file)
                 scheduler.Stop();
             }
         );
+
+        if (cmd_file != "")
+            ExecCmdFile(cmd_file, session);
+
         scheduler.Run();
+    }
+}
+
+void spect::CpuSimulator::ExecCmdFile(std::string path, cli::CliLocalTerminalSession &session)
+{
+    std::ifstream ifs;
+    ifs.open(path);
+    std::string line;
+    if (ifs.is_open()) {
+        std::cout << "Loading command file: " << path << "\n";
+        while (std::getline(ifs, line)) {
+            std::cout << "Executing command: " << line << "\n";
+            session.Feed(line);
+        }
+        session.Feed("\n");
+    } else {
+        std::cout << "Failed to open command file: " << path << "\n";
     }
 }
