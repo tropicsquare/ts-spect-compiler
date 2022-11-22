@@ -37,7 +37,7 @@ function(string_starts_with str search)
 endfunction()
 
 
-file(STRINGS InstructionDefs.txt IDEF_LIST)
+file(STRINGS ${TS_SPECT_COMPILER_ROOT}/templates/InstructionDefs.txt IDEF_LIST)
 
 set(DEF_STR "")
 set(REG_STR "")
@@ -59,6 +59,7 @@ foreach(LINE ${IDEF_LIST})
         list(GET LINE_LIST 4 OPMASK)
         list(GET LINE_LIST 5 R31_DEP)
         list(GET LINE_LIST 6 C_TIME)
+        list(GET LINE_LIST 7 CROSS_COVER)
 
         message("   ${InstructionColor}${MNEMONIC}${ColourReset}")
 

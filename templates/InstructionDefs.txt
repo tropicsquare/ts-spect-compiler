@@ -1,0 +1,57 @@
+_TYPES: R=0b11 I=0b01 M=0b10 J=0b00
+
+----------------------------------------------------------------------------------------------------------------------------------
+- TYPE        MNEMONIC         OPCODE        FUNC       OPERAND MASK     Depends on R31     Constant Time       OP2 x OP3 Cross
+----------------------------------------------------------------------------------------------------------------------------------
+R               ADD            0b0001        0b001          0b111           false               true                0
+R               SUB            0b0010        0b001          0b111           false               true                0
+R               CMP            0b0100        0b001          0b011           false               true                0
+R               AND            0b0001        0b010          0b111           false               true                0
+R                OR            0b0010        0b010          0b111           false               true                0
+R               XOR            0b0100        0b010          0b111           false               true                0
+R               NOT            0b1000        0b010          0b110           false               true                0
+R               LSL            0b0001        0b100          0b110           false               true                0
+R               LSR            0b0010        0b100          0b110           false               true                0
+R               ROL            0b0101        0b100          0b110           false               true                0
+R               ROR            0b0110        0b100          0b110           false               true                0
+R              ROL8            0b1001        0b100          0b110           false               true                0
+R              ROR8            0b1010        0b100          0b110           false               true                0
+R               SWE            0b1100        0b100          0b110           false               true                0
+R               MOV            0b0001        0b101          0b110           false               true                0
+R             CSWAP            0b0011        0b101          0b110           false               true                0
+R              HASH            0b0101        0b111          0b110           false               true                0
+R               GRV            0b1001        0b111          0b100           false               false               0
+R               SCB            0b1111        0b111          0b111           false               true                0
+R          MUL25519            0b0011        0b110          0b111           false               true                1
+R            MUL256            0b0111        0b110          0b111           false               true                1
+R              ADDP            0b1101        0b110          0b111           true                true                1
+R              SUBP            0b1110        0b110          0b111           true                true                1
+R              MULP            0b1111        0b110          0b111           true                true                1
+R              REDP            0b1100        0b110          0b111           true                true                1
+
+
+I              ADDI            0b0001        0b001          0b111           false               true                0
+I              SUBI            0b0010        0b001          0b111           false               true                0
+I              CMPI            0b0100        0b001          0b011           false               true                0
+I              ANDI            0b0001        0b010          0b111           false               true                0
+I               ORI            0b0010        0b010          0b111           false               true                0
+I              XORI            0b0100        0b010          0b111           false               true                0
+I              CMPA            0b1000        0b101          0b011           false               true                0
+I              MOVI            0b0001        0b101          0b101           false               true                0
+I           HASH_IT            0b0110        0b111          0b000           false               true                0
+I               GPK            0b1010        0b111          0b101           false               false               0
+
+
+M                LD            0b0010        0b101          0b110           false               true                0
+M                ST            0b0100        0b101          0b110           false               true                0
+
+
+J              CALL            0b0001        0b000          0b100           false               true                0
+J               RET            0b0010        0b000          0b000           false               true                0
+J               BRZ            0b0100        0b000          0b100           false               true                0
+J              BRNZ            0b0101        0b000          0b100           false               true                0
+J               BRC            0b0110        0b000          0b100           false               true                0
+J              BRNC            0b0111        0b000          0b100           false               true                0
+J               JMP            0b1100        0b000          0b100           false               true                0
+J               END            0b1001        0b111          0b000           false               true                0
+J               NOP            0b1010        0b111          0b000           false               true                0

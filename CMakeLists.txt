@@ -6,6 +6,8 @@ project( SPECT_COMPILER C CXX)
 set (CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_FLAGS "-O0")
 
+set(TS_SPECT_COMPILER_ROOT "${CMAKE_CURRENT_LIST_DIR}")
+
 include_directories(
     "src/common"
     "src/spect_lib"

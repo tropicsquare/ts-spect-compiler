@@ -1,0 +1,300 @@
+/******************************************************************************
+* SPECT - Coverage
+*
+* TODO: License
+*
+* Author: Marek Santa
+******************************************************************************/
+
+///////////////////////////////////////////////////////////////////////////////
+// Typedefs
+///////////////////////////////////////////////////////////////////////////////
+
+// Instructions
+typedef enum bit[8:0] {
+  {% for instruction in instructions %}
+    I_{{instruction.mnemonic}} = 9'b{{instruction.i_type}}_{{instruction.opcode}}_{{instruction.func}}{{ ", " if not loop.last else "" }}{% endfor %}
+} instr_t;
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Covergroups
+/////////////////////////////////////////////////////////////////////////////
+
+// -------------------------------------------------------------------------
+// Cover each instruction
+// -------------------------------------------------------------------------
+covergroup instruction_cov with function sample(instr_t instr);
+  // Instruction
+  cp_instr: coverpoint instr;
+endgroup : instruction_cov
+
+
+// -------------------------------------------------------------------------
+// Cover each bit of register toggled
+// -------------------------------------------------------------------------
+covergroup register_cov with function sample(logic[255:0] value, int position);
+  // Track coverage information for each instance
+  option.per_instance = 1;
+
+  cp_register_zero: coverpoint position iff (value[position] == 0) {
+    bins b[] = {[0:255]};
+  }
+
+  cp_register_one: coverpoint position iff (value[position] == 1) {
+    bins b[] = {[0:255]};
+  }
+endgroup : register_cov
+
+
+// -------------------------------------------------------------------------
+// Cover each bit of immediate toggled
+// -------------------------------------------------------------------------
+covergroup immediate_cov with function sample(logic[11:0] value, int position);
+  // Track coverage information for each instance
+  option.per_instance = 1;
+
+  cp_immediate_zero: coverpoint position iff (value[position] == 0) {
+    bins b[] = {[0:12]};
+  }
+
+  cp_immediate_one: coverpoint position iff (value[position] == 1) {
+    bins b[] = {[0:12]};
+  }
+endgroup : immediate_cov
+
+// -------------------------------------------------------------------------
+// Cover each bit of NewPC / Addr toggled
+// -------------------------------------------------------------------------
+covergroup addr_newpc_cov with function sample(logic[15:0] value, int position);
+  // Track coverage information for each instance
+  option.per_instance = 1;
+
+  cp_immediate_zero: coverpoint position iff (value[position] == 0) {
+    bins b[] = {[0:15]};
+  }
+
+  cp_immediate_one: coverpoint position iff (value[position] == 1) {
+    bins b[] = {[0:15]};
+  }
+endgroup : addr_newpc_cov
+
+
+// -------------------------------------------------------------------------
+// Instruction with 3 operands
+// -------------------------------------------------------------------------
+covergroup operands_3_regs_cov with function sample(logic[4:0] op1, logic[4:0] op2, logic[4:0] op3);
+  option.per_instance = 1;
+
+  // Operand 1
+  cp_op1: coverpoint op1 {
+    bins register = {[0:31]};
+  }
+
+  // Operand 2
+  cp_op2: coverpoint op2 {
+    bins register = {[0:31]};
+  }
+
+  // Operand 3
+  cp_op3: coverpoint op3 {
+    bins register = {[0:31]};
+  }
+
+  // Two same operands
+  cp_op1_eq_op2: coverpoint (op1 == op2) {
+    bins true  = {1};
+    bins false = {0};
+  }
+
+  cp_op1_eq_op3: coverpoint (op1 == op3) {
+    bins true  = {1};
+    bins false = {0};
+  }
+
+  cp_op2_eq_op3: coverpoint (op2 == op3) {
+    bins true  = {1};
+    bins false = {0};
+  }
+
+  // Three same operands
+  cp_op1_eq_op2_eq_op3: coverpoint (op1 == op2 && op2 == op3) {
+    bins true  = {1};
+    bins false = {0};
+  }
+
+endgroup : operands_3_regs_cov
+
+
+// -----------------------------
+// Instruction with 2 operands
+// -----------------------------
+
+covergroup operands_2_regs_cov with function sample(logic[4:0] op1, logic[4:0] op2);
+  option.per_instance = 1;
+
+  // Operand 1
+  cp_op1: coverpoint op1 {
+    bins register = {[0:31]};
+  }
+
+  // Operand 2
+  cp_op2: coverpoint op2 {
+    bins register = {[0:31]};
+  }
+
+  // Two same operands
+  cp_op1_eq_op2: coverpoint (op1 == op2) {
+    bins true  = {1};
+    bins false = {0};
+  }
+
+endgroup : operands_2_regs_cov
+
+// -----------------------------
+// Instruction with 1 operand
+// -----------------------------
+
+covergroup operands_1_reg_cov with function sample(logic[4:0] op1);
+  option.per_instance = 1;
+
+  // Operand 1
+  cp_op1: coverpoint op1 {
+    bins register = {[0:31]};
+  }
+
+endgroup : operands_1_reg_cov
+
+
+// -----------------------------
+// Operand values combination
+// -----------------------------
+
+covergroup op2_op3_cross_cov with function sample(logic[255:0] op2_val, logic[255:0] op3_val);
+  option.per_instance = 1;
+
+  // Operand 2
+  cp_op2 : coverpoint op2_val {
+    bins op2_val[10] = {[0:$]};
+  }
+
+  // Operand 3
+  cp_op3 : coverpoint op3_val {
+    bins op3_val[10] = {[0:$]};
+  }
+
+  // Cross
+  cp_op2_op3_cross : cross cp_op2, cp_op3;
+
+endgroup : op2_op3_cross_cov
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Generated covergroups
+/////////////////////////////////////////////////////////////////////////////
+
+
+class spect_coverage extends uvm_component;
+  // UVM Factory Registration
+  `uvm_component_utils(spect_env_pkg::spect_coverage)
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Data Members
+  /////////////////////////////////////////////////////////////////////////////
+
+  // Covergroups
+  instruction_cov                     m_instruction_cov;
+
+  // Coverage for instruction operand and their combinations
+{% for instruction in instructions %}{% if 'op_cov_def' in instruction %}{{instruction.op_cov_def}}{% endif %}{% endfor %}
+
+  // Coverage for toggling on instruction operands
+{% for instruction in instructions %}{{instruction.val_cov_def}}{% endfor %}
+
+  // Coverage for toggling on Immediate
+{% for instruction in instructions %}{{instruction.imm_cov_def}}{% endfor %}
+
+  // Coverage for toggling on NewPC
+{% for instruction in instructions %}{{instruction.newpc_cov_def}}{% endfor %}
+
+  // Coverage for toggling on Addr
+{% for instruction in instructions %}{{instruction.addr_cov_def}}{% endfor %}
+
+  // Cross coverage for operands 2 and 3
+{% for instruction in instructions %}{% if 'cross_cov_def' in instruction %}{{instruction.cross_cov_def}}{% endif %}{% endfor %}
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Methods
+  /////////////////////////////////////////////////////////////////////////////
+
+  //***************************************************************************
+  // Function: new
+  // Class constructor
+  //
+  // Parameters:
+  // name   - Component's name
+  // parent - Parent object in hierarchy
+  //***************************************************************************
+  function new(string name, uvm_component parent);
+    super.new(name, parent);
+
+    m_instruction_cov = new;
+
+{% for instruction in instructions %}{% if 'op_cov_constr' in instruction %}{{instruction.op_cov_constr}}{% endif %}{% endfor %}
+{% for instruction in instructions %}{% if 'val_cov_constr' in instruction %}{{instruction.val_cov_constr}}{% endif %}{% endfor %}
+{% for instruction in instructions %}{% if 'imm_cov_constr' in instruction %}{{instruction.imm_cov_constr}}{% endif %}{% endfor %}
+{% for instruction in instructions %}{% if 'newpc_cov_constr' in instruction %}{{instruction.newpc_cov_constr}}{% endif %}{% endfor %}
+{% for instruction in instructions %}{% if 'addr_cov_constr' in instruction %}{{instruction.addr_cov_constr}}{% endif %}{% endfor %}
+{% for instruction in instructions %}{% if 'cross_cov_constr' in instruction %}{{instruction.cross_cov_constr}}{% endif %}{% endfor %}
+
+  endfunction : new
+
+
+  //***************************************************************************
+  // Function: sample_instruction
+  // This function will be called from Predictor every time an instruction is
+  // executed. Type of the input parameter can be any appropriate
+  // representation of an instruction (string, bit vector, structure, ...)
+
+  // Parameters:
+  // instr - instruction
+  //***************************************************************************
+  function void sample_instruction(dpi_instruction_t dpi_instruction);
+
+    // Convert instruction encoding to vector format
+    logic [1:0] l_type   = dpi_instruction.i_type;
+    logic [3:0] l_opcode = dpi_instruction.opcode;
+    logic [2:0] l_func   = dpi_instruction.func;
+
+    logic [255:0] op1 = {32'(dpi_instruction.v.r.op1[7]), 32'(dpi_instruction.v.r.op1[6]),
+                         32'(dpi_instruction.v.r.op1[5]), 32'(dpi_instruction.v.r.op1[4]),
+                         32'(dpi_instruction.v.r.op1[3]), 32'(dpi_instruction.v.r.op1[2]),
+                         32'(dpi_instruction.v.r.op1[1]), 32'(dpi_instruction.v.r.op1[0])};
+
+    logic [255:0] op2 = {32'(dpi_instruction.v.r.op2[7]), 32'(dpi_instruction.v.r.op2[6]),
+                         32'(dpi_instruction.v.r.op2[5]), 32'(dpi_instruction.v.r.op2[4]),
+                         32'(dpi_instruction.v.r.op2[3]), 32'(dpi_instruction.v.r.op2[2]),
+                         32'(dpi_instruction.v.r.op2[1]), 32'(dpi_instruction.v.r.op2[0])};
+
+    logic [255:0] op3 = {32'(dpi_instruction.v.r.op3[7]), 32'(dpi_instruction.v.r.op3[6]),
+                         32'(dpi_instruction.v.r.op3[5]), 32'(dpi_instruction.v.r.op3[4]),
+                         32'(dpi_instruction.v.r.op3[3]), 32'(dpi_instruction.v.r.op3[2]),
+                         32'(dpi_instruction.v.r.op3[1]), 32'(dpi_instruction.v.r.op3[0])};
+
+    // Sample instruction
+    m_instruction_cov.sample(instr_t'({l_type, l_opcode, l_func}));
+
+    // Sample operands
+    case ({l_type, l_opcode, l_func})
+
+      {% for instruction in instructions %}
+        I_{{ instruction.mnemonic }}: begin
+{% if 'op_cov_sample' in instruction %}{{instruction.op_cov_sample}}{% endif %}{% if 'val_cov_sample' in instruction %}{{instruction.val_cov_sample}}{% endif %}{% if 'imm_cov_sample' in instruction %}{{instruction.imm_cov_sample}}{% endif %}{% if 'newpc_cov_sample' in instruction %}{{instruction.newpc_cov_sample}}{% endif %}{% if 'addr_cov_sample' in instruction %}{{instruction.addr_cov_sample}}{% endif %}{% if 'cross_cov_sample' in instruction %}{{instruction.cross_cov_sample}}{% endif %}
+        end
+      {% endfor -%}
+    endcase
+
+  endfunction : sample_instruction
+
+endclass : spect_coverage
