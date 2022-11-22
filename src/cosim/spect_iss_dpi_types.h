@@ -52,6 +52,38 @@ typedef enum {
     DPI_HEX_VERILOG_ADDR_WORD   = (1 << 2)
 } dpi_hex_file_type_t;
 
+typedef struct {
+    uint32_t i_type;
+    uint32_t opcode;
+    uint32_t func;
+
+    // Register indices 0 -31
+    uint32_t op1;
+    uint32_t op2;
+    uint32_t op3;
+
+    // Parameter (operand, immediate, etc...) values
+    union {
+        struct {
+            uint32_t op1[8];
+            uint32_t op2[8];
+            uint32_t op3[8];
+        } r;
+        struct {
+            uint32_t op1[8];
+            uint32_t op2[8];
+            uint32_t immediate;
+        } i;
+        struct {
+            uint32_t op1[8];
+            uint32_t addr;
+        } m;
+        struct {
+            uint32_t new_pc;
+        } j;
+    } v;
+} dpi_instruction_t;
+
 inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {
     switch (in){
     case DPI_CHANGE_GPR  : return std::string("DPI_CHANGE_GPR");

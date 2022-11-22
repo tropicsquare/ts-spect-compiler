@@ -97,6 +97,37 @@ package spect_iss_dpi_pkg;
     int unsigned      new_val[8] = '{default: 0};
   } dpi_state_change_t;
 
+  typedef struct {
+    int unsigned i_type;
+    int unsigned opcode;
+    int unsigned func;
+
+    // Register indices 0 -31
+    int unsigned op1;
+    int unsigned op2;
+    int unsigned op3;
+
+    // Parameter (operand, immediate, etc...) values
+    union {
+        struct {
+            int unsigned op1[8];
+            int unsigned op2[8];
+            int unsigned op3[8];
+        } r;
+        struct {
+            int unsigned op1[8];
+            int unsigned op2[8];
+            int unsigned immediate;
+        } i;
+        struct {
+            int unsigned op1[8];
+            int unsigned addr;
+        } m;
+        struct {
+            int unsigned new_pc;
+        } j;
+    } v;
+  } dpi_instruction_t;
 
   /////////////////////////////////////////////////////////////////////////////
   // Imports section
