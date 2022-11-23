@@ -3,6 +3,15 @@
 *
 * TODO: License
 *
+* This file is auto-generated at build-time of SPECT model from golden
+* representation of instructions in 'InstructionDefs.txt'.
+*
+* !!! DO NOT MODIFY THIS FILE BY HAND !!!
+*
+* If you need to modify generated coverage class, modify
+* 'coverage_class_template.txt' template which is used to generate the
+* coverage class.
+*
 * Author: Marek Santa
 ******************************************************************************/
 
