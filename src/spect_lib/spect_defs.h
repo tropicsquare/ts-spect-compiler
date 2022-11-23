@@ -1,13 +1,13 @@
 /**************************************************************************************************
-* 
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 **************************************************************************************************/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,8 +79,11 @@
 #define SPECT_INSTR_MEM_SIZE 0x2000
 #endif
 
-// If true, SPECT instruction memory is read/writable via AHB
-#define SPECT_INSTR_MEM_AHB_RW true
+// If true, SPECT instruction memory is readable via AHB
+#define SPECT_INSTR_MEM_AHB_R false
+
+// If true, SPECT instruction memory is writable via AHB
+#define SPECT_INSTR_MEM_AHB_W true
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Internal defines

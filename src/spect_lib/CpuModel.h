@@ -36,10 +36,11 @@ class spect::CpuModel
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief New CPU model constructor
-        /// @param instr_mem_rw Whether instruction memory has R/W access via AHB
+        /// @param instr_mem_ahb_w Instruction memory writable via AHB
+        /// @param instr_mem_ahb_r Instruction memory readable via AHB
         /// @returns New model object
         ///////////////////////////////////////////////////////////////////////////////////////////
-        CpuModel(bool instr_mem_ahb_rw);
+        CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief CPU model destructor
@@ -385,11 +386,11 @@ class spect::CpuModel
         // Queue for processor state changes
         std::queue<dpi_state_change_t> change_q_;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // true  - Instruction RAM (R/W from AHB), R from Core
-        // false - Instruction ROM(no access from AHB), R from Core
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        const bool instr_mem_rw_;
+        // Instruction memory writable via AHB
+        const bool instr_mem_ahb_w_;
+
+        // Instruction memory readable via AHB
+        const bool instr_mem_ahb_r_;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // true  - Program has finished (END has been executed or Error occured)

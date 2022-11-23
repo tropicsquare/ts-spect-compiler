@@ -19,8 +19,9 @@
 #include "InstructionFactory.h"
 
 
-spect::CpuModel::CpuModel(bool instr_mem_rw) :
-    instr_mem_rw_(instr_mem_rw)
+spect::CpuModel::CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r) :
+    instr_mem_ahb_w_(instr_mem_ahb_w),
+    instr_mem_ahb_r_(instr_mem_ahb_r)
 {
     memory_ = new uint32_t[SPECT_TOTAL_MEM_SIZE / 4];
     regs_ = new ordt_root();
@@ -124,7 +125,7 @@ uint32_t spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
     uint32_t written = 0;
 
     if ( IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
-        (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_rw_)) {
+        (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_ahb_w_)) {
         memory_[address >> 2] = data;
         written = data;
     }
@@ -152,7 +153,7 @@ uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
     uint32_t rv = 0;
 
     if ( IsWithinMem(CpuMemory::DATA_RAM_OUT, address) ||
-        (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_rw_))
+        (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_ahb_r_))
         rv = memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {

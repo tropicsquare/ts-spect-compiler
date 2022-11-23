@@ -18,7 +18,7 @@
 
 spect::CpuSimulator::CpuSimulator()
 {
-    model_ = new spect::CpuModel(SPECT_INSTR_MEM_AHB_RW);
+    model_ = new spect::CpuModel(SPECT_INSTR_MEM_AHB_W, SPECT_INSTR_MEM_AHB_R);
     model_->verbosity_ = VERBOSITY_HIGH;
     compiler_ = new spect::Compiler(SPECT_INSTR_MEM_BASE);
 
