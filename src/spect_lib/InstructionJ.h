@@ -16,6 +16,8 @@
 #include "spect.h"
 
 #include "Instruction.h"
+#include "CpuModel.h"
+#include "spect_iss_dpi_types.h"
 
 class spect::InstructionJ : public Instruction
 {
@@ -27,6 +29,8 @@ class spect::InstructionJ : public Instruction
         uint32_t Assemble();
         static Instruction* DisAssemble(uint32_t wrd);
         bool Execute();
+        void SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *model);
+        void SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model);
 
         uint16_t new_pc_ : IENC_NEW_PC_BITS;
 

@@ -57,31 +57,20 @@ typedef struct {
     uint32_t opcode;
     uint32_t func;
 
-    // Register indices 0 -31
+    // Register indices:
+    //      0 - 31     - Valid register indices
     uint32_t op1;
     uint32_t op2;
     uint32_t op3;
 
-    // Parameter (operand, immediate, etc...) values
-    union {
-        struct {
-            uint32_t op1[8];
-            uint32_t op2[8];
-            uint32_t op3[8];
-        } r;
-        struct {
-            uint32_t op1[8];
-            uint32_t op2[8];
-            uint32_t immediate;
-        } i;
-        struct {
-            uint32_t op1[8];
-            uint32_t addr;
-        } m;
-        struct {
-            uint32_t new_pc;
-        } j;
-    } v;
+    uint32_t immediate;
+    uint32_t addr;
+    uint32_t new_pc;
+
+    // Operand values
+    uint32_t op1_v[8];
+    uint32_t op2_v[8];
+    uint32_t op3_v[8];
 } dpi_instruction_t;
 
 inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {

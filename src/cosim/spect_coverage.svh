@@ -511,20 +511,20 @@ class spect_coverage extends uvm_component;
     logic [3:0] l_opcode = dpi_instruction.opcode;
     logic [2:0] l_func   = dpi_instruction.func;
 
-    logic [255:0] op1 = {32'(dpi_instruction.v.r.op1[7]), 32'(dpi_instruction.v.r.op1[6]),
-                         32'(dpi_instruction.v.r.op1[5]), 32'(dpi_instruction.v.r.op1[4]),
-                         32'(dpi_instruction.v.r.op1[3]), 32'(dpi_instruction.v.r.op1[2]),
-                         32'(dpi_instruction.v.r.op1[1]), 32'(dpi_instruction.v.r.op1[0])};
+    logic [255:0] op1 = {32'(dpi_instruction.op1_v[7]), 32'(dpi_instruction.op1_v[6]),
+                         32'(dpi_instruction.op1_v[5]), 32'(dpi_instruction.op1_v[4]),
+                         32'(dpi_instruction.op1_v[3]), 32'(dpi_instruction.op1_v[2]),
+                         32'(dpi_instruction.op1_v[1]), 32'(dpi_instruction.op1_v[0])};
 
-    logic [255:0] op2 = {32'(dpi_instruction.v.r.op2[7]), 32'(dpi_instruction.v.r.op2[6]),
-                         32'(dpi_instruction.v.r.op2[5]), 32'(dpi_instruction.v.r.op2[4]),
-                         32'(dpi_instruction.v.r.op2[3]), 32'(dpi_instruction.v.r.op2[2]),
-                         32'(dpi_instruction.v.r.op2[1]), 32'(dpi_instruction.v.r.op2[0])};
+    logic [255:0] op2 = {32'(dpi_instruction.op2_v[7]), 32'(dpi_instruction.op2_v[6]),
+                         32'(dpi_instruction.op2_v[5]), 32'(dpi_instruction.op2_v[4]),
+                         32'(dpi_instruction.op2_v[3]), 32'(dpi_instruction.op2_v[2]),
+                         32'(dpi_instruction.op2_v[1]), 32'(dpi_instruction.op2_v[0])};
 
-    logic [255:0] op3 = {32'(dpi_instruction.v.r.op3[7]), 32'(dpi_instruction.v.r.op3[6]),
-                         32'(dpi_instruction.v.r.op3[5]), 32'(dpi_instruction.v.r.op3[4]),
-                         32'(dpi_instruction.v.r.op3[3]), 32'(dpi_instruction.v.r.op3[2]),
-                         32'(dpi_instruction.v.r.op3[1]), 32'(dpi_instruction.v.r.op3[0])};
+    logic [255:0] op3 = {32'(dpi_instruction.op3_v[7]), 32'(dpi_instruction.op3_v[6]),
+                         32'(dpi_instruction.op3_v[5]), 32'(dpi_instruction.op3_v[4]),
+                         32'(dpi_instruction.op3_v[3]), 32'(dpi_instruction.op3_v[2]),
+                         32'(dpi_instruction.op3_v[1]), 32'(dpi_instruction.op3_v[0])};
 
     // Sample instruction
     m_instruction_cov.sample(instr_t'({l_type, l_opcode, l_func}));
@@ -782,7 +782,7 @@ class spect_coverage extends uvm_component;
             m_ADDI_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_ADDI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_ADDI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -794,7 +794,7 @@ class spect_coverage extends uvm_component;
             m_SUBI_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_SUBI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_SUBI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -805,7 +805,7 @@ class spect_coverage extends uvm_component;
             m_CMPI_reg_cov[1].sample(op1, i);
           end
           for (int i=0; i<12; i++) begin
-            m_CMPI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_CMPI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -817,7 +817,7 @@ class spect_coverage extends uvm_component;
             m_ANDI_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_ANDI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_ANDI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -829,7 +829,7 @@ class spect_coverage extends uvm_component;
             m_ORI_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_ORI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_ORI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -841,7 +841,7 @@ class spect_coverage extends uvm_component;
             m_XORI_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_XORI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_XORI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -852,7 +852,7 @@ class spect_coverage extends uvm_component;
             m_CMPA_reg_cov[1].sample(op1, i);
           end
           for (int i=0; i<12; i++) begin
-            m_CMPA_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_CMPA_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -863,7 +863,7 @@ class spect_coverage extends uvm_component;
             m_MOVI_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_MOVI_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_MOVI_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -878,7 +878,7 @@ class spect_coverage extends uvm_component;
             m_GPK_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_GPK_imm_cov.sample(dpi_instruction.v.i.immediate, i);
+            m_GPK_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
@@ -889,7 +889,7 @@ class spect_coverage extends uvm_component;
             m_LD_reg_cov[1].sample(op1, i);
           end
           for (int i=0; i<16; i++) begin
-            m_LD_addr_cov.sample(dpi_instruction.v.m.addr, i);
+            m_LD_addr_cov.sample(dpi_instruction.addr, i);
           end
 
         end
@@ -900,14 +900,14 @@ class spect_coverage extends uvm_component;
             m_ST_reg_cov[1].sample(op1, i);
           end
           for (int i=0; i<16; i++) begin
-            m_ST_addr_cov.sample(dpi_instruction.v.m.addr, i);
+            m_ST_addr_cov.sample(dpi_instruction.addr, i);
           end
 
         end
       
         I_CALL: begin
           for (int i=0; i<16; i++) begin
-            m_CALL_newpc_cov.sample(dpi_instruction.v.j.new_pc, i);
+            m_CALL_newpc_cov.sample(dpi_instruction.new_pc, i);
           end
 
         end
@@ -918,35 +918,35 @@ class spect_coverage extends uvm_component;
       
         I_BRZ: begin
           for (int i=0; i<16; i++) begin
-            m_BRZ_newpc_cov.sample(dpi_instruction.v.j.new_pc, i);
+            m_BRZ_newpc_cov.sample(dpi_instruction.new_pc, i);
           end
 
         end
       
         I_BRNZ: begin
           for (int i=0; i<16; i++) begin
-            m_BRNZ_newpc_cov.sample(dpi_instruction.v.j.new_pc, i);
+            m_BRNZ_newpc_cov.sample(dpi_instruction.new_pc, i);
           end
 
         end
       
         I_BRC: begin
           for (int i=0; i<16; i++) begin
-            m_BRC_newpc_cov.sample(dpi_instruction.v.j.new_pc, i);
+            m_BRC_newpc_cov.sample(dpi_instruction.new_pc, i);
           end
 
         end
       
         I_BRNC: begin
           for (int i=0; i<16; i++) begin
-            m_BRNC_newpc_cov.sample(dpi_instruction.v.j.new_pc, i);
+            m_BRNC_newpc_cov.sample(dpi_instruction.new_pc, i);
           end
 
         end
       
         I_JMP: begin
           for (int i=0; i<16; i++) begin
-            m_JMP_newpc_cov.sample(dpi_instruction.v.j.new_pc, i);
+            m_JMP_newpc_cov.sample(dpi_instruction.new_pc, i);
           end
 
         end

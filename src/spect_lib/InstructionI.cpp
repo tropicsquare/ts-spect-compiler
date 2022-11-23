@@ -100,3 +100,23 @@ bool spect::InstructionI::Execute()
 
     return true;
 }
+
+void spect::InstructionI::SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *model)
+{
+    if (op_mask_ & 0b100)
+        dpi_instr->op1 = TO_INT(op1_);
+    if (op_mask_ & 0b010)
+        dpi_instr->op2 = TO_INT(op2_);
+    if (op_mask_ & 0b001)
+        dpi_instr->immediate = immediate_;
+
+    for (int i = 0; i < 8; i++)
+        dpi_instr->op2_v[i] = (uint32_t)(model->GetGpr(TO_INT(op2_)) >> (32 * i));
+}
+
+void spect::InstructionI::SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model)
+{
+    for (int i = 0; i < 8; i++)
+        if (op_mask_ & 0b100)
+            dpi_instr->op1_v[i] = (uint32_t)(model->GetGpr(TO_INT(op1_)) >> (32 * i));
+}

@@ -297,6 +297,27 @@ extern "C" {
     uint32_t spect_dpi_program_step(uint32_t cycle_count);
 
     /**
+     *  @brief Returns last executed instruction, including its parameters (operands) and
+     *         operand values.
+     *  @param dpi_instruction Pointer to instruction structure.
+     *  @returns 0 - Returned instruction is valid
+     *           1 - Returned instruction is invalid (no instruction has been previously
+     *               executed).
+     *  @note This function shall be called after 'spect_dpi_program_step' or after
+     *        'spect_dpi_program_run' to query last executed instruction for functional
+     *        coverage measurement. If this function is queried without previous invocation
+     *        of one of these functions, behavior of this function is undefined.
+     *  @note Input parameters of instruction (op2, op3, immediate, newpc, addr) are
+     *        sampled BEFORE execution of the instruction. Output parameters (op1) is
+     *        sampled AFTER execution of the instruction!
+     *  @note Model fills 0xFF to all attributes of 'dpi_instruction' which are not used by
+     *        last executed instruction (e.g. 'addr' attribute will be filled to 0xFFFFFFFF
+     *        for R type instructions, or all elements of op1_v will be filled by 0xFFFFFFFF
+     *        for CMP instruction since CMP instruction does not use operand 1)
+     */
+    void spect_dpi_get_last_instr(dpi_instruction_t *dpi_instruction);
+
+    /**
      *  @brief Set Change reporting by model (pushing change events to SCHF - State Change FIFO)
      *  @param enable 0 - Disable change reporting
      *                1 - Enable change reporting

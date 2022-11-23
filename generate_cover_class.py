@@ -36,21 +36,21 @@ def form_val_code_sample(cov_point_name, has_op1, has_op2, has_op3):
 
 def form_imm_sample(cov_point_name):
     rv = "          for (int i=0; i<12; i++) begin\n"
-    rv += f"            {cov_point_name}.sample(dpi_instruction.v.i.immediate, i);\n"
+    rv += f"            {cov_point_name}.sample(dpi_instruction.immediate, i);\n"
     rv += "          end\n"
     return rv
 
 
 def form_addr_sample(cov_point_name):
     rv = "          for (int i=0; i<16; i++) begin\n"
-    rv += f"            {cov_point_name}.sample(dpi_instruction.v.m.addr, i);\n"
+    rv += f"            {cov_point_name}.sample(dpi_instruction.addr, i);\n"
     rv += "          end\n"
     return rv
 
 
 def form_newpc_sample(cov_point_name):
     rv = "          for (int i=0; i<16; i++) begin\n"
-    rv += f"            {cov_point_name}.sample(dpi_instruction.v.j.new_pc, i);\n"
+    rv += f"            {cov_point_name}.sample(dpi_instruction.new_pc, i);\n"
     rv += "          end\n"
     return rv
 

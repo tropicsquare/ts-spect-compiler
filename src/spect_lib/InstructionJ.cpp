@@ -60,6 +60,7 @@ spect::Instruction* spect::InstructionJ::DisAssemble(uint32_t wrd)
     return cln;
 }
 
+
 void spect::InstructionJ::Dump(std::ostream& os)
 {
     for (int i = 2; i >= 0; i--)
@@ -81,3 +82,13 @@ bool spect::InstructionJ::Execute()
 
     return true;
 }
+
+void spect::InstructionJ::SampleInputs(dpi_instruction_t *dpi_instr, A_UNUSED CpuModel *model)
+{
+    if (op_mask_ & 0b100)
+        dpi_instr->new_pc = new_pc_;
+}
+
+void spect::InstructionJ::SampleOutputs(A_UNUSED dpi_instruction_t *dpi_instr,
+                                        A_UNUSED CpuModel *model)
+{}

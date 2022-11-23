@@ -15,6 +15,8 @@
 
 #include "spect.h"
 #include "Instruction.h"
+#include "CpuModel.h"
+#include "spect_iss_dpi_types.h"
 
 class spect::InstructionI : public Instruction
 {
@@ -26,6 +28,8 @@ class spect::InstructionI : public Instruction
         uint32_t Assemble();
         static Instruction* DisAssemble(uint32_t wrd);
         bool Execute();
+        void SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *model);
+        void SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model);
 
         CpuGpr op1_;
         CpuGpr op2_;

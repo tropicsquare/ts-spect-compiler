@@ -258,6 +258,16 @@ class spect::CpuModel
         bool HasChange();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Gets last executed instruction including sampled operands and filled results
+        /// @param dpi_instr Instruction structure in which instruction will be filled
+        /// @note This function shall be called after 'Step' or after 'StepSingle' to query last
+        ///       executed instruction for functional coverage measurement. If this function is
+        ///       queried without previous invocation of one of these functions, behavior of this
+        ///       function is undefined.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void GetLastInstruction(dpi_instruction_t *dpi_instr);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Print debug message in the model
         /// @param verbosity_level Verbosity of the message
         ///         VERBOSITY_NONE      - Always shown
@@ -389,6 +399,9 @@ class spect::CpuModel
 
         // Address of first instruction to be executed
         uint16_t start_pc_ = SPECT_INSTR_MEM_BASE;
+
+        // Last executed instruction
+        dpi_instruction_t last_instr = {};
 
         uint32_t *MemToPtrs(CpuMemory mem, int *size);
         bool IsWithinMem(CpuMemory mem, uint16_t address);

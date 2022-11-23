@@ -16,6 +16,7 @@
 #include <list>
 
 #include "spect.h"
+#include "spect_iss_dpi_types.h"
 
 class spect::Instruction
 {
@@ -88,6 +89,24 @@ class spect::Instruction
         ///          Pointer to Symbol - If attached symbol is unresolved.
         ///////////////////////////////////////////////////////////////////////////////////////////
         virtual Symbol* Relocate() = 0;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Samples instruction input parameter values from a CPU model to DPI structure
+        /// @param dpi_instr DPI instruction structure where to sample
+        /// @param model Model from which to sample the instructions
+        /// @note This function shall be called BEFORE the instruction was executed to sample
+        ///       valid results.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *model);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Samples instruction input parameters from a CPU model to DPI structure
+        /// @param dpi_instr DPI instruction structure where to sample
+        /// @param model Model from which to sample the instructions
+        /// @note This function shall be called AFTER the instruction was executed to sample
+        ///       valid results.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model);
 
         // Instruction type
         const InstructionType itype_;

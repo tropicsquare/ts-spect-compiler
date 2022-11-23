@@ -92,3 +92,18 @@ bool spect::InstructionM::Execute()
 
     return true;
 }
+
+void spect::InstructionM::SampleInputs(dpi_instruction_t *dpi_instr, A_UNUSED CpuModel *model)
+{
+    if (op_mask_ & 0b100)
+        dpi_instr->op1 = TO_INT(op1_);
+    if (op_mask_ & 0b110)
+        dpi_instr->addr = addr_;
+}
+
+void spect::InstructionM::SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model)
+{
+    for (int i = 0; i < 8; i++)
+        if (op_mask_ & 0b100)
+            dpi_instr->op1_v[i] = (uint32_t)(model->GetGpr(TO_INT(op1_)) >> (32 * i));
+}

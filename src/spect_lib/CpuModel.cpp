@@ -423,6 +423,11 @@ bool spect::CpuModel::HasChange()
     return !change_q_.empty();
 }
 
+void spect::CpuModel::GetLastInstruction(dpi_instruction_t *dpi_instr)
+{
+    memcpy(dpi_instr, &(last_instr), sizeof(dpi_instruction_t));
+    std::cout << "C SIZE: " << sizeof(dpi_instruction_t) << "\n";
+}
 
 int spect::CpuModel::Step(int n)
 {
@@ -553,6 +558,9 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     DebugInfo(VERBOSITY_LOW, "Executing instruction:         ", instr->Dump());
 
+    // Sample input operands and values for DPI readout
+    instr->SampleInputs(&(last_instr), this);
+
     // Execute instruction
     instr->model_ = this;
     if (instr->Execute())
@@ -573,6 +581,9 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
         rv = 0;
 
     gold->cycles_ = cycles;
+
+    // Sample output operands and values for DPI readout
+    instr->SampleOutputs(&(last_instr), this);
 
     // Separate instructions by empty line -> More readable output
     DebugInfo(VERBOSITY_MEDIUM, "");

@@ -11,6 +11,7 @@
 *****************************************************************************/
 
 #include <ostream>
+#include <cassert>
 
 #include "Instruction.h"
 #include "InstructionR.h"
@@ -47,6 +48,44 @@ spect::Instruction* spect::Instruction::DisAssemble(uint32_t wrd)
         return InstructionM::DisAssemble(wrd);
     default:
         return InstructionJ::DisAssemble(wrd);
+    }
+}
+
+void spect::Instruction::SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *model)
+{
+    assert(dpi_instr != nullptr);
+    assert(model != nullptr);
+
+    // First clear all previous stuff so that we don't get overlapping instructions
+    memset(dpi_instr, 0xFF, sizeof(dpi_instruction_t));
+
+    dpi_instr->i_type = TO_INT(itype_);
+    dpi_instr->opcode = opcode_;
+    dpi_instr->func = func_;
+
+    switch (itype_) {
+    case InstructionType::R:
+        return static_cast<spect::InstructionR*>(this)->SampleInputs(dpi_instr, model);
+    case InstructionType::I:
+        return static_cast<spect::InstructionI*>(this)->SampleInputs(dpi_instr, model);
+    case InstructionType::M:
+        return static_cast<spect::InstructionM*>(this)->SampleInputs(dpi_instr, model);
+    default:
+        return static_cast<spect::InstructionJ*>(this)->SampleInputs(dpi_instr, model);
+    }
+}
+
+void spect::Instruction::SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model)
+{
+    switch (itype_) {
+    case InstructionType::R:
+        return static_cast<spect::InstructionR*>(this)->SampleOutputs(dpi_instr, model);
+    case InstructionType::I:
+        return static_cast<spect::InstructionI*>(this)->SampleOutputs(dpi_instr, model);
+    case InstructionType::M:
+        return static_cast<spect::InstructionM*>(this)->SampleOutputs(dpi_instr, model);
+    default:
+        return static_cast<spect::InstructionJ*>(this)->SampleOutputs(dpi_instr, model);
     }
 }
 

@@ -276,20 +276,20 @@ class spect_coverage extends uvm_component;
     logic [3:0] l_opcode = dpi_instruction.opcode;
     logic [2:0] l_func   = dpi_instruction.func;
 
-    logic [255:0] op1 = {32'(dpi_instruction.v.r.op1[7]), 32'(dpi_instruction.v.r.op1[6]),
-                         32'(dpi_instruction.v.r.op1[5]), 32'(dpi_instruction.v.r.op1[4]),
-                         32'(dpi_instruction.v.r.op1[3]), 32'(dpi_instruction.v.r.op1[2]),
-                         32'(dpi_instruction.v.r.op1[1]), 32'(dpi_instruction.v.r.op1[0])};
+    logic [255:0] op1 = {32'(dpi_instruction.op1_v[7]), 32'(dpi_instruction.op1_v[6]),
+                         32'(dpi_instruction.op1_v[5]), 32'(dpi_instruction.op1_v[4]),
+                         32'(dpi_instruction.op1_v[3]), 32'(dpi_instruction.op1_v[2]),
+                         32'(dpi_instruction.op1_v[1]), 32'(dpi_instruction.op1_v[0])};
 
-    logic [255:0] op2 = {32'(dpi_instruction.v.r.op2[7]), 32'(dpi_instruction.v.r.op2[6]),
-                         32'(dpi_instruction.v.r.op2[5]), 32'(dpi_instruction.v.r.op2[4]),
-                         32'(dpi_instruction.v.r.op2[3]), 32'(dpi_instruction.v.r.op2[2]),
-                         32'(dpi_instruction.v.r.op2[1]), 32'(dpi_instruction.v.r.op2[0])};
+    logic [255:0] op2 = {32'(dpi_instruction.op2_v[7]), 32'(dpi_instruction.op2_v[6]),
+                         32'(dpi_instruction.op2_v[5]), 32'(dpi_instruction.op2_v[4]),
+                         32'(dpi_instruction.op2_v[3]), 32'(dpi_instruction.op2_v[2]),
+                         32'(dpi_instruction.op2_v[1]), 32'(dpi_instruction.op2_v[0])};
 
-    logic [255:0] op3 = {32'(dpi_instruction.v.r.op3[7]), 32'(dpi_instruction.v.r.op3[6]),
-                         32'(dpi_instruction.v.r.op3[5]), 32'(dpi_instruction.v.r.op3[4]),
-                         32'(dpi_instruction.v.r.op3[3]), 32'(dpi_instruction.v.r.op3[2]),
-                         32'(dpi_instruction.v.r.op3[1]), 32'(dpi_instruction.v.r.op3[0])};
+    logic [255:0] op3 = {32'(dpi_instruction.op3_v[7]), 32'(dpi_instruction.op3_v[6]),
+                         32'(dpi_instruction.op3_v[5]), 32'(dpi_instruction.op3_v[4]),
+                         32'(dpi_instruction.op3_v[3]), 32'(dpi_instruction.op3_v[2]),
+                         32'(dpi_instruction.op3_v[1]), 32'(dpi_instruction.op3_v[0])};
 
     // Sample instruction
     m_instruction_cov.sample(instr_t'({l_type, l_opcode, l_func}));

@@ -98,35 +98,23 @@ package spect_iss_dpi_pkg;
   } dpi_state_change_t;
 
   typedef struct {
-    int unsigned i_type;
-    int unsigned opcode;
-    int unsigned func;
+    int unsigned i_type = 0;
+    int unsigned opcode = 0;
+    int unsigned func = 0;
 
-    // Register indices 0 -31
-    int unsigned op1;
-    int unsigned op2;
-    int unsigned op3;
+    // Register indices: 0 -31
+    int unsigned op1 = '{default: 0};
+    int unsigned op2 = '{default: 0};
+    int unsigned op3 = '{default: 0};
 
-    // Parameter (operand, immediate, etc...) values
-    union {
-        struct {
-            int unsigned op1[8];
-            int unsigned op2[8];
-            int unsigned op3[8];
-        } r;
-        struct {
-            int unsigned op1[8];
-            int unsigned op2[8];
-            int unsigned immediate;
-        } i;
-        struct {
-            int unsigned op1[8];
-            int unsigned addr;
-        } m;
-        struct {
-            int unsigned new_pc;
-        } j;
-    } v;
+    int unsigned immediate;
+    int unsigned addr;
+    int unsigned new_pc;
+
+    // Operand values
+    int unsigned op1_v[8] = '{default: 0};
+    int unsigned op2_v[8] = '{default: 0};
+    int unsigned op3_v[8] = '{default: 0};
   } dpi_instruction_t;
 
   /////////////////////////////////////////////////////////////////////////////
@@ -380,6 +368,27 @@ package spect_iss_dpi_pkg;
    *               took.
    */
   import "DPI-C" function int unsigned spect_dpi_program_step(int unsigned cycle_count);
+
+  /**
+   *  @brief Returns last executed instruction, including its parameters (operands) and
+   *         operand values.
+   *  @param dpi_instruction Pointer to instruction structure.
+   *  @returns 0 - Returned instruction is valid
+   *           1 - Returned instruction is invalid (no instruction has been previously
+   *               executed).
+   *  @note This function shall be called after 'spect_dpi_program_step' or after
+   *        'spect_dpi_program_run' to query last executed instruction for functional
+   *        coverage measurement. If this function is queried without previous invocation
+   *        of one of these functions, behavior of this function is undefined.
+   *  @note Input parameters of instruction (op2, op3, immediate, newpc, addr) are
+   *        sampled BEFORE execution of the instruction. Output parameters (op1) is
+   *        sampled AFTER execution of the instruction!
+   *  @note Model fills 0xFF to all attributes of 'dpi_instruction' which are not used by
+   *        last executed instruction (e.g. 'addr' attribute will be filled to 0xFFFFFFFF
+   *        for R type instructions, or all elements of op1_v will be filled by 0xFFFFFFFF
+   *        for CMP instruction since CMP instruction does not use operand 1)
+   */
+  import "DPI-C" function void spect_dpi_get_last_instr(output dpi_instruction_t dpi_instruction);
 
   /**
    *  @brief Set Change reporting by model (pushing change events to SCHF - State Change FIFO)

@@ -361,6 +361,13 @@ extern "C" {
         return rv;
     }
 
+    void spect_dpi_get_last_instr(dpi_instruction_t *dpi_instruction)
+    {
+        DPI_CALL_LOG_ENTER
+        simulator->model_->GetLastInstruction(dpi_instruction);
+        DPI_CALL_LOG_EXIT
+    }
+
     void spect_dpi_set_change_reporting(uint32_t enable)
     {
         DPI_CALL_LOG_ENTER

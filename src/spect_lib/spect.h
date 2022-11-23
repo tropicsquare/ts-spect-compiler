@@ -179,6 +179,9 @@ namespace spect {
 #else
     #define A_UNUSED __attribute__((unused))
 #endif
+
+    #define A_PACKED __attribute__((packed))
+
 }
 
 #endif
