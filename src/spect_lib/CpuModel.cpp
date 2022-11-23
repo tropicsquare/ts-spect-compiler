@@ -431,9 +431,11 @@ void spect::CpuModel::GetLastInstruction(dpi_instruction_t *dpi_instr)
 
 int spect::CpuModel::Step(int n)
 {
-    if (n > 0)
-        DebugInfo(VERBOSITY_HIGH, "Executing", n, "instructions:");
-    else
+    if (n > 0) {
+        std::stringstream ss;
+        ss << std::dec << n;
+        DebugInfo(VERBOSITY_HIGH, "Executing", ss.str(), "instructions:");
+    } else
         DebugInfo(VERBOSITY_HIGH, "Executing all instructions till end of program:");
 
     int cnt = 0;
@@ -455,7 +457,9 @@ int spect::CpuModel::Step(int n)
 
 int spect::CpuModel::StepSingle(int cycles)
 {
-    DebugInfo(VERBOSITY_HIGH, "Executing single instruction in ", cycles, " RTL clock cycles:");
+    std::stringstream ss;
+    ss << std::dec << cycles;
+    DebugInfo(VERBOSITY_HIGH, "Executing single instruction in ", ss.str(), " RTL clock cycles:");
 
     return ExecuteNextInstruction(cycles);
 }
