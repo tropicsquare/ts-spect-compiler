@@ -23,6 +23,7 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem, uint
         std::string line;
         bool first_line = true;
         uint32_t *mem_c = mem;
+
         while (std::getline(ifs, line)) {
             uint32_t val;
 
@@ -52,6 +53,42 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem, uint
                 mem_c++;
             }
         }
+        ifs.close();
+    } else {
+        throw std::runtime_error("Unable to open a file:" + path);
+    }
+}
+
+void spect::HexHandler::DumpHexFile(const std::string &path, HexFileType hex_type,
+                                    uint32_t *mem, uint32_t offset, size_t size)
+{
+    std::ofstream ofs;
+    ofs << std::hex;
+    ofs << std::setfill('0');
+    ofs.open(path);
+    if (ofs.is_open()) {
+        uint32_t *mem_c = mem + (offset >> 2);
+
+        for (size_t i = 0; i < (size >> 2); i++) {
+
+            if (hex_type == HexFileType::ISS_WORD ||
+                hex_type == HexFileType::VERILOG_ADDR_WORD)
+            {
+                ofs << "@";
+                ofs << std::setw(4);
+                if (hex_type == HexFileType::ISS_WORD)
+                    ofs << (offset + (i << 2));
+                else
+                    ofs << i;
+                ofs << " ";
+            }
+
+            ofs << std::setw(8);
+            ofs << *mem_c;
+            ofs << "\n";
+            mem_c++;
+        }
+        ofs.close();
     } else {
         throw std::runtime_error("Unable to open a file:" + path);
     }

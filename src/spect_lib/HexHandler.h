@@ -33,6 +33,18 @@ class spect::HexHandler
         /// @throw std::runtime_error when failed to open the file, or when it has invalid format
         ///////////////////////////////////////////////////////////////////////////////////////////
         static void LoadHexFile(const std::string &path, uint32_t *mem, uint32_t offset);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Dumps HEX file
+        /// @param path Path to HEX file to be dumped
+        /// @param hex_type Type of HEX file to dump
+        /// @param mem Pointer to memory to be dumped.
+        /// @param offset Offset from 'mem' (in byte addressing) where to start dumping.
+        /// @param size Number of bytes to be dumped (Number of words * 4)
+        /// @throw std::runtime_error when failed to open the file.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        static void DumpHexFile(const std::string &path, HexFileType hex_type, uint32_t *mem,
+                                uint32_t offset, size_t size);
 };
 
 #endif

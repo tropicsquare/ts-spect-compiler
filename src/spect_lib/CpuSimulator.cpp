@@ -377,6 +377,20 @@ void spect::CpuSimulator::CmdLoad(A_UNUSED std::ostream &out, std::string arg1, 
     HexHandler::LoadHexFile(arg1, mem, offset);
 }
 
+void spect::CpuSimulator::CmdDump(A_UNUSED std::ostream &out, std::string arg1, uint32_t address,
+                                  uint32_t size)
+{
+    uint32_t *mem = model_->GetMemoryPtr();
+    std::cout << "Dumping memory:\n";
+    std::cout << std::hex;
+    std::cout << "   From address:    0x" << address << "\n";
+    std::cout << "   To address:      0x" << (address + size) << "\n";
+    std::cout << "   Number of bytes:   " << std::dec << size << "\n";
+    std::cout << "   Number of words:   " << std::dec << (size >> 2) << "\n";
+
+    HexHandler::DumpHexFile(arg1, HexFileType::ISS_WORD, mem, address, size);
+}
+
 void spect::CpuSimulator::CmdStep(A_UNUSED std::ostream &out, int n)
 {
     if (CheckFinished())
@@ -459,6 +473,12 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                  },
                 "Load file to SPECT memory. Place at address from HEX file + offset:\n"
                 "           load <hex-file> <offset>      - Load HEX file.");
+
+    menu->Insert("dump", [&](std::ostream &out, std::string arg1, std::string arg2, std::string arg3){
+                    CmdDump(out, arg1, stoint(arg2), stoint(arg3));
+                 },
+                "Load file to SPECT memory. Place at address from HEX file + offset:\n"
+                "           dump <hex-file> <start_addr> <size>      - Dump memory to HEX file.");
 
     menu->Insert("run", [&](std::ostream &out){
                     CmdRun(out);

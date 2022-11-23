@@ -149,6 +149,7 @@ class spect::CpuSimulator
         void CmdSet(std::ostream &out, std::string arg1, std::string arg2);
         void CmdGet(std::ostream &out, std::string arg1);
         void CmdLoad(std::ostream &out, std::string arg1, uint32_t offset);
+        void CmdDump(A_UNUSED std::ostream &out, std::string arg1, uint32_t address, uint32_t size);
 
         // Array of breakpoints break-points
         std::vector<uint32_t> breakpoints_;
