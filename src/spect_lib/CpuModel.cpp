@@ -192,8 +192,7 @@ uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
     }
 
     ch_mem.new_val[0] = written;
-    if (ch_mem.new_val[0] != ch_mem.old_val[0])
-        ReportChange(ch_mem);
+    ReportChange(ch_mem);
 
     return written;
 }
