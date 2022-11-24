@@ -1,5 +1,5 @@
 /******************************************************************************
-* SPECT - Coverage
+* SPECT - Instruction Coverage
 *
 * TODO: License
 *
@@ -97,17 +97,17 @@ covergroup operands_3_regs_cov with function sample(logic[4:0] op1, logic[4:0] o
 
   // Operand 1
   cp_op1: coverpoint op1 {
-    bins register = {[0:31]};
+    bins register[] = {[0:31]};
   }
 
   // Operand 2
   cp_op2: coverpoint op2 {
-    bins register = {[0:31]};
+    bins register[] = {[0:31]};
   }
 
   // Operand 3
   cp_op3: coverpoint op3 {
-    bins register = {[0:31]};
+    bins register[] = {[0:31]};
   }
 
   // Two same operands
@@ -144,12 +144,12 @@ covergroup operands_2_regs_cov with function sample(logic[4:0] op1, logic[4:0] o
 
   // Operand 1
   cp_op1: coverpoint op1 {
-    bins register = {[0:31]};
+    bins register[] = {[0:31]};
   }
 
   // Operand 2
   cp_op2: coverpoint op2 {
-    bins register = {[0:31]};
+    bins register[] = {[0:31]};
   }
 
   // Two same operands
@@ -169,7 +169,7 @@ covergroup operands_1_reg_cov with function sample(logic[4:0] op1);
 
   // Operand 1
   cp_op1: coverpoint op1 {
-    bins register = {[0:31]};
+    bins register[] = {[0:31]};
   }
 
 endgroup : operands_1_reg_cov
@@ -204,13 +204,19 @@ endgroup : op2_op3_cross_cov
 /////////////////////////////////////////////////////////////////////////////
 
 
-class spect_coverage extends uvm_component;
+class spect_instr_gen_coverage extends uvm_component;
   // UVM Factory Registration
-  `uvm_component_utils(spect_env_pkg::spect_coverage)
+  `uvm_component_utils(spect_env_pkg::spect_instr_gen_coverage)
 
   /////////////////////////////////////////////////////////////////////////////
   // Data Members
   /////////////////////////////////////////////////////////////////////////////
+  logic [  1:0]                       l_type;
+  logic [  3:0]                       l_opcode;
+  logic [  2:0]                       l_func;
+  logic [255:0]                       op1;
+  logic [255:0]                       op2;
+  logic [255:0]                       op3;
 
   // Covergroups
   instruction_cov                     m_instruction_cov;
@@ -262,34 +268,20 @@ class spect_coverage extends uvm_component;
 
   //***************************************************************************
   // Function: sample_instruction
-  // This function will be called from Predictor every time an instruction is
-  // executed. Type of the input parameter can be any appropriate
-  // representation of an instruction (string, bit vector, structure, ...)
+  // Sample coverage on given instruction.
 
   // Parameters:
-  // instr - instruction
+  // dpi_instruction - instruction
   //***************************************************************************
   function void sample_instruction(dpi_instruction_t dpi_instruction);
 
     // Convert instruction encoding to vector format
-    logic [1:0] l_type   = dpi_instruction.i_type;
-    logic [3:0] l_opcode = dpi_instruction.opcode;
-    logic [2:0] l_func   = dpi_instruction.func;
-
-    logic [255:0] op1 = {32'(dpi_instruction.op1_v[7]), 32'(dpi_instruction.op1_v[6]),
-                         32'(dpi_instruction.op1_v[5]), 32'(dpi_instruction.op1_v[4]),
-                         32'(dpi_instruction.op1_v[3]), 32'(dpi_instruction.op1_v[2]),
-                         32'(dpi_instruction.op1_v[1]), 32'(dpi_instruction.op1_v[0])};
-
-    logic [255:0] op2 = {32'(dpi_instruction.op2_v[7]), 32'(dpi_instruction.op2_v[6]),
-                         32'(dpi_instruction.op2_v[5]), 32'(dpi_instruction.op2_v[4]),
-                         32'(dpi_instruction.op2_v[3]), 32'(dpi_instruction.op2_v[2]),
-                         32'(dpi_instruction.op2_v[1]), 32'(dpi_instruction.op2_v[0])};
-
-    logic [255:0] op3 = {32'(dpi_instruction.op3_v[7]), 32'(dpi_instruction.op3_v[6]),
-                         32'(dpi_instruction.op3_v[5]), 32'(dpi_instruction.op3_v[4]),
-                         32'(dpi_instruction.op3_v[3]), 32'(dpi_instruction.op3_v[2]),
-                         32'(dpi_instruction.op3_v[1]), 32'(dpi_instruction.op3_v[0])};
+    l_type   = dpi_instruction.i_type;
+    l_opcode = dpi_instruction.opcode;
+    l_func   = dpi_instruction.func;
+    op1      = {<< 32 {dpi_instruction.op1_v}};
+    op2      = {<< 32 {dpi_instruction.op2_v}};
+    op3      = {<< 32 {dpi_instruction.op3_v}};
 
     // Sample instruction
     m_instruction_cov.sample(instr_t'({l_type, l_opcode, l_func}));
@@ -306,4 +298,4 @@ class spect_coverage extends uvm_component;
 
   endfunction : sample_instruction
 
-endclass : spect_coverage
+endclass : spect_instr_gen_coverage
