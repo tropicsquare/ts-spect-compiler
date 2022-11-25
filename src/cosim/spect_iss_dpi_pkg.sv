@@ -109,12 +109,14 @@ package spect_iss_dpi_pkg;
 
     int unsigned immediate;
     int unsigned addr;
+    int unsigned old_pc;
     int unsigned new_pc;
 
     // Operand values
     int unsigned op1_v[8] = '{default: 0};
     int unsigned op2_v[8] = '{default: 0};
     int unsigned op3_v[8] = '{default: 0};
+    int unsigned r31_v[8] = '{default: 0};
   } dpi_instruction_t;
 
   /////////////////////////////////////////////////////////////////////////////

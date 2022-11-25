@@ -114,6 +114,8 @@ void spect::InstructionR::SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *m
             dpi_instr->op2_v[i] = (uint32_t)(model->GetGpr(TO_INT(op2_)) >> (32 * i));
         if (op_mask_ & 0b001)
             dpi_instr->op3_v[i] = (uint32_t)(model->GetGpr(TO_INT(op3_)) >> (32 * i));
+        if (r31_dep_)
+            dpi_instr->r31_v[i] = (uint32_t)(model->GetGpr(31          ) >> (32 * i));
     }
 }
 

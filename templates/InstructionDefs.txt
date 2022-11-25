@@ -21,7 +21,7 @@ R               MOV            0b0001        0b101          0b110           fals
 R             CSWAP            0b0011        0b101          0b110           false               true                0
 R              HASH            0b0101        0b111          0b110           false               true                0
 R               GRV            0b1001        0b111          0b100           false               false               0
-R               SCB            0b1111        0b111          0b111           false               true                0
+R               SCB            0b1111        0b111          0b111           true                true                0
 R          MUL25519            0b0011        0b110          0b111           false               true                1
 R            MUL256            0b0111        0b110          0b111           false               true                1
 R              ADDP            0b1101        0b110          0b111           true                true                1

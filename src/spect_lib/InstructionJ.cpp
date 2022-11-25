@@ -83,10 +83,12 @@ bool spect::InstructionJ::Execute()
     return true;
 }
 
-void spect::InstructionJ::SampleInputs(dpi_instruction_t *dpi_instr, A_UNUSED CpuModel *model)
+void spect::InstructionJ::SampleInputs(dpi_instruction_t *dpi_instr, CpuModel *model)
 {
     if (op_mask_ & 0b100)
         dpi_instr->new_pc = new_pc_;
+    
+    dpi_instr->old_pc = (uint32_t)(model->GetPc());
 }
 
 void spect::InstructionJ::SampleOutputs(A_UNUSED dpi_instruction_t *dpi_instr,

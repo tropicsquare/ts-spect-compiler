@@ -65,12 +65,14 @@ typedef struct {
 
     uint32_t immediate;
     uint32_t addr;
+    uint32_t old_pc;
     uint32_t new_pc;
 
     // Operand values
     uint32_t op1_v[8];
     uint32_t op2_v[8];
     uint32_t op3_v[8];
+    uint32_t r31_v[8];
 } dpi_instruction_t;
 
 inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {
