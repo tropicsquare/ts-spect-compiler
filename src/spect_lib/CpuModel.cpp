@@ -116,21 +116,23 @@ uint32_t* spect::CpuModel::GetMemoryPtr()
     return memory_;
 }
 
-uint32_t spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
+void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "AHB Write", tohexs(address, 4), "data:", tohexs(data, 8));
 
     DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
-    ch_mem.old_val[0] = memory_[address >> 2];
-    uint32_t written = 0;
 
     if ( IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_ahb_w_)) {
+        ch_mem.old_val[0] = memory_[address >> 2];
         memory_[address >> 2] = data;
-        written = data;
+        ch_mem.new_val[0] = data;
+        ReportChange(ch_mem);
     }
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
+        ch_mem.old_val[0] = memory_[address >> 2];
+
         ordt_data wdata(1, data);
         regs_->write(address - SPECT_CONFIG_REGS_BASE, wdata);
         UpdateInterrupts();
@@ -138,14 +140,9 @@ uint32_t spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
 
         ordt_data rdata(1, 0);
         regs_->read(address - SPECT_CONFIG_REGS_BASE, rdata);
-        written = rdata[0];
-    }
-
-    ch_mem.new_val[0] = written;
-    if (ch_mem.new_val[0] != ch_mem.old_val[0])
+        ch_mem.new_val[0] = rdata[0];
         ReportChange(ch_mem);
-
-    return written;
+    }
 }
 
 uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
@@ -178,24 +175,19 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
     return rv;
 }
 
-uint32_t spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
+void spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Core Write", tohexs(address, 4), "data:", tohexs(data, 8));
 
-    uint32_t written = 0;
     DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
-    ch_mem.old_val[0] = memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         IsWithinMem(CpuMemory::DATA_RAM_OUT, address)) {
+        ch_mem.old_val[0] = memory_[address >> 2];
         memory_[address >> 2] = data;
-        written = data;
+        ch_mem.new_val[0] = data;
+        ReportChange(ch_mem);
     }
-
-    ch_mem.new_val[0] = written;
-    ReportChange(ch_mem);
-
-    return written;
 }
 
 uint32_t spect::CpuModel::ReadMemoryCoreFetch(uint16_t address)
