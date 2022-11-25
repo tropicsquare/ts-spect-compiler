@@ -150,12 +150,11 @@ class spect::CpuModel
         /// @brief Write from the model space as-if via AHB bus
         /// @param address Addresss to write
         /// @param data Data to be written
-        /// @returns Value actually written to the memory
         /// @note This function implements AHB R/W restrictions as defined in SPECT specification
         ///         (e.g. Const ROM is not writable from AHB).
         /// @note This function reports change to Report queue.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t WriteMemoryAhb(uint16_t address, uint32_t data);
+        void WriteMemoryAhb(uint16_t address, uint32_t data);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Read from model memory space as if done by Core data port (LD instruction)
@@ -170,12 +169,11 @@ class spect::CpuModel
         /// @brief Write to model memory space as if done by Core data port (ST instruction)
         /// @param address Addresss to write
         /// @param data Data to write to the memory location
-        /// @returns Data at the memory location after it was written.
         /// @note This function implements Read/Write restrictions as defined in SPECT specification
         ///         (e.g. Const ROM is not writable by SPECT Core)
         /// @note This function reports change to Report queue.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t WriteMemoryCoreData(uint16_t address, uint32_t data);
+        void WriteMemoryCoreData(uint16_t address, uint32_t data);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Read from model memory space as if done by Core instruction port (fetch)
