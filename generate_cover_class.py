@@ -22,7 +22,7 @@ from argparse import ArgumentParser
 DPI_I_NAME = "dpi_instruction"
 
 
-def form_val_code_sample(cov_point_name, has_op1, has_op2, has_op3):
+def form_val_code_sample(cov_point_name, has_op1, has_op2, has_op3, has_r31):
     rv = "          for (int i=0; i<255; i++) begin\n"
     if (has_op1):
         rv += f"            {cov_point_name}[1].sample(op1, i);\n"
@@ -30,6 +30,8 @@ def form_val_code_sample(cov_point_name, has_op1, has_op2, has_op3):
         rv += f"            {cov_point_name}[2].sample(op2, i);\n"
     if (has_op3):
         rv += f"            {cov_point_name}[3].sample(op3, i);\n"
+    if (has_r31):
+        rv += f"            {cov_point_name}[4].sample(r31, i);\n"
     rv += "          end\n"
     return rv
 
@@ -134,8 +136,12 @@ if __name__ == "__main__":
                     op_cov_def = f"  operands_3_regs_cov       m_{mnemonic}_instruction_ops_cov;\n"
                     op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op1, {DPI_I_NAME}.op2, {DPI_I_NAME}.op3);\n"
 
-                    val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:3];\n"
-                    val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, True)
+                    if r31_dep == "true":
+                        val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:4];\n"
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, True, True)
+                    else:
+                        val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:3];\n"
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, True, False)
 
                     if op2_op3_cross == "1":
                         cross_cov_def = f"  op2_op3_cross_cov   m_{mnemonic}_op_cross_cov;\n"
@@ -147,12 +153,12 @@ if __name__ == "__main__":
                     if (op_mask == "0b011"):
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[2:3];\n"
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op2, {DPI_I_NAME}.op3);\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, True, True)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, True, True, False)
 
                     elif (op_mask == "0b110"):
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:2];\n"
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op1, {DPI_I_NAME}.op2);\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, False)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, False, False)
 
                     else:
                         print(f"Skipping operand coverpoint for: {mnemonic}")
@@ -163,19 +169,19 @@ if __name__ == "__main__":
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op1);\n"
 
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:1];\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, False, False)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, False, False, False)
 
                     elif (op_mask == "0b010"):
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op2);\n"
 
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[2:2];\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, True, False)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, True, False, False)
 
                     elif (op_mask == "0b001"):
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op3);\n"
 
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[3:3];\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, False, True)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, False, True, False)
 
                 #else:
                 #    print(f"Invalid operand mask: {op_mask}, for instruction: {mnemonic}")
@@ -189,7 +195,7 @@ if __name__ == "__main__":
                     imm_cov_sample = form_imm_sample(f"m_{mnemonic}_imm_cov")
 
                     val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:2];\n"
-                    val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, False)
+                    val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, True, False, False)
 
                 elif (op_mask == "0b011" or op_mask == "0b101"):
                     op_cov_def = f"  operands_1_reg_cov       m_{mnemonic}_instruction_ops_cov;\n"
@@ -198,13 +204,13 @@ if __name__ == "__main__":
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op1);\n"
 
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:1];\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, False, False)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, False, False, False)
 
                     else:
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op2);\n"
 
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[2:2];\n"
-                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, True, False)
+                        val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", False, True, False, False)
 
                     imm_cov_def = f"  immediate_cov       m_{mnemonic}_imm_cov;\n"
                     imm_cov_sample = form_imm_sample(f"m_{mnemonic}_imm_cov")
@@ -217,7 +223,7 @@ if __name__ == "__main__":
                 op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op1);\n"
 
                 val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:1];\n"
-                val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, False, False)
+                val_cov_sample = form_val_code_sample(f"m_{mnemonic}_reg_cov", True, False, False, False)
 
                 addr_cov_def = f"  addr_newpc_cov      m_{mnemonic}_addr_cov;\n"
                 addr_cov_sample = form_addr_sample(f"m_{mnemonic}_addr_cov")

@@ -217,6 +217,7 @@ class spect_instr_gen_coverage extends uvm_component;
   logic [255:0]                       op1;
   logic [255:0]                       op2;
   logic [255:0]                       op3;
+  logic [255:0]                       r31;
 
   // Covergroups
   instruction_cov                     m_instruction_cov;
@@ -282,6 +283,7 @@ class spect_instr_gen_coverage extends uvm_component;
     op1      = {<< 32 {dpi_instruction.op1_v}};
     op2      = {<< 32 {dpi_instruction.op2_v}};
     op3      = {<< 32 {dpi_instruction.op3_v}};
+    r31      = {<< 32 {dpi_instruction.r31_v}};
 
     // Sample instruction
     m_instruction_cov.sample(instr_t'({l_type, l_opcode, l_func}));

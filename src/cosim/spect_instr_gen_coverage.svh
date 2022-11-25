@@ -262,6 +262,7 @@ class spect_instr_gen_coverage extends uvm_component;
   logic [255:0]                       op1;
   logic [255:0]                       op2;
   logic [255:0]                       op3;
+  logic [255:0]                       r31;
 
   // Covergroups
   instruction_cov                     m_instruction_cov;
@@ -324,13 +325,13 @@ class spect_instr_gen_coverage extends uvm_component;
   register_cov        m_CSWAP_reg_cov[1:2];
   register_cov        m_HASH_reg_cov[1:2];
   register_cov        m_GRV_reg_cov[1:1];
-  register_cov        m_SCB_reg_cov[1:3];
+  register_cov        m_SCB_reg_cov[1:4];
   register_cov        m_MUL25519_reg_cov[1:3];
   register_cov        m_MUL256_reg_cov[1:3];
-  register_cov        m_ADDP_reg_cov[1:3];
-  register_cov        m_SUBP_reg_cov[1:3];
-  register_cov        m_MULP_reg_cov[1:3];
-  register_cov        m_REDP_reg_cov[1:3];
+  register_cov        m_ADDP_reg_cov[1:4];
+  register_cov        m_SUBP_reg_cov[1:4];
+  register_cov        m_MULP_reg_cov[1:4];
+  register_cov        m_REDP_reg_cov[1:4];
   register_cov        m_ADDI_reg_cov[1:2];
   register_cov        m_SUBI_reg_cov[1:2];
   register_cov        m_CMPI_reg_cov[1:1];
@@ -517,6 +518,7 @@ class spect_instr_gen_coverage extends uvm_component;
     op1      = {<< 32 {dpi_instruction.op1_v}};
     op2      = {<< 32 {dpi_instruction.op2_v}};
     op3      = {<< 32 {dpi_instruction.op3_v}};
+    r31      = {<< 32 {dpi_instruction.r31_v}};
 
     // Sample instruction
     m_instruction_cov.sample(instr_t'({l_type, l_opcode, l_func}));
@@ -697,6 +699,7 @@ class spect_instr_gen_coverage extends uvm_component;
             m_SCB_reg_cov[1].sample(op1, i);
             m_SCB_reg_cov[2].sample(op2, i);
             m_SCB_reg_cov[3].sample(op3, i);
+            m_SCB_reg_cov[4].sample(r31, i);
           end
 
         end
@@ -729,6 +732,7 @@ class spect_instr_gen_coverage extends uvm_component;
             m_ADDP_reg_cov[1].sample(op1, i);
             m_ADDP_reg_cov[2].sample(op2, i);
             m_ADDP_reg_cov[3].sample(op3, i);
+            m_ADDP_reg_cov[4].sample(r31, i);
           end
           m_ADDP_op_cross_cov.sample(op2, op3);
 
@@ -740,6 +744,7 @@ class spect_instr_gen_coverage extends uvm_component;
             m_SUBP_reg_cov[1].sample(op1, i);
             m_SUBP_reg_cov[2].sample(op2, i);
             m_SUBP_reg_cov[3].sample(op3, i);
+            m_SUBP_reg_cov[4].sample(r31, i);
           end
           m_SUBP_op_cross_cov.sample(op2, op3);
 
@@ -751,6 +756,7 @@ class spect_instr_gen_coverage extends uvm_component;
             m_MULP_reg_cov[1].sample(op1, i);
             m_MULP_reg_cov[2].sample(op2, i);
             m_MULP_reg_cov[3].sample(op3, i);
+            m_MULP_reg_cov[4].sample(r31, i);
           end
           m_MULP_op_cross_cov.sample(op2, op3);
 
@@ -762,6 +768,7 @@ class spect_instr_gen_coverage extends uvm_component;
             m_REDP_reg_cov[1].sample(op1, i);
             m_REDP_reg_cov[2].sample(op2, i);
             m_REDP_reg_cov[3].sample(op3, i);
+            m_REDP_reg_cov[4].sample(r31, i);
           end
           m_REDP_op_cross_cov.sample(op2, op3);
 
