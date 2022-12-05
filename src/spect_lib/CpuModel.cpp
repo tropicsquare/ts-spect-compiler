@@ -41,6 +41,9 @@ void spect::CpuModel::Start()
     DebugInfo(VERBOSITY_LOW, "First instruction address:", tohexs(start_pc_, 4));
     SetPc(start_pc_);
 
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT is clearing COMMAND[START] = 0.");
+    regs_->r_command.f_start.data = 0;
+
     DebugInfo(VERBOSITY_MEDIUM, "SPECT is clearing STATUS[IDLE] = 0.");
     regs_->r_status.f_idle.data = 0;
     UpdateInterrupts();
@@ -59,8 +62,8 @@ void spect::CpuModel::Finish(int status_err)
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[IDLE] = 1.");
     regs_->r_status.f_idle.data = 1;
 
-    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[DONE] = 1.");
-    regs_->r_status.f_done.data = 1;
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[DONE] = ", !status_err);
+    regs_->r_status.f_done.data = !status_err;
 
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[ERR] = ", status_err);
     regs_->r_status.f_err.data = status_err;
@@ -131,17 +134,10 @@ void spect::CpuModel::WriteMemoryAhb(uint16_t address, uint32_t data)
     }
 
     if (IsWithinMem(CpuMemory::CONFIG_REGS, address)) {
-        ch_mem.old_val[0] = memory_[address >> 2];
-
         ordt_data wdata(1, data);
         regs_->write(address - SPECT_CONFIG_REGS_BASE, wdata);
         UpdateInterrupts();
         UpdateRegisterEffects();
-
-        ordt_data rdata(1, 0);
-        regs_->read(address - SPECT_CONFIG_REGS_BASE, rdata);
-        ch_mem.new_val[0] = rdata[0];
-        ReportChange(ch_mem);
     }
 }
 
