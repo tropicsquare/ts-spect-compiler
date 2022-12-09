@@ -64,11 +64,11 @@ covergroup immediate_cov with function sample(logic[11:0] value, int position);
   option.per_instance = 1;
 
   cp_immediate_zero: coverpoint position iff (value[position] == 0) {
-    bins b[] = {[0:12]};
+    bins b[] = {[0:11]};
   }
 
   cp_immediate_one: coverpoint position iff (value[position] == 1) {
-    bins b[] = {[0:12]};
+    bins b[] = {[0:11]};
   }
 endgroup : immediate_cov
 
