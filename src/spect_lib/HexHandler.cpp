@@ -10,6 +10,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <regex>
 
 #include "spect.h"
 #include "HexHandler.h"
@@ -26,6 +27,17 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem, uint
 
         while (std::getline(ifs, line)) {
             uint32_t val;
+
+            // Remove comments
+            line = std::regex_replace(line, std::regex("//.*"), "");
+
+            // Trim spaces
+            line = std::regex_replace(line, std::regex("^ +"), "");
+            line = std::regex_replace(line, std::regex(" +$"), "");
+
+            // Skip empty lines
+            if (line.empty())
+                continue;
 
             // On first line figure out type of HEX file (+0x4 addressed, or non-addressed)
             // take into acount offset for non-addressed HEX-file
