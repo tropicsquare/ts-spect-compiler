@@ -23,7 +23,7 @@ DPI_I_NAME = "dpi_instruction"
 
 
 def form_val_code_sample(cov_point_name, has_op1, has_op2, has_op3, has_r31):
-    rv = "          for (int i=0; i<255; i++) begin\n"
+    rv = "          for (int i=0; i<256; i++) begin\n"
     if (has_op1):
         rv += f"            {cov_point_name}[1].sample(op1, i);\n"
     if (has_op2):
@@ -200,7 +200,7 @@ if __name__ == "__main__":
                 elif (op_mask == "0b011" or op_mask == "0b101"):
                     op_cov_def = f"  operands_1_reg_cov       m_{mnemonic}_instruction_ops_cov;\n"
 
-                    if (op_mask == "0b011"):
+                    if (op_mask == "0b101"):
                         op_cov_sample = f"          m_{mnemonic}_instruction_ops_cov.sample({DPI_I_NAME}.op1);\n"
 
                         val_cov_def = f"  register_cov        m_{mnemonic}_reg_cov[1:1];\n"
