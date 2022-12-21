@@ -1,4 +1,3 @@
-
 cmake_minimum_required ( VERSION 3.18.2 )
 
 project( SPECT_COMPILER C CXX)
@@ -12,7 +11,7 @@ include_directories(
     "src/common"
     "src/spect_lib"
     "src/cosim"
-    "$ENV{TS_REPO_ROOT}/modules/cli/include/cli"
+    "../modules/cli/include/cli"
 )
 
 add_compile_options(-Wall -Wextra -Wshadow -fPIC -fdump-tree-original)
