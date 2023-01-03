@@ -164,11 +164,11 @@ covergroup addr_newpc_cov with function sample(logic[15:0] value, int position);
   // Track coverage information for each instance
   option.per_instance = 1;
 
-  cp_immediate_zero: coverpoint position iff (value[position] == 0) {
+  cp_addr_newpc_zero: coverpoint position iff (value[position] == 0) {
     bins b[] = {[0:15]};
   }
 
-  cp_immediate_one: coverpoint position iff (value[position] == 1) {
+  cp_addr_newpc_one: coverpoint position iff (value[position] == 1) {
     bins        b[]    = {[2:15]};
     // Address is 32-bit aligned therefore bits 1:0 are always 0
     ignore_bins ignore = {[0:1]};
