@@ -26,7 +26,8 @@ enum  optionIndex {
     INSTRUCTION_MEM_HEX,
     CONST_ROM_HEX,
     DATA_RAM_IN_HEX,
-    DATA_RAM_OUT_HEX
+    DATA_RAM_OUT_HEX,
+    GRV_HEX,
 };
 
 const option::Descriptor usage[] =
@@ -44,6 +45,7 @@ const option::Descriptor usage[] =
     {CONST_ROM_HEX,         0,  ""  ,    "const-rom"            ,option::Arg::Optional,     "  --const-rom=<hex-file>       Content of Constant ROM to be loaded.\n"},
     {DATA_RAM_IN_HEX,       0,  ""  ,    "data-ram-in"          ,option::Arg::Optional,     "  --data-ram-in=<hex-file>     Content of Data RAM IN to be loaded.\n"},
     {DATA_RAM_OUT_HEX,      0,  ""  ,    "data-ram-out"         ,option::Arg::Optional,     "  --data-ram-out=<hex-file>    Path where content of Data RAM out will be dumped.\n"},
+    {GRV_HEX,               0,  ""  ,    "grv-hex"              ,option::Arg::Optional,     "  --grv-hex=<hex-file>         Data for GRV instruction (HEX file without address - no '@' in the file). \n"},
 
     {0,0,0,0,0,0}
 };
@@ -154,6 +156,8 @@ int main(int argc, char** argv)
         })
     }
 
+
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Configure start address
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,6 +176,20 @@ int main(int argc, char** argv)
         ss >> start_pc;
     }
     simulator->model_->SetStartPc(start_pc);
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Feed the GRV data to CPU model
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    if (options[GRV_HEX]) {
+        std::vector<uint32_t> mem;
+        EXEC_WITH_ERR_HANDLER({
+            spect::HexHandler::LoadHexFile(std::string(options[GRV_HEX].arg), mem);
+        })
+
+        for (const auto &wrd : mem)
+            simulator->model_->GrvQueuePush(wrd);
+    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

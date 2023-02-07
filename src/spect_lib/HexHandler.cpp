@@ -71,6 +71,44 @@ void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem, uint
     }
 }
 
+void spect::HexHandler::LoadHexFile(const std::string &path, std::vector<uint32_t> &mem)
+{
+    std::ifstream ifs;
+    ifs.open(path);
+
+    if (ifs.is_open()) {
+        std::string line;
+        while (std::getline(ifs, line)) {
+            // Remove comments
+            line = std::regex_replace(line, std::regex("//.*"), "");
+
+            // Trim spaces
+            line = std::regex_replace(line, std::regex("^ +"), "");
+            line = std::regex_replace(line, std::regex(" +$"), "");
+
+            // Skip empty lines
+            if (line.empty())
+                continue;
+
+            // Adddresses HEX file -> Throw error here!
+            if (line.size() > 0 && line[0] == '@') {
+                throw std::runtime_error("Unable to read line:" + line + " from file: "
+                                          + path + " (Wrong HEX file format?)\n");
+            }
+
+            // Convert line to a number!
+            uint32_t wrd = 0;
+            std::stringstream ss;
+            ss << std::hex << line;
+            ss >> wrd;
+
+            mem.push_back(wrd);
+        }
+    }
+}
+
+
+
 void spect::HexHandler::DumpHexFile(const std::string &path, HexFileType hex_type,
                                     uint32_t *mem, uint32_t offset, size_t size)
 {

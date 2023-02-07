@@ -330,7 +330,7 @@ uint32_t spect::CpuModel::GrvQueuePop()
         grv_q_.pop();
         DebugInfo(VERBOSITY_HIGH, "Popping from GRV queue:", tohexs(rv, 8));
     } else
-        DebugInfo(VERBOSITY_LOW, "Popping from empty GRV queue, returning 0");
+        DebugInfo(VERBOSITY_LOW, "Popping from empty GRV queue, GRV returns 0");
     return rv;
 }
 
@@ -348,7 +348,7 @@ uint32_t spect::CpuModel::GpkQueuePop(uint32_t index)
         gpk_q_[index].pop();
         DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", tohexs(rv, 8));
     } else
-        DebugInfo(VERBOSITY_LOW, "Popping from empty GPK queue", index, ": returning 0");
+        DebugInfo(VERBOSITY_LOW, "Popping from empty GPK queue, GPK returns 0");
     return rv;
 }
 
