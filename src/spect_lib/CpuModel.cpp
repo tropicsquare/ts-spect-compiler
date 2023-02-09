@@ -50,6 +50,13 @@ void spect::CpuModel::Start()
 
     end_executed_ = false;
 
+    // Erase track of execution count
+    auto it = spect::InstructionFactory::GetInstructionIterator();
+    for (; !spect::InstructionFactory::IteratorIsLast(it); it++) {
+        Instruction *instr = it->second;
+        instr->exec_cnt_ = 0;
+    }
+
     // To make browsing logs easier
     DebugInfo(VERBOSITY_LOW, "");
 }
@@ -70,6 +77,20 @@ void spect::CpuModel::Finish(int status_err)
 
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting SRR = ", gpr_[31]);
     SetSrr(gpr_[31]);
+
+
+    DebugInfo(VERBOSITY_HIGH, "Program statistics:");
+    DebugInfo(VERBOSITY_HIGH, "     Instruction         No. of Executions       Cycles per instruction");
+    auto it = spect::InstructionFactory::GetInstructionIterator();
+    for (; !spect::InstructionFactory::IteratorIsLast(it); it++) {
+        Instruction *instr = it->second;
+        if (instr->exec_cnt_ > 0) {
+            char buf[128];
+            sprintf(buf, "   %10s                   %4lu                        %4d", instr->mnemonic_.c_str(),
+                    instr->exec_cnt_, instr->cycles_);
+            DebugInfo(VERBOSITY_HIGH, buf);
+        }
+    }
 }
 
 bool spect::CpuModel::IsFinished()
@@ -573,6 +594,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
         rv = 0;
 
     gold->cycles_ = cycles;
+    gold->exec_cnt_++;
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);

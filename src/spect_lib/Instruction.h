@@ -132,6 +132,9 @@ class spect::Instruction
         // Number of clock cycles instruction took to execute on RTL
         int cycles_ = 0;
 
+        // Number of times instruction was executed
+        uint64_t exec_cnt_ = 0;
+
         // Symbol with instruction label from .s file
         spect::Symbol *s_label_ = nullptr;
 

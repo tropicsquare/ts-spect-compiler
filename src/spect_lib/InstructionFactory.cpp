@@ -1,13 +1,13 @@
 /**************************************************************************************************
-* 
+*
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
-* 
+*
 * @todo: License
 *
 * @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
 * @date 19.9.2022
-* 
+*
 **************************************************************************************************/
 
 #include <iostream>
@@ -17,7 +17,7 @@
 
 #define REGISTER_R_INSTRUCTION(name)                                        \
     InstructionFactory::Register(new name(CpuGpr::R0, CpuGpr::R0, CpuGpr::R0));
-    
+
 #define REGISTER_I_INSTRUCTION(name)                                        \
     InstructionFactory::Register(new name(CpuGpr::R0, CpuGpr::R0, 0x0));
 
@@ -72,8 +72,20 @@ spect::Instruction* spect::InstructionFactory::GetInstruction(std::string mnemon
     auto it = mnemonic_map_.find(mnemonic);
     if (it == mnemonic_map_.end())
         return nullptr;
-    return mnemonic_map_[mnemonic]; 
+    return mnemonic_map_[mnemonic];
 }
+
+std::map<std::string, spect::Instruction*>::iterator spect::InstructionFactory::GetInstructionIterator()
+{
+    return mnemonic_map_.begin();
+}
+
+bool spect::InstructionFactory::IteratorIsLast(
+    std::map<std::string, spect::Instruction*>::iterator &it)
+{
+    return (it == mnemonic_map_.end());
+}
+
 
 std::map<std::string, spect::Instruction*> spect::InstructionFactory::mnemonic_map_;
 
