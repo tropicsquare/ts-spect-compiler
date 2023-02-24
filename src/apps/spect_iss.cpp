@@ -221,5 +221,11 @@ int main(int argc, char** argv)
 
     simulator->Start(batch_mode, cmd_file.c_str());
 
+    if (options[DATA_RAM_OUT_HEX]) {
+        spect::HexHandler::DumpHexFile(std::string(options[DATA_RAM_OUT_HEX].arg),
+            spect::HexFileType::ISS_WORD, simulator->model_->GetMemoryPtr(), SPECT_DATA_RAM_OUT_BASE,
+            SPECT_DATA_RAM_OUT_SIZE);
+    }
+
     return 0;
 }
