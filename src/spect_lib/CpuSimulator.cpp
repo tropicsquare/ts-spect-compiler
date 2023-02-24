@@ -477,7 +477,7 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
     menu->Insert("dump", [&](std::ostream &out, std::string arg1, std::string arg2, std::string arg3){
                     CmdDump(out, arg1, stoint(arg2), stoint(arg3));
                  },
-                "Load file to SPECT memory. Place at address from HEX file + offset:\n"
+                "Dump SPECT memory to a file:\n"
                 "           dump <hex-file> <start_addr> <size>      - Dump memory to HEX file.");
 
     menu->Insert("run", [&](std::ostream &out){

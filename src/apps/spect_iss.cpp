@@ -28,6 +28,7 @@ enum  optionIndex {
     DATA_RAM_IN_HEX,
     DATA_RAM_OUT_HEX,
     GRV_HEX,
+    MAX_INSTR_CNT,
 };
 
 const option::Descriptor usage[] =
@@ -46,6 +47,7 @@ const option::Descriptor usage[] =
     {DATA_RAM_IN_HEX,       0,  ""  ,    "data-ram-in"          ,option::Arg::Optional,     "  --data-ram-in=<hex-file>     Content of Data RAM IN to be loaded.\n"},
     {DATA_RAM_OUT_HEX,      0,  ""  ,    "data-ram-out"         ,option::Arg::Optional,     "  --data-ram-out=<hex-file>    Path where content of Data RAM out will be dumped.\n"},
     {GRV_HEX,               0,  ""  ,    "grv-hex"              ,option::Arg::Optional,     "  --grv-hex=<hex-file>         Data for GRV instruction (HEX file without address - no '@' in the file). \n"},
+    {MAX_INSTR_CNT,         0,  ""  ,    "max-instr-cnt"        ,option::Arg::Optional,     "  --max-instr-cnt=<n>          Limit for number of instructions executed by the simulator. When reached, simulator exits (default = 10^8). Decimal value. \n"},
 
     {0,0,0,0,0,0}
 };
@@ -177,6 +179,15 @@ int main(int argc, char** argv)
     }
     simulator->model_->SetStartPc(start_pc);
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Configure maximal number of executed instructions
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    simulator->model_->max_instr_cnt_ = 10E8;
+    if (options[MAX_INSTR_CNT]) {
+        std::stringstream ss;
+        ss << options[MAX_INSTR_CNT].arg;
+        ss >> simulator->model_->max_instr_cnt_;
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Feed the GRV data to CPU model

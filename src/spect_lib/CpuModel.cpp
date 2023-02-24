@@ -57,6 +57,9 @@ void spect::CpuModel::Start()
         instr->exec_cnt_ = 0;
     }
 
+    // Erase track of number of executed instructions
+    instr_cnt_ = 0;
+
     // To make browsing logs easier
     DebugInfo(VERBOSITY_LOW, "");
 }
@@ -598,6 +601,15 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);
+
+    // Check number of executed instructions
+    instr_cnt_++;
+    if (instr_cnt_ == max_instr_cnt_) {
+        DebugInfo(VERBOSITY_LOW, "Limit of executed instruction (", max_instr_cnt_, ") reached!");
+        Finish(1);
+        UpdateInterrupts();
+        return 0;
+    }
 
     // Separate instructions by empty line -> More readable output
     DebugInfo(VERBOSITY_MEDIUM, "");

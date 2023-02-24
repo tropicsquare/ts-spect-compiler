@@ -335,6 +335,12 @@ class spect::CpuModel
         // Program
         CpuProgram *program_ = NULL;
 
+        // Maximal number of instructions to execute
+        uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();
+
+        // Number of already executed instructions since start
+        uint64_t instr_cnt_ = 0;
+
         // Print function
         int (*print_fnc)(const char *format, ...);
 
