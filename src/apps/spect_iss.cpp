@@ -29,6 +29,8 @@ enum  optionIndex {
     DATA_RAM_OUT_HEX,
     GRV_HEX,
     MAX_INSTR_CNT,
+    DUMP_CONTEXT,
+    LOAD_CONTEXT,
 };
 
 const option::Descriptor usage[] =
@@ -48,6 +50,8 @@ const option::Descriptor usage[] =
     {DATA_RAM_OUT_HEX,      0,  ""  ,    "data-ram-out"         ,option::Arg::Optional,     "  --data-ram-out=<hex-file>    Path where content of Data RAM out will be dumped.\n"},
     {GRV_HEX,               0,  ""  ,    "grv-hex"              ,option::Arg::Optional,     "  --grv-hex=<hex-file>         Data for GRV instruction (HEX file without address - no '@' in the file). \n"},
     {MAX_INSTR_CNT,         0,  ""  ,    "max-instr-cnt"        ,option::Arg::Optional,     "  --max-instr-cnt=<n>          Limit for number of instructions executed by the simulator. When reached, simulator exits (default = 10^8). Decimal value. \n"},
+    {DUMP_CONTEXT,          0,  ""  ,    "dump-context"         ,option::Arg::Optional,     "  --dump-context=<file>        Dump context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) after execution to file. \n"},
+    {LOAD_CONTEXT,          0,  ""  ,    "load-context"         ,option::Arg::Optional,     "  --load-context=<file>        Load context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) before execution from file. \n"},
 
     {0,0,0,0,0,0}
 };
@@ -211,20 +215,28 @@ int main(int argc, char** argv)
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     bool batch_mode = true;
-    std::string cmd_file = std::string("");
 
     if (options[SHELL])
         batch_mode = false;
 
     if (options[CMD_FILE])
-        cmd_file = std::string(options[CMD_FILE].arg);
+        simulator->cmd_file_ = std::string(options[CMD_FILE].arg);
 
-    simulator->Start(batch_mode, cmd_file.c_str());
+    if (options[LOAD_CONTEXT])
+        simulator->model_context_ = std::string(options[LOAD_CONTEXT].arg);
+
+    EXEC_WITH_ERR_HANDLER({
+        simulator->Start(batch_mode);
+    })
 
     if (options[DATA_RAM_OUT_HEX]) {
         spect::HexHandler::DumpHexFile(std::string(options[DATA_RAM_OUT_HEX].arg),
             spect::HexFileType::ISS_WORD, simulator->model_->GetMemoryPtr(), SPECT_DATA_RAM_OUT_BASE,
             SPECT_DATA_RAM_OUT_SIZE);
+    }
+
+    if (options[DUMP_CONTEXT]) {
+        simulator->model_->DumpContext(std::string(options[DUMP_CONTEXT].arg));
     }
 
     return 0;

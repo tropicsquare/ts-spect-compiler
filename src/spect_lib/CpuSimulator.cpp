@@ -266,6 +266,8 @@ void spect::CpuSimulator::CmdRun(A_UNUSED std::ostream &out)
 
     if (!program_running_) {
         model_->Reset();
+        if (model_context_ != "")
+            model_->LoadContext(model_context_);
         model_->Start();
         program_running_ = true;
     }
@@ -403,6 +405,8 @@ void spect::CpuSimulator::CmdStep(A_UNUSED std::ostream &out, int n)
 void spect::CpuSimulator::CmdStart(A_UNUSED std::ostream &out)
 {
     model_->Reset();
+    if (model_context_ != "")
+        model_->LoadContext(model_context_);
     model_->Start();
     program_running_ = true;
 }
@@ -503,14 +507,16 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
     menu->Insert("start", [&](std::ostream &out){
                     CmdStart(out);
                 },
-                 "Start execution of program (Reset SPECT and load Start PC)");
+                 "Start execution of program (Reset SPECT, Load context and Load Start PC)");
 
 }
 
-void spect::CpuSimulator::Start(bool batch_mode, std::string cmd_file)
+void spect::CpuSimulator::Start(bool batch_mode)
 {
     if (batch_mode) {
         model_->Reset();
+        if (model_context_ != "")
+            model_->LoadContext(model_context_);
         model_->Start();
         model_->Step(0);
     } else {
@@ -528,26 +534,26 @@ void spect::CpuSimulator::Start(bool batch_mode, std::string cmd_file)
             }
         );
 
-        if (cmd_file != "")
-            ExecCmdFile(cmd_file, session);
+        if (cmd_file_ != "")
+            ExecCmdFile(session);
 
         scheduler.Run();
     }
 }
 
-void spect::CpuSimulator::ExecCmdFile(std::string path, cli::CliLocalTerminalSession &session)
+void spect::CpuSimulator::ExecCmdFile(cli::CliLocalTerminalSession &session)
 {
     std::ifstream ifs;
-    ifs.open(path);
+    ifs.open(cmd_file_);
     std::string line;
     if (ifs.is_open()) {
-        std::cout << "Loading command file: " << path << "\n";
+        std::cout << "Loading command file: " << cmd_file_ << "\n";
         while (std::getline(ifs, line)) {
             std::cout << "Executing command: " << line << "\n";
             session.Feed(line);
         }
         session.Feed("\n");
     } else {
-        std::cout << "Failed to open command file: " << path << "\n";
+        std::cout << "Failed to open command file: " << cmd_file_ << "\n";
     }
 }

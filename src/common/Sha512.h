@@ -1,7 +1,7 @@
 /*
  * Updated to C++, zedwood.com 2012
  * Based on Olivier Gay's version
- * See Modified BSD License below: 
+ * See Modified BSD License below:
  *
  * FIPS 180-2 SHA-224/256/384/512 implementation
  * Issue date:  04/30/2005
@@ -39,24 +39,25 @@
 #define SHA512_H
 
 #include <string>
- 
+
 class Sha512
 {
 protected:
     typedef unsigned char uint8;
     typedef unsigned int uint32;
     typedef unsigned long long uint64;
- 
+
     const static uint64 sha512_k[];
     static const unsigned int SHA384_512_BLOCK_SIZE = (1024/8);
- 
+
 public:
     void init();
     void update(const unsigned char *message, unsigned int len);
     void final(unsigned char *digest);
     uint64_t getContext(int index);
+    void setContext(int index, uint64_t val);
     static const unsigned int DIGEST_SIZE = ( 512 / 8);
- 
+
 protected:
     void transform(const unsigned char *message, unsigned int block_nb);
     unsigned int m_tot_len;
@@ -64,10 +65,10 @@ protected:
     unsigned char m_block[2 * SHA384_512_BLOCK_SIZE];
     uint64 m_h[8];
 };
- 
- 
+
+
 std::string sha512(std::string input);
- 
+
 #define SHA2_SHFR(x, n)    (x >> n)
 #define SHA2_ROTR(x, n)   ((x >> n) | (x << ((sizeof(x) << 3) - n)))
 #define SHA2_ROTL(x, n)   ((x << n) | (x >> ((sizeof(x) << 3) - n)))
@@ -106,5 +107,5 @@ std::string sha512(std::string input);
            | ((uint64) *((str) + 1) << 48)    \
            | ((uint64) *((str) + 0) << 56);   \
 }
- 
+
 #endif

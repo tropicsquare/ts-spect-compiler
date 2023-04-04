@@ -316,6 +316,11 @@ uint16_t spect::CpuModel::GetRarAt(uint16_t index)
     return rar_stack_[index];
 }
 
+void spect::CpuModel::SetRarAt(uint16_t index, uint16_t val)
+{
+    rar_stack_[index] = val;
+}
+
 uint16_t spect::CpuModel::GetRarSp()
 {
     return rar_sp_;
@@ -428,6 +433,152 @@ void spect::CpuModel::PrintHashContext(uint32_t verbosity_level)
         ss << tohexs(sha_512_.getContext(i), 16);
         DebugInfo(verbosity_level, ss.str().c_str());
     }
+}
+
+#define PUT_COMMENT_LINE(comment)           \
+    ofs << std::string(80, '*') << "\n";    \
+    ofs << comment << "\n";                 \
+    ofs << std::string(80, '*') << "\n";
+
+#define SKIP_COMMENT_LINES          \
+    for (int i = 0; i < 3; i++)     \
+        std::getline(ifs, line);
+
+void spect::CpuModel::DumpContext(const std::string &path)
+{
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model context to: ", path);
+
+        ofs << std::hex;
+        ofs << std::setfill('0');
+
+        PUT_COMMENT_LINE("GPR registers:");
+        for (int i = 0; i < 32; i++)
+            ofs << std::setw(64) << GetGpr(i) << "\n";
+
+        PUT_COMMENT_LINE("SHA 512 context:");
+        for (int i = 0; i < 8; i++)
+            ofs << std::setw(16) << sha_512_.getContext(i) << "\n";
+
+        PUT_COMMENT_LINE("RAR stack:");
+        for (int i = 0; i < SPECT_RAR_DEPTH; i++)
+            ofs << std::setw(4) << GetRarAt(i) << "\n";
+
+        PUT_COMMENT_LINE("RAR stack pointer:");
+        ofs << std::setw(4) << GetRarSp() << "\n";
+
+        PUT_COMMENT_LINE("FLAGS (Z, C):");
+        CpuFlags flgs = GetCpuFlags();
+        ofs << flgs.zero << "\n";
+        ofs << flgs.carry << "\n";
+
+        PUT_COMMENT_LINE("Memory:");
+        uint32_t backup = verbosity_;
+        for (int i = 0; i < (SPECT_TOTAL_MEM_SIZE / 4) ; i++) {
+            if (i == 10) {
+                int num_accesses = (SPECT_TOTAL_MEM_SIZE / 4) - 10;
+                DebugInfo(VERBOSITY_LOW, "Executed", std::to_string(num_accesses),
+                        "further acesses to memory that were not printed...");
+                verbosity_ = 0;
+            }
+            ofs << std::setw(8) << GetMemory(i * 4) << "\n";
+        }
+        verbosity_ = backup;
+
+        DebugInfo(VERBOSITY_LOW, "Finished Dumping model context.");
+        DebugInfo(VERBOSITY_LOW, "\n");
+
+        ofs.close();
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+}
+
+void spect::CpuModel::LoadContext(const std::string &path)
+{
+    std::ifstream ifs(path);
+    std::string line;
+
+    if (ifs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Loading model context from: ", path);
+
+        // GPRs
+        SKIP_COMMENT_LINES
+        for (int i = 0; i < 32; i++) {
+            std::getline(ifs, line);
+            std::string num = std::string("0x") + line;
+            SetGpr(i, uint256_t(num.c_str()));
+        }
+
+        // SHA512
+        SKIP_COMMENT_LINES
+        for (int i = 0; i < 8; i++) {
+            uint64_t num;
+            std::getline(ifs, line);
+            std::istringstream iss(line);
+            iss >> std::hex >> num;
+            DebugInfo(VERBOSITY_LOW, "Setting SHA512 context (", i, ") to 0x", line.c_str());
+            sha_512_.setContext(i, num);
+        }
+
+        // RAR stack
+        SKIP_COMMENT_LINES
+        for (int i = 0; i < SPECT_RAR_DEPTH; i++) {
+            std::getline(ifs, line);
+            uint16_t num;
+            std::istringstream iss(line);
+            iss >> std::hex >> num;
+            SetRarAt(i, num);
+        }
+
+        // RAR stack pointer
+        SKIP_COMMENT_LINES
+        std::getline(ifs, line);
+        uint16_t num;
+        std::istringstream iss(line);
+        iss >> std::hex >> num;
+        SetRarSp(num);
+
+        // Flags
+        SKIP_COMMENT_LINES
+        bool val;
+
+        std::getline(ifs, line);
+        std::istringstream iss2(line);
+        iss2 >> val;
+        SetCpuFlag(CpuFlagType::ZERO, val);
+
+        std::getline(ifs, line);
+        std::istringstream iss3(line);
+        iss3 >> val;
+        SetCpuFlag(CpuFlagType::CARRY, val);
+
+        // Memory
+        SKIP_COMMENT_LINES
+        uint32_t backup = verbosity_;
+        for (int i = 0; i < (SPECT_TOTAL_MEM_SIZE / 4) ; i++) {
+            if (i == 10) {
+                int num_accesses = (SPECT_TOTAL_MEM_SIZE / 4) - 10;
+                DebugInfo(VERBOSITY_LOW, "Executed", std::to_string(num_accesses),
+                        "further acesses to memory that were not printed...");
+                verbosity_ = 0;
+            }
+            uint32_t mem_val;
+            std::getline(ifs, line);
+            std::istringstream iss4(line);
+            iss4 >> std::hex >> mem_val;
+            SetMemory(i * 4, mem_val);
+        }
+        verbosity_ = backup;
+
+        DebugInfo(VERBOSITY_LOW, "Finished Loading model context.");
+        DebugInfo(VERBOSITY_LOW, "\n");
+
+        ifs.close();
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
 }
 
 bool spect::CpuModel::HasChange()

@@ -140,6 +140,11 @@ uint64_t Sha512::getContext(int index)
     return m_h[index];
 }
 
+void Sha512::setContext(int index, uint64_t val)
+{
+    m_h[index] = val;
+}
+
 void Sha512::update(const unsigned char *message, unsigned int len)
 {
     unsigned int block_nb;

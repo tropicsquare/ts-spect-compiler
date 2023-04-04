@@ -107,9 +107,9 @@ class spect::CpuSimulator
         /// @brief Starts the CPU simulator
         /// @param batch_mode True  - Start in batch mode
         ///                   False - Start in interactive mode
-        /// @param file Command file to be executed by the simulator.
+        /// @param context CPU context file to start the simulation with
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Start(bool batch_mode, std::string cmd_file);
+        void Start(bool batch_mode);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Starts the CPU simulator
@@ -136,6 +136,12 @@ class spect::CpuSimulator
         // Objects handling CLI and interactive simulation
         cli::Cli *cli_;
 
+        // Path to CPU model context file to be preloaded before model execution
+        std::string model_context_;
+
+        // Paht to command file for simulator
+        std::string cmd_file_;
+
     private:
 
         // Functions to execute individual commands
@@ -161,7 +167,7 @@ class spect::CpuSimulator
         void BuildCliCommands(std::unique_ptr<cli::Menu> &menu);
 
         // Execute command file
-        void ExecCmdFile(std::string path, cli::CliLocalTerminalSession &session);
+        void ExecCmdFile(cli::CliLocalTerminalSession &session);
 
 };
 
