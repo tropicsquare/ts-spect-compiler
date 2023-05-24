@@ -5,6 +5,7 @@ add_library(spect_iss_dpi SHARED
 target_link_libraries(spect_iss_dpi
     SPECT
     COMMON
+    XKCP
 )
 
 target_include_directories(spect_iss_dpi PUBLIC $ENV{VCS_HOME}/include)

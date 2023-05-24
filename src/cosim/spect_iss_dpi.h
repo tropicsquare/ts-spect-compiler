@@ -217,12 +217,11 @@ extern "C" {
     void spect_dpi_push_grv_queue(uint32_t data);
 
     /**
-     * @brief Push data for GPK instruction queried via GPK Handshake interface.
-     * @param data Data to push to one of GPK queues.
-     * @param index Index of GPK queue (corresponds to value of spect_prk_type): 0 - 7.
-     *              Corresponds to spect_prk_type[5:3] and immediate[2:0].
+     * @brief Push data for LDK instruction queried via KBUS Handshake interface.
+     * @param data Data to push to one of LDK queues.
+     * @param index Index of LDK queue (corresponds to value of spect_kbus_type): 0 - 256.
      */
-    void spect_dpi_push_gpk_queue(uint32_t data, uint32_t index);
+    void spect_dpi_push_ldk_queue(uint32_t data, uint32_t index);
 
     /**
      * @brief Get value of SPECT interrupt output

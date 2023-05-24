@@ -174,7 +174,7 @@ IMPLEMENT_R_32_AIRTH_OP(InstructionSUB,-,true)
 IMPLEMENT_R_32_AIRTH_OP(InstructionCMP,-,false)
 
 
-#define IMPLEMENT_R_32_LOGIC_OP(classname,operand)                                              \
+#define IMPLEMENT_R_LOGIC_OP(classname,operand)                                                 \
     bool spect::classname::Execute()                                                            \
     {                                                                                           \
         DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));                                    \
@@ -186,12 +186,12 @@ IMPLEMENT_R_32_AIRTH_OP(InstructionCMP,-,false)
         model_->SetGpr(TO_INT(op1_),                                                            \
             binary_logic_op_lsb(model_->GetGpr(TO_INT(op2_)),                                   \
                                 model_->GetGpr(TO_INT(op3_)),                                   \
-                                8,                                                              \
+                                64,                                                             \
                 [] (const uint256_t &lhs, const uint256_t &rhs) -> uint256_t {                  \
                     return lhs operand rhs;                                                     \
                 }                                                                               \
             ));                                                                                 \
-        bool new_flag_val = is_32_lsb_bits_zero(model_->GetGpr(TO_INT(op1_)));                  \
+        bool new_flag_val = (model_->GetGpr(TO_INT(op1_)) == uint256_t("0x0"));                 \
         model_->SetCpuFlag(CpuFlagType::ZERO, new_flag_val);                                    \
                                                                                                 \
         PUT_FLAG_TO_CHANGE(ch_zf, new_val, model_->GetCpuFlag(CpuFlagType::ZERO));              \
@@ -202,9 +202,9 @@ IMPLEMENT_R_32_AIRTH_OP(InstructionCMP,-,false)
         return true;                                                                            \
     }
 
-IMPLEMENT_R_32_LOGIC_OP(InstructionAND, &)
-IMPLEMENT_R_32_LOGIC_OP(InstructionOR, |)
-IMPLEMENT_R_32_LOGIC_OP(InstructionXOR, ^)
+IMPLEMENT_R_LOGIC_OP(InstructionAND, &)
+IMPLEMENT_R_LOGIC_OP(InstructionOR, |)
+IMPLEMENT_R_LOGIC_OP(InstructionXOR, ^)
 
 
 bool spect::InstructionNOT::Execute()
@@ -218,14 +218,14 @@ bool spect::InstructionNOT::Execute()
     model_->SetGpr( TO_INT(op1_),
         binary_logic_op_lsb(model_->GetGpr(TO_INT(op2_)),
                             model_->GetGpr(TO_INT(op3_)),
-                            8,
+                            64,
             [] (const uint256_t &lhs, const uint256_t &rhs) -> uint256_t {
                 // Need copy, since ~ modifies passed reference
                 uint256_t cpy = lhs;
-                return mask_n_lsb_digits(~cpy, 8);
+                return mask_n_lsb_digits(~cpy, 64);
             }
         ));
-    model_->SetCpuFlag(CpuFlagType::ZERO, is_32_lsb_bits_zero(model_->GetGpr(TO_INT(op1_))));
+    model_->SetCpuFlag(CpuFlagType::ZERO, model_->GetGpr(TO_INT(op1_)) == uint256_t("0x0"));
 
     PUT_FLAG_TO_CHANGE(ch_zf, new_val, model_->GetCpuFlag(CpuFlagType::ZERO));
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
@@ -235,7 +235,39 @@ bool spect::InstructionNOT::Execute()
     return true;
 }
 
-#define IMPLEMENT_R_32_SHIFT_OP(classname,op_shift,op_opposite,n_bits,rotate,set_carry)             \
+bool spect::InstructionSBIT::Execute()
+{
+    DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
+
+    PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
+
+    // TODO issue warning when op3>255?
+    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(model_->GetGpr(TO_INT(op3_)));
+    model_->SetGpr( TO_INT(op1_), model_->GetGpr(TO_INT(op2_)) | mask);
+
+    PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
+    model_->ReportChange(ch_gpr);
+
+    return true;
+}
+
+bool spect::InstructionCBIT::Execute()
+{
+    DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
+
+    PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
+
+    // TODO issue warning when op3>255?
+    uint256_t mask = uint256_t("0x1") << static_cast<uint32_t>(model_->GetGpr(TO_INT(op3_)));
+    model_->SetGpr( TO_INT(op1_), model_->GetGpr(TO_INT(op2_)) & ~mask);
+
+    PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
+    model_->ReportChange(ch_gpr);
+
+    return true;
+}
+
+#define IMPLEMENT_R_32_SHIFT_OP(classname,op_shift,op_opposite,n_bits,rotate,op3_in,set_carry)      \
     bool spect::classname::Execute()                                                                \
     {                                                                                               \
         DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));                                        \
@@ -249,6 +281,11 @@ bool spect::InstructionNOT::Execute()
                                                                                                     \
         if (rotate) {                                                                               \
             uint256_t rotated = op2 op_opposite (256 - n_bits);                                     \
+            tmp = tmp | rotated;                                                                    \
+        }                                                                                           \
+        if (op3_in) {                                                                               \
+            const uint256_t &op3 = model_->GetGpr(TO_INT(op3_));                                    \
+            uint256_t rotated = op3 op_opposite (256 - n_bits);                                     \
             tmp = tmp | rotated;                                                                    \
         }                                                                                           \
         if (set_carry) {                                                                            \
@@ -271,12 +308,14 @@ bool spect::InstructionNOT::Execute()
         return true;                                                                                \
     }
 
-IMPLEMENT_R_32_SHIFT_OP(InstructionLSL,     <<, >>, 1, false, true)
-IMPLEMENT_R_32_SHIFT_OP(InstructionLSR,     >>, <<, 1, false, true)
-IMPLEMENT_R_32_SHIFT_OP(InstructionROL,     <<, >>, 1, true,  true)
-IMPLEMENT_R_32_SHIFT_OP(InstructionROR,     >>, <<, 1, true,  true)
-IMPLEMENT_R_32_SHIFT_OP(InstructionROL8,    <<, >>, 8, true,  false)
-IMPLEMENT_R_32_SHIFT_OP(InstructionROR8,    >>, <<, 8, true,  false)
+IMPLEMENT_R_32_SHIFT_OP(InstructionLSL,     <<, >>, 1, false, false, true)
+IMPLEMENT_R_32_SHIFT_OP(InstructionLSR,     >>, <<, 1, false, false, true)
+IMPLEMENT_R_32_SHIFT_OP(InstructionROL,     <<, >>, 1, true,  false, true)
+IMPLEMENT_R_32_SHIFT_OP(InstructionROR,     >>, <<, 1, true,  false, true)
+IMPLEMENT_R_32_SHIFT_OP(InstructionROL8,    <<, >>, 8, true,  false, false)
+IMPLEMENT_R_32_SHIFT_OP(InstructionROR8,    >>, <<, 8, true,  false, false)
+IMPLEMENT_R_32_SHIFT_OP(InstructionROLIN,   <<, >>, 8, true,  true,  false)
+IMPLEMENT_R_32_SHIFT_OP(InstructionRORIN,   >>, <<, 8, true,  true,  false)
 
 
 bool spect::InstructionSWE::Execute()
@@ -319,31 +358,67 @@ bool spect::InstructionMOV::Execute()
     return true;
 }
 
-bool spect::InstructionCSWAP::Execute()
+bool spect::InstructionLDR::Execute()
 {
-    DEFINE_CHANGE(ch_gpr_1, DPI_CHANGE_GPR, TO_INT(op1_));
-    DEFINE_CHANGE(ch_gpr_2, DPI_CHANGE_GPR, TO_INT(op2_));
+    DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
+    PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    PUT_GPR_TO_CHANGE(ch_gpr_1, old_val, model_->GetGpr(TO_INT(op1_)));
-    PUT_GPR_TO_CHANGE(ch_gpr_2, old_val, model_->GetGpr(TO_INT(op2_)));
-
-    if (model_->GetCpuFlag(CpuFlagType::CARRY)) {
-        uint256_t tmp = model_->GetGpr(TO_INT(op2_));
-        model_->SetGpr(TO_INT(op2_), model_->GetGpr(TO_INT(op1_)));
-        model_->SetGpr(TO_INT(op1_), tmp);
+    uint16_t  addr = static_cast<uint16_t>(model_->GetGpr(TO_INT(op2_)));
+    uint256_t tmp  = 0;
+    for (int i = 0; i < 8; i++) {
+        uint32_t buf = model_->ReadMemoryCoreData(addr + (4 * i));
+        tmp = (uint256_t(buf) << (i * 32)) | tmp;
     }
+    model_->SetGpr(TO_INT(op1_), tmp);
 
-    PUT_GPR_TO_CHANGE(ch_gpr_1, new_val, model_->GetGpr(TO_INT(op1_)));
-    PUT_GPR_TO_CHANGE(ch_gpr_2, new_val, model_->GetGpr(TO_INT(op2_)));
-    model_->ReportChange(ch_gpr_1);
-
-    // Match DUT behavior, report only single change if swapping between
-    // the same registers.
-    if (op1_ != op2_)
-        model_->ReportChange(ch_gpr_2);
+    PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
+    model_->ReportChange(ch_gpr);
 
     return true;
 }
+
+bool spect::InstructionSTR::Execute()
+{
+    uint16_t  addr = static_cast<uint16_t>(model_->GetGpr(TO_INT(op2_)));
+    uint256_t tmp  = model_->GetGpr(TO_INT(op1_));
+    for (int i = 0; i < 8; i++) {
+        model_->WriteMemoryCoreData(addr + (i * 4),
+                    static_cast<uint32_t>(tmp & uint256_t("0xFFFFFFFF")));
+        tmp = tmp >> 32;
+    }
+    return true;
+}
+
+#define IMPLEMENT_SWAP_OP(classname, flag_name)                                                 \
+    bool spect::classname::Execute()                                                            \
+    {                                                                                           \
+        DEFINE_CHANGE(ch_gpr_1, DPI_CHANGE_GPR, TO_INT(op1_));                                  \
+        DEFINE_CHANGE(ch_gpr_2, DPI_CHANGE_GPR, TO_INT(op2_));                                  \
+                                                                                                \
+        PUT_GPR_TO_CHANGE(ch_gpr_1, old_val, model_->GetGpr(TO_INT(op1_)));                     \
+        PUT_GPR_TO_CHANGE(ch_gpr_2, old_val, model_->GetGpr(TO_INT(op2_)));                     \
+                                                                                                \
+        if (model_->GetCpuFlags().flag_name){                                                   \
+            uint256_t tmp = model_->GetGpr(TO_INT(op2_));                                       \
+            model_->SetGpr(TO_INT(op2_), model_->GetGpr(TO_INT(op1_)));                         \
+            model_->SetGpr(TO_INT(op1_), tmp);                                                  \
+        }                                                                                       \
+                                                                                                \
+        PUT_GPR_TO_CHANGE(ch_gpr_1, new_val, model_->GetGpr(TO_INT(op1_)));                     \
+        PUT_GPR_TO_CHANGE(ch_gpr_2, new_val, model_->GetGpr(TO_INT(op2_)));                     \
+        model_->ReportChange(ch_gpr_1);                                                         \
+                                                                                                \
+        /* Match DUT behavior, report only single change if swapping between*/                  \
+        /* the same registers.*/                                                                \
+        if (op1_ != op2_)                                                                       \
+            model_->ReportChange(ch_gpr_2);                                                     \
+                                                                                                \
+        return true;                                                                            \
+    }
+
+IMPLEMENT_SWAP_OP(InstructionCSWAP, carry)
+IMPLEMENT_SWAP_OP(InstructionZSWAP, zero)
+
 
 bool spect::InstructionHASH::Execute()
 {
@@ -513,6 +588,79 @@ bool spect::InstructionSUBP::Execute()
     return true;
 }
 
+bool spect::InstructionTMAC_IT::Execute()
+{
+    // Initialize Keccak
+    if (KeccakWidth400_SpongeInitialize(&(model_->keccak_inst_), KECCAK_RATE, KECCAK_CAPACITY) != 0)
+        return false;
+
+    return true;
+}
+
+bool spect::InstructionTMAC_UP::Execute()
+{
+    unsigned char msg[KECCAK_RATE/8];
+
+    // Convert register op2_ to input message (must be character stream)
+    uint256_t tmp = model_->GetGpr(TO_INT(op2_));
+    for (int i = 0; i < KECCAK_RATE/8; i++) {
+        msg[i] = (uint8_t)((tmp >> (136 - (i * 8))) & uint256_t("0xFF"));
+    }
+
+    // Print Message
+    model_->DebugInfo(VERBOSITY_HIGH, "Keccak input message:");
+    std::stringstream ss;
+    ss << std::hex << std::setw(2);
+    for (int i = 0; i < KECCAK_RATE/8; i++)
+        ss << (int)msg[i] << " ";
+    model_->DebugInfo(VERBOSITY_HIGH, ss.str().c_str());
+    model_->DebugInfo(VERBOSITY_HIGH, "");
+
+    // Process by Keccak
+    if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_RATE/8) != 0)
+        return false;
+
+    return true;
+}
+
+bool spect::InstructionTMAC_RD::Execute()
+{
+    unsigned char msg[KECCAK_CAPACITY/8];
+
+    DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
+    PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
+
+    // Move to squeezing phase
+    model_->keccak_inst_.squeezing = 1;
+
+    // Get Keccak output
+    if (KeccakWidth400_SpongeSqueeze(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_CAPACITY/8) != 0)
+        return false;
+
+    // Print Message
+    model_->DebugInfo(VERBOSITY_HIGH, "Keccak output message:");
+    std::stringstream ss;
+    ss << std::hex << std::setw(2);
+    for (int i = 0; i < KECCAK_CAPACITY/8; i++)
+        ss << (int)msg[i] << " ";
+    model_->DebugInfo(VERBOSITY_HIGH, ss.str().c_str());
+    model_->DebugInfo(VERBOSITY_HIGH, "");
+
+    // Convert output message to register op1_
+    uint256_t reg = uint256_t(0);
+    for (int i = 0; i < 32; i++) {
+        uint256_t tmp = uint256_t(msg[i]);
+        reg = reg | (tmp << (248 - (i * 8)));
+    }
+
+    model_->SetGpr(TO_INT(op1_), reg);
+
+    PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
+    model_->ReportChange(ch_gpr);
+
+    return true;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // I Instructions
@@ -612,15 +760,52 @@ bool spect::InstructionHASH_IT::Execute()
     return true;
 }
 
-bool spect::InstructionGPK::Execute()
+bool spect::InstructionTMAC_IS::Execute()
+{
+    // Init string in format {nonce, key length, key, 0x00, 0x00}
+    unsigned char initstr[36];
+
+    // Nonce
+    initstr[0] = uint8_t(immediate_ & 0xFF);
+    // Key length (0x20)
+    initstr[1] = 0x20;
+    // Key
+    uint256_t tmp = model_->GetGpr(TO_INT(op2_));
+    for (int j = 0; j < 32; j++) {
+        initstr[j+2] = (uint8_t)((tmp >> (248 - (j * 8))) & uint256_t("0xFF"));
+    }
+    // Zero bytes
+    initstr[34] = 0x00;
+    initstr[35] = 0x00;
+
+    // Print Init string
+    model_->DebugInfo(VERBOSITY_HIGH, "Keccak Init string:");
+    std::stringstream ss;
+    ss << std::hex << std::setw(2);
+    for (int i = 0; i < 36; i++)
+        ss << (int)initstr[i] << " ";
+    model_->DebugInfo(VERBOSITY_HIGH, ss.str().c_str());
+    model_->DebugInfo(VERBOSITY_HIGH, "");
+
+    // Process by Keccak
+    for (int j = 0; j < 2; j++) {
+        if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)(&initstr[j*KECCAK_RATE/8]), KECCAK_RATE/8) != 0)
+            return false;
+    }
+
+    return true;
+}
+
+bool spect::InstructionLDK::Execute()
 {
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    int index = immediate_ & 0x7;
+    uint32_t slot   = (uint32_t)(model_->GetGpr(TO_INT(op2_)) & uint256_t("0xFF"));
+    uint32_t offset = immediate_ & 0x1F;
     uint256_t tmp = 0;
     for (int i = 0; i < 8; i++) {
-        uint256_t part = model_->GpkQueuePop(index);
+        uint256_t part = model_->LdkQueuePop(slot, offset);
         part = part << (32 * i);
         tmp = tmp | part;
     }
@@ -629,6 +814,19 @@ bool spect::InstructionGPK::Execute()
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
     model_->ReportChange(ch_gpr);
 
+    return true;
+}
+
+
+bool spect::InstructionSTK::Execute()
+{
+    // TODO
+    return true;
+}
+
+bool spect::InstructionERK::Execute()
+{
+    // TODO
     return true;
 }
 
@@ -712,6 +910,8 @@ IMPLEMENT_COND_JUMP_OP(InstructionBRZ,zero,true)
 IMPLEMENT_COND_JUMP_OP(InstructionBRNZ,zero,false)
 IMPLEMENT_COND_JUMP_OP(InstructionBRC,carry,true)
 IMPLEMENT_COND_JUMP_OP(InstructionBRNC,carry,false)
+IMPLEMENT_COND_JUMP_OP(InstructionBRE,error,true)
+IMPLEMENT_COND_JUMP_OP(InstructionBRNE,error,false)
 
 bool spect::InstructionJMP::Execute()
 {
@@ -721,7 +921,6 @@ bool spect::InstructionJMP::Execute()
 
 bool spect::InstructionEND::Execute()
 {
-    model_->SetSrr(model_->GetGpr(31));
     model_->Finish(0);
     model_->UpdateInterrupts();
 

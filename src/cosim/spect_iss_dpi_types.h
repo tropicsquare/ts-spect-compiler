@@ -25,7 +25,8 @@ typedef enum {
 
 typedef enum {
     DPI_SPECT_FLAG_ZERO         = (1 << 0),
-    DPI_SPECT_FLAG_CARRY        = (1 << 1)
+    DPI_SPECT_FLAG_CARRY        = (1 << 1),
+    DPI_SPECT_FLAG_ERROR        = (1 << 2)
 } dpi_flag_type_t;
 
 typedef enum {
@@ -97,6 +98,8 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
             return std::string("DPI_SPECT_FLAG_ZERO");
         else if (obj == DPI_SPECT_FLAG_CARRY)
             return std::string("DPI_SPECT_FLAG_CARRY");
+        else if (obj == DPI_SPECT_FLAG_ERROR)
+            return std::string("DPI_SPECT_FLAG_ERROR");
         else
             return std::string("UNKNOWN FLAG TYPE!");
         break;
@@ -138,6 +141,7 @@ typedef struct {
     //  DPI_CHANGE_FLAG:
     //      DPI_SPECT_FLAG_ZERO
     //      DPI_SPECT_FLAG_CARRY
+    //      DPI_SPECT_FLAG_ERROR
     //
     //  DPI_CHANGE_MEM:
     //      Address in memory on which change occured.

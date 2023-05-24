@@ -176,6 +176,7 @@ void spect::CpuSimulator::PrintFlags()
     std::cout << "CPU Flags:\n";
     std::cout << std::dec << "  " << "Z: " << model_->GetCpuFlag(CpuFlagType::ZERO) << "\n";
     std::cout << std::dec << "  " << "C: " << model_->GetCpuFlag(CpuFlagType::CARRY) << "\n";
+    std::cout << std::dec << "  " << "E: " << model_->GetCpuFlag(CpuFlagType::ERROR) << "\n";
 }
 
 void spect::CpuSimulator::PrintPc()

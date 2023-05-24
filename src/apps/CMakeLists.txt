@@ -6,6 +6,7 @@ add_executable(spect_compiler
 target_link_libraries(spect_compiler
     SPECT
     COMMON
+    XKCP
 )
 
 add_executable(spect_iss
@@ -15,4 +16,6 @@ add_executable(spect_iss
 target_link_libraries(spect_iss
     SPECT
     COMMON
+    XKCP
 )
+

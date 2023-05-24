@@ -195,6 +195,9 @@ extern "C" {
         case DPI_SPECT_FLAG_CARRY:
             rv = simulator->model_->GetCpuFlags().carry;
             break;
+        case DPI_SPECT_FLAG_ERROR:
+            rv = simulator->model_->GetCpuFlags().error;
+            break;
         default:
             rv = 0;
         }
@@ -231,12 +234,10 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
+    // TODO remove
     uint32_t spect_dpi_get_srr(uint32_t part)
     {
-        DPI_CALL_LOG_ENTER
-        uint256_t tmp = (simulator->model_->GetSrr() >> (part * 32)) & uint256_t("0xFFFFFFFF");
-        DPI_CALL_LOG_EXIT
-        return (uint32_t)tmp;
+        return 0;
     }
 
     uint32_t spect_dpi_get_rar_value(uint32_t address)
@@ -262,10 +263,10 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
-    void spect_dpi_push_gpk_queue(uint32_t data, uint32_t index)
+    void spect_dpi_push_ldk_queue(uint32_t data, uint32_t index)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->GpkQueuePush(index, data);
+        simulator->model_->LdkQueuePush(index, data);
         DPI_CALL_LOG_EXIT
     }
 

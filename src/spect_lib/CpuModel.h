@@ -18,6 +18,9 @@
 #include "spect.h"
 #include "CpuProgram.h"
 #include "Sha512.h"
+extern "C" {
+#include "KeccakSponge.h"
+}
 
 #include "ordt_pio_common.hpp"
 #include "ordt_pio.hpp"
@@ -40,7 +43,7 @@ class spect::CpuModel
         /// @param instr_mem_ahb_r Instruction memory readable via AHB
         /// @returns New model object
         ///////////////////////////////////////////////////////////////////////////////////////////
-        CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r);
+        CpuModel(bool insr_mem_ahb_w, bool instr_mem_ahb_r);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief CPU model destructor
@@ -221,21 +224,23 @@ class spect::CpuModel
         uint32_t GrvQueuePop();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Push data to GPK Queue
+        /// @brief Push data to LDK Queue
         /// @param data Data to be pushed to TAIL of the queue.
-        /// @param index Index of the queue (corresponds to immediate[2:0])
-        /// @note This function shall be used by outside world to push data to be returned by GPK
+        /// @param slot Slot of the queue (corresponds to op2[7:0])
+        /// @param offset Offset within the slot (corresponds to immediate[4:0])
+        /// @note This function shall be used by outside world to push data to be returned by LDK
         //        instruction.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void GpkQueuePush(uint32_t index, uint32_t data);
+        void LdkQueuePush(uint32_t slot, uint32_t offset, uint32_t data);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Pop data from GPK Queue
-        /// @param index Index of the queue (corresponds to immediate[2:0])
+        /// @brief Pop data from LDK Queue
+        /// @param slot Slot of the queue (corresponds to op2[7:0])
+        /// @param offset Offset within the slot (corresponds to immediate[4:0])
         /// @returns data from HEAD of the queue
-        /// @note This function is used by instruction model when executing GPK instruction.
+        /// @note This function is used by instruction model when executing LDK instruction.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t GpkQueuePop(uint32_t index);
+        uint32_t LdkQueuePop(uint32_t slot, uint32_t offset);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Report Change on the CPU model
@@ -313,7 +318,7 @@ class spect::CpuModel
         uint16_t GetPc();
         void SetPc(uint16_t val);
 
-        // Flags (Z,C)
+        // Flags (Z,C,E)
         void SetCpuFlag(CpuFlagType type, bool val);
         bool GetCpuFlag(CpuFlagType type);
         CpuFlags GetCpuFlags();
@@ -347,6 +352,9 @@ class spect::CpuModel
         // SHA512 calculation unit - Direct access
         Sha512 sha_512_;
 
+        // Keccak Sponge instance
+        KeccakWidth400_SpongeInstance keccak_inst_;
+
         // Program
         CpuProgram *program_ = NULL;
 
@@ -373,11 +381,8 @@ class spect::CpuModel
         // program Counter (PC)
         uint16_t pc_;
 
-        // Flags (Z, C)
+        // Flags (Z, C, E)
         CpuFlags flags_;
-
-        // Secret result register
-        uint256_t srr_;
 
         // Return Address register (RAR) stack
         uint16_t rar_stack_[SPECT_RAR_DEPTH];
@@ -398,9 +403,9 @@ class spect::CpuModel
         // Random value queue, source of data provided by GRV instruction
         std::queue<uint32_t> grv_q_;
 
-        // Private Key queues, source of data provided by GPK instruction
-        // queue is selected by immediate[2:0]
-        std::queue<uint32_t> gpk_q_[8];
+        // Private Key queues, source of data provided by LDK instruction
+        // queue is selected by op2[7:0] and immediate[4:0]
+        std::queue<uint32_t> ldk_q_[256][32];
 
         // Queue for processor state changes
         std::queue<dpi_state_change_t> change_q_;

@@ -72,11 +72,13 @@ namespace spect {
     struct CpuFlags {
         bool zero;
         bool carry;
+        bool error;
     };
 
     enum class CpuFlagType {
         ZERO,
-        CARRY
+        CARRY,
+        ERROR
     };
 
     enum class CpuIntType {
@@ -169,6 +171,9 @@ namespace spect {
     #define VERBOSITY_HIGH 3
 
     #define MODEL_LABEL "SPECT_MODEL: "
+
+    #define KECCAK_CAPACITY 256
+    #define KECCAK_RATE     144
 
 #if defined(__has_cpp_attribute)
     #if 	__has_cpp_attribute(maybe_unused)

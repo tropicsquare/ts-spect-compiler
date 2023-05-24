@@ -78,9 +78,6 @@ void spect::CpuModel::Finish(int status_err)
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[ERR] = ", status_err);
     regs_->r_status.f_err.data = status_err;
 
-    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting SRR = ", gpr_[31]);
-    SetSrr(gpr_[31]);
-
 
     DebugInfo(VERBOSITY_HIGH, "Program statistics:");
     DebugInfo(VERBOSITY_HIGH, "     Instruction         No. of Executions       Cycles per instruction");
@@ -254,6 +251,10 @@ void spect::CpuModel::SetCpuFlag(CpuFlagType type, bool val)
         DebugInfo(VERBOSITY_MEDIUM, "Setting C flag to", val);
         flags_.carry = val;
         break;
+    case CpuFlagType::ERROR:
+        DebugInfo(VERBOSITY_MEDIUM, "Setting E flag to", val);
+        flags_.error = val;
+        break;
     default:
         break;
     }
@@ -266,6 +267,8 @@ bool spect::CpuModel::GetCpuFlag(CpuFlagType type)
         return flags_.zero;
     case CpuFlagType::CARRY:
         return flags_.carry;
+    case CpuFlagType::ERROR:
+        return flags_.error;
     default:
         return false;
     }
@@ -274,17 +277,6 @@ bool spect::CpuModel::GetCpuFlag(CpuFlagType type)
 spect::CpuFlags spect::CpuModel::GetCpuFlags()
 {
     return flags_;
-}
-
-const uint256_t& spect::CpuModel::GetSrr()
-{
-    return srr_;
-}
-
-void spect::CpuModel::SetSrr(const uint256_t &val)
-{
-    DebugInfo(VERBOSITY_MEDIUM, "Setting SRR flag to", val);
-    srr_ = val;
 }
 
 void spect::CpuModel::RarPush(uint16_t ret_addr)
@@ -363,21 +355,21 @@ uint32_t spect::CpuModel::GrvQueuePop()
     return rv;
 }
 
-void spect::CpuModel::GpkQueuePush(uint32_t index, uint32_t data)
+void spect::CpuModel::LdkQueuePush(uint32_t slot, uint32_t offset, uint32_t data)
 {
-    DebugInfo(VERBOSITY_HIGH, "Pushing to GPK queue", index, ":", data);
-    gpk_q_[index].push(data);
+    DebugInfo(VERBOSITY_HIGH, "Pushing to LDK queue[", slot, "][", offset, "]:", data);
+    ldk_q_[slot][offset].push(data);
 }
 
-uint32_t spect::CpuModel::GpkQueuePop(uint32_t index)
+uint32_t spect::CpuModel::LdkQueuePop(uint32_t slot, uint32_t offset)
 {
     uint32_t rv = 0;
-    if (!gpk_q_[index].empty()) {
-        rv = gpk_q_[index].front();
-        gpk_q_[index].pop();
-        DebugInfo(VERBOSITY_HIGH, "Popping from GPK queue", index, ":", tohexs(rv, 8));
+    if (!ldk_q_[slot][offset].empty()) {
+        rv = ldk_q_[slot][offset].front();
+        ldk_q_[slot][offset].pop();
+        DebugInfo(VERBOSITY_HIGH, "Popping from LDK queue[", slot, "][", offset, "]:", tohexs(rv, 8));
     } else
-        DebugInfo(VERBOSITY_LOW, "Popping from empty GPK queue, GPK returns 0");
+        DebugInfo(VERBOSITY_LOW, "Popping from empty LDK queue, LDK returns 0");
     return rv;
 }
 
@@ -470,10 +462,11 @@ void spect::CpuModel::DumpContext(const std::string &path)
         PUT_COMMENT_LINE("RAR stack pointer:");
         ofs << std::setw(4) << GetRarSp() << "\n";
 
-        PUT_COMMENT_LINE("FLAGS (Z, C):");
+        PUT_COMMENT_LINE("FLAGS (Z, C, E):");
         CpuFlags flgs = GetCpuFlags();
         ofs << flgs.zero << "\n";
         ofs << flgs.carry << "\n";
+        ofs << flgs.error << "\n";
 
         PUT_COMMENT_LINE("Memory:");
         uint32_t backup = verbosity_;
@@ -555,6 +548,11 @@ void spect::CpuModel::LoadContext(const std::string &path)
         iss3 >> val;
         SetCpuFlag(CpuFlagType::CARRY, val);
 
+        std::getline(ifs, line);
+        std::istringstream iss4(line);
+        iss4 >> val;
+        SetCpuFlag(CpuFlagType::ERROR, val);
+
         // Memory
         SKIP_COMMENT_LINES
         uint32_t backup = verbosity_;
@@ -567,8 +565,8 @@ void spect::CpuModel::LoadContext(const std::string &path)
             }
             uint32_t mem_val;
             std::getline(ifs, line);
-            std::istringstream iss4(line);
-            iss4 >> std::hex >> mem_val;
+            std::istringstream iss5(line);
+            iss5 >> std::hex >> mem_val;
             SetMemory(i * 4, mem_val);
         }
         verbosity_ = backup;
@@ -635,8 +633,8 @@ void spect::CpuModel::Reset()
         SetGpr(i, uint256_t("0x0"));
 
     SetCpuFlag(CpuFlagType::CARRY, false);
-    SetCpuFlag(CpuFlagType::ZERO, false);
-    SetSrr("0x0");
+    SetCpuFlag(CpuFlagType::ZERO,  false);
+    SetCpuFlag(CpuFlagType::ERROR, false);
 
     for (int i = 0; i < SPECT_RAR_DEPTH; i++)
         rar_stack_[i] = 0x0;
