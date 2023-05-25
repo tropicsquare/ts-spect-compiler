@@ -339,18 +339,7 @@ bool spect::CpuModel::GetInterrrupt(CpuIntType int_type)
 
 void spect::CpuModel::SetParityType(ParityType type)
 {
-    switch(type) {
-    case ParityType::ODD:
-      DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to: ODD");
-      break;
-    case ParityType::EVEN:
-      DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to: EVEN");
-      break;
-    default:
-      DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to: NONE");
-      break;
-    }
-
+    DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to:", type);
     parity_type_ = type;
 }
 

@@ -33,6 +33,20 @@ std::ostream& operator << ( std::ostream& os, const spect::SymbolType& symbol_ty
     }
 }
 
+std::ostream& operator << ( std::ostream& os, const spect::ParityType& parity_type)
+{
+    switch (parity_type) {
+    case ParityType::ODD:
+        return os << "Odd";
+    case ParityType::EVEN:
+        return os << "Even";
+    case ParityType::NONE:
+        return os << "None";
+    default:
+        return os << "Invalid parity type!";
+    }
+}
+
 uint32_t stoint(std::string str)
 {
     if (str.size() < 2) {

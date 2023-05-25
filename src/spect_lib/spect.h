@@ -131,6 +131,8 @@ namespace spect {
         EVEN
     };
 
+    std::ostream& operator << ( std::ostream& os, const spect::ParityType& parity_type);
+
     class Instruction;
     class InstructionFactory;
     class InstructionR;
