@@ -337,6 +337,28 @@ bool spect::CpuModel::GetInterrrupt(CpuIntType int_type)
     return false;
 }
 
+void spect::CpuModel::SetParityType(ParityType type)
+{
+    switch(type) {
+    case ParityType::ODD:
+      DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to: ODD");
+      break;
+    case ParityType::EVEN:
+      DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to: EVEN");
+      break;
+    default:
+      DebugInfo(VERBOSITY_MEDIUM, "Setting Parity Type to: NONE");
+      break;
+    }
+
+    parity_type_ = type;
+}
+
+spect::ParityType spect::CpuModel::GetParityType()
+{
+    return parity_type_;
+}
+
 void spect::CpuModel::GrvQueuePush(uint32_t data)
 {
     DebugInfo(VERBOSITY_HIGH, "Pushing to GRV queue:", tohexs(data, 8));
@@ -710,7 +732,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     uint32_t wrd = ReadMemoryCoreFetch(GetPc());
 
     DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", tohexs(wrd, 8));
-    Instruction *instr = spect::Instruction::DisAssemble(wrd);
+    Instruction *instr = spect::Instruction::DisAssemble(GetParityType(), wrd);
 
     // Detect invalid instruction and finish
     if (instr == nullptr) {

@@ -28,6 +28,7 @@ enum  optionIndex {
     FIRST_ADDR,
     HEX_FORMAT,
     HEX_FILE,
+    PARITY,
     DUMP_PROGRAM,
     DUMP_SYMBOLS
 };
@@ -42,6 +43,10 @@ const option::Descriptor usage[] =
                                                                             "                           1 - Hex file for Verilog model (address not included)\n"
                                                                             "                           2 - Hex file for Verilog model (address included).\n"},
     {HEX_FILE,         0,  ""  ,    "hex-file"      ,option::Arg::Optional, "  --hex-file=<file>       HEX file for simulator where code will be assembled."},
+    {PARITY,           0,  ""  ,    "parity"        ,option::Arg::Optional, "  --parity=<type>         Parity type:\n"
+                                                                            "                           1 - Odd parity.\n"
+                                                                            "                           2 - Even parity.\n"
+                                                                            "                           else - No parity (default).\n"},
     {DUMP_PROGRAM,     0,  ""  ,    "dump-program"  ,option::Arg::Optional, "  --dump-program=<file>   File where program to dump compiled program (.s file with addresses)\n"},
     {DUMP_SYMBOLS,     0,  ""  ,    "dump-symbols"  ,option::Arg::Optional, "  --dump-symbols=<file>   File where dump all symbols found during compilation.\n"},
 
@@ -114,7 +119,15 @@ int main(int argc, char** argv)
                     hex_type = spect::HexFileType::VERILOG_ADDR_WORD;
             }
 
-            comp->program_->Assemble(std::string(options[HEX_FILE].arg), hex_type);
+            spect::ParityType parity_type = spect::ParityType::NONE;
+            if (options[PARITY]) {
+                if (*options[PARITY].arg == '1')
+                    parity_type = spect::ParityType::ODD;
+                else if (*options[PARITY].arg == '2')
+                    parity_type = spect::ParityType::EVEN;
+            }
+
+            comp->program_->Assemble(std::string(options[HEX_FILE].arg), hex_type, parity_type);
         } catch(std::runtime_error &err) {
             std::cout << err.what() << std::endl;
             ret_code = 1;

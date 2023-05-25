@@ -125,6 +125,12 @@ namespace spect {
         VERILOG_ADDR_WORD           = 2
     };
 
+    enum class ParityType {
+        NONE,
+        ODD,
+        EVEN
+    };
+
     class Instruction;
     class InstructionFactory;
     class InstructionR;

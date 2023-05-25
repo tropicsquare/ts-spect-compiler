@@ -21,6 +21,7 @@ enum  optionIndex {
     PROGRAM,
     FIRST_ADDR,
     START_PC,
+    PARITY,
     CMD_FILE,
     SHELL,
     INSTRUCTION_MEM_HEX,
@@ -42,6 +43,10 @@ const option::Descriptor usage[] =
                                                                                                                            "option only when loading program via '--program' switch. Option is ignored"
                                                                                                                            "when loading program from HEX file.\n" },
     {START_PC,              0,  ""  ,    "start-pc"             ,option::Arg::Optional,     "  --start-pc=<addr>            Address of first instruction to be executed by model.\n"},
+    {PARITY,                0,  ""  ,    "parity"               ,option::Arg::Optional,     "  --parity=<type>              Parity type:\n"
+                                                                                            "                               1 - Odd parity.\n"
+                                                                                            "                               2 - Even parity.\n"
+                                                                                            "                               else - No parity (default).\n"},
     {CMD_FILE,              0,  ""  ,    "cmd-file"             ,option::Arg::Optional,     "  --cmd-file=<file>            Execute file with simulator shell commands.\n"},
     {SHELL,                 0,  ""  ,    "shell"                ,option::Arg::Optional,     "  --shell                      Launch simulator in the interactive shell.\n"},
     {INSTRUCTION_MEM_HEX,   0,  ""  ,    "instruction-mem"      ,option::Arg::Optional,     "  --instruction-mem=<hex-file> Program (assembled) to be loaded to instruction memory.\n"},
@@ -107,6 +112,18 @@ int main(int argc, char** argv)
     simulator = new spect::CpuSimulator();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Configure parity type
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    spect::ParityType parity_type = spect::ParityType::NONE;
+    if (options[PARITY]) {
+        if (*options[PARITY].arg == '1')
+            parity_type = spect::ParityType::ODD;
+        else if (*options[PARITY].arg == '2')
+            parity_type = spect::ParityType::EVEN;
+    }
+    simulator->model_->SetParityType(parity_type);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     // Compile the program if '.s' file passed on Command line and Preload memories
     ///////////////////////////////////////////////////////////////////////////////////////////////
     uint32_t *m_mem = simulator->model_->GetMemoryPtr();
@@ -144,7 +161,7 @@ int main(int argc, char** argv)
             simulator->compiler_->Compile(ss.str());
             simulator->compiler_->CompileFinish();
             uint32_t *p_start = m_mem + (simulator->compiler_->program_->first_addr_ >> 2);
-            simulator->compiler_->program_->Assemble(p_start);
+            simulator->compiler_->program_->Assemble(p_start, parity_type);
         })
     }
 

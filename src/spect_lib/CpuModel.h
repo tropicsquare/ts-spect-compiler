@@ -337,6 +337,10 @@ class spect::CpuModel
         // Get Interrupt output state
         bool GetInterrrupt(CpuIntType int_type);
 
+        // Parity type
+        void SetParityType(ParityType type);
+        ParityType GetParityType();
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @section Public attributes
@@ -415,6 +419,9 @@ class spect::CpuModel
 
         // Instruction memory readable via AHB
         const bool instr_mem_ahb_r_;
+
+        // Parity check type
+        ParityType parity_type_ = ParityType::NONE;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // true  - Program has finished (END has been executed or Error occured)

@@ -34,10 +34,40 @@ spect::Instruction::Instruction(std::string mnemonic, InstructionType itype, uin
 spect::Instruction::~Instruction()
 {}
 
-spect::Instruction* spect::Instruction::DisAssemble(uint32_t wrd)
+uint32_t spect::Instruction::Assemble(spect::ParityType parity_type)
+{
+    using namespace spect;
+    uint32_t wrd;
+
+    switch (itype_) {
+    case InstructionType::R:
+        wrd = static_cast<spect::InstructionR*>(this)->Assemble();
+        break;
+    case InstructionType::I:
+        wrd = static_cast<spect::InstructionI*>(this)->Assemble();
+        break;
+    case InstructionType::M:
+        wrd = static_cast<spect::InstructionM*>(this)->Assemble();
+        break;
+    default:
+        wrd = static_cast<spect::InstructionJ*>(this)->Assemble();
+        break;
+    }
+
+    // Compute parity
+    uint32_t parity = ComputeParity(parity_type, wrd);
+
+    return (wrd | ((parity & IENC_PARITY_MASK) << IENC_PARITY_OFFSET));
+}
+
+spect::Instruction* spect::Instruction::DisAssemble(spect::ParityType parity_type, uint32_t wrd)
 {
     using namespace spect;
     uint32_t itype = (wrd >> IENC_TYPE_OFFSET) & IENC_TYPE_MASK;
+
+    // Check parity
+    if (CheckParity(parity_type, wrd) == false)
+        return nullptr;
 
     switch (itype) {
     case TO_INT(InstructionType::R):
@@ -120,3 +150,50 @@ std::string spect::Instruction::Dump()
     return ss.str();
 }
 
+bool spect::Instruction::CheckParity(spect::ParityType parity_type, uint32_t wrd)
+{
+    uint32_t b;
+
+    // No parity check
+    if (parity_type == spect::ParityType::NONE)
+        return true;
+
+    // Compute parity
+    b = wrd ^ (wrd >> 1);
+    b = b   ^ (b   >> 2);
+    b = b   ^ (b   >> 4);
+    b = b   ^ (b   >> 8);
+    b = b   ^ (b   >> 16);
+
+    if (parity_type == spect::ParityType::ODD)
+        // Odd parity
+        return (b & 1) == 1;
+    else
+        // Even parity
+        return (b & 1) == 0;
+
+}
+
+uint32_t spect::Instruction::ComputeParity(spect::ParityType parity_type, uint32_t wrd)
+{
+    uint32_t b;
+
+    // No parity
+    if (parity_type == spect::ParityType::NONE)
+        return 0;
+
+    // Compute parity
+    b = wrd ^ (wrd >> 1);
+    b = b   ^ (b   >> 2);
+    b = b   ^ (b   >> 4);
+    b = b   ^ (b   >> 8);
+    b = b   ^ (b   >> 16);
+
+    if (parity_type == spect::ParityType::ODD)
+        // Odd parity
+        return (~b & 1);
+    else
+        // Even parity
+        return (b & 1);
+
+}

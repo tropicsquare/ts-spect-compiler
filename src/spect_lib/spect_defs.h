@@ -89,6 +89,7 @@
 // Internal defines
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define IENC_PARITY_BITS        1
 #define IENC_TYPE_BITS          2
 #define IENC_OPCODE_BITS        4
 #define IENC_FUNC_BITS          3
@@ -97,6 +98,7 @@
 #define IENC_ADDR_BITS          16
 #define IENC_NEW_PC_BITS        16
 
+#define IENC_PARITY_MASK        0x1
 #define IENC_TYPE_MASK          0x3
 #define IENC_OPCODE_MASK        0xF
 #define IENC_FUNC_MASK          0x7
@@ -105,6 +107,7 @@
 #define IENC_ADDR_MASK          0xFFFF
 #define IENC_NEW_PC_MASK        0xFFFF
 
+#define IENC_PARITY_OFFSET      31
 #define IENC_TYPE_OFFSET        29
 #define IENC_OPCODE_OFFSET      25
 #define IENC_FUNC_OFFSET        22

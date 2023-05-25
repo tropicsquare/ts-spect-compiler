@@ -24,7 +24,7 @@ void spect::CpuProgram::AppendInstruction(spect::Instruction *instr)
     code_.push_back(instr);
 }
 
-void spect::CpuProgram::Assemble(uint32_t *mem)
+void spect::CpuProgram::Assemble(uint32_t *mem, spect::ParityType parity_type)
 {
     for (auto const &instr : code_) {
 
@@ -36,15 +36,15 @@ void spect::CpuProgram::Assemble(uint32_t *mem)
                               s_unknown->identifier_.c_str());
             compiler_->ErrorAt(buf, s_unknown->f_, s_unknown->line_nr_);
         }
-        *mem = instr->Assemble();
+        *mem = instr->Assemble(parity_type);
         mem++;
     }
 }
 
-void spect::CpuProgram::Assemble(std::string path, spect::HexFileType hex_type)
+void spect::CpuProgram::Assemble(std::string path, spect::HexFileType hex_type, spect::ParityType parity_type)
 {
     uint32_t *mem = new uint32_t[code_.size()];
-    Assemble(mem);
+    Assemble(mem, parity_type);
 
     std::ofstream ofs;
     ofs.open(path);

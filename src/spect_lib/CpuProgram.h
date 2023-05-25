@@ -33,15 +33,17 @@ class spect::CpuProgram
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Assemble the program
         /// @param mem Pointer to memory where the program shall be assembled
+        /// @param parity_type Type of parity to generate
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Assemble(uint32_t *mem);
+        void Assemble(uint32_t *mem, spect::ParityType parity_type);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Assemble the program
         /// @param path Path to HEX file where the program shall be assembled.
         /// @param hex_type Type (format) of HEX file to generate
+        /// @param parity_type Type of parity to generate
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Assemble(std::string path, spect::HexFileType hex_type);
+        void Assemble(std::string path, spect::HexFileType hex_type, spect::ParityType parity_type);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Dump the program

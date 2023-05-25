@@ -61,9 +61,10 @@ class spect::Instruction
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Assemble the instruction
+        /// @param parity_type Type of parity to generate
         /// @returns Assembled encoding of the instruction
         ///////////////////////////////////////////////////////////////////////////////////////////
-        virtual uint32_t Assemble() = 0;
+        uint32_t Assemble(spect::ParityType parity_type);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Clone the instruction
@@ -74,10 +75,11 @@ class spect::Instruction
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Clone the instruction
+        /// @param parity_type Type of parity to check
         /// @returns New instruction object living on heap, matches attributes of object which
         ///          called this function.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        static spect::Instruction* DisAssemble(uint32_t wrd);
+        static spect::Instruction* DisAssemble(spect::ParityType parity_type, uint32_t wrd);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Relocate the instruction.
@@ -108,6 +110,25 @@ class spect::Instruction
         ///////////////////////////////////////////////////////////////////////////////////////////
         void SampleOutputs(dpi_instruction_t *dpi_instr, CpuModel *model);
 
+    private:
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Check Parity
+        /// @param parity_type Type of parity to check
+        /// @param wrd Data word
+        /// @returns True if the parity check passes, false otherwise.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        static bool CheckParity(spect::ParityType parity_type, uint32_t wrd);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Compute Parity
+        /// @param parity_type Type of parity to generate
+        /// @param wrd Data word
+        /// @returns Parity bit
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        static uint32_t ComputeParity(spect::ParityType parity_type, uint32_t wrd);
+
+
+    public:
         // Instruction type
         const InstructionType itype_;
 
