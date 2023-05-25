@@ -187,6 +187,12 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
         IsWithinMem(CpuMemory::CONST_ROM, address))
         rv = memory_[address >> 2];
 
+    if (IsWithinMem(CpuMemory::EMEM_IN, address)) {
+        DEFINE_CHANGE(ch_emem, DPI_CHANGE_EMEM_IN, address);
+        rv = memory_[address >> 2];
+        ReportChange(ch_emem);
+    }
+
     DebugInfo(VERBOSITY_MEDIUM, "Core Read", tohexs(address, 4), "data:", tohexs(rv, 8));
 
     return rv;
@@ -196,14 +202,19 @@ void spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Core Write", tohexs(address, 4), "data:", tohexs(data, 8));
 
-    DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
-
     if (IsWithinMem(CpuMemory::DATA_RAM_IN, address) ||
         IsWithinMem(CpuMemory::DATA_RAM_OUT, address)) {
+        DEFINE_CHANGE(ch_mem, DPI_CHANGE_MEM, address);
         ch_mem.old_val[0] = memory_[address >> 2];
         memory_[address >> 2] = data;
         ch_mem.new_val[0] = data;
         ReportChange(ch_mem);
+    }
+
+    if (IsWithinMem(CpuMemory::EMEM_OUT, address)) {
+        DEFINE_CHANGE(ch_emem, DPI_CHANGE_EMEM_OUT, address);
+        ch_emem.new_val[0] = data;
+        ReportChange(ch_emem);
     }
 }
 
@@ -829,8 +840,17 @@ bool spect::CpuModel::IsWithinMem(CpuMemory mem, uint16_t address)
         end = start + SPECT_INSTR_MEM_SIZE;
         break;
     case CpuMemory::CONFIG_REGS:
-         start = SPECT_CONFIG_REGS_BASE;
-         end = start + SPECT_CONFIG_REGS_SIZE;
+        start = SPECT_CONFIG_REGS_BASE;
+        end = start + SPECT_CONFIG_REGS_SIZE;
+        break;
+    case CpuMemory::EMEM_IN:
+        start = SPECT_EMEM_IN_BASE;
+        end = start + SPECT_EMEM_IN_SIZE;
+        break;
+    case CpuMemory::EMEM_OUT:
+        start = SPECT_EMEM_OUT_BASE;
+        end = start + SPECT_EMEM_OUT_SIZE;
+        break;
     default:
         break;
     }

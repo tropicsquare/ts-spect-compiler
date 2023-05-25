@@ -70,6 +70,26 @@
 #endif
 
 
+// External Memory In
+#ifndef SPECT_EMEM_IN_BASE
+#define SPECT_EMEM_IN_BASE 0x4000
+#endif
+
+#ifndef SPECT_EMEM_IN_SIZE
+#define SPECT_EMEM_IN_SIZE 0x40
+#endif
+
+
+// External Memory Out
+#ifndef SPECT_EMEM_OUT_BASE
+#define SPECT_EMEM_OUT_BASE 0x5000
+#endif
+
+#ifndef SPECT_EMEM_OUT_SIZE
+#define SPECT_EMEM_OUT_SIZE 0x50
+#endif
+
+
 // Instruction Memory
 #ifndef SPECT_INSTR_MEM_BASE
 #define SPECT_INSTR_MEM_BASE 0x8000

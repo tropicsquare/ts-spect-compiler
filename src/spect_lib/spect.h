@@ -91,6 +91,8 @@ namespace spect {
         DATA_RAM_OUT,
         CONST_ROM,
         CONFIG_REGS,
+        EMEM_IN,
+        EMEM_OUT,
         INSTR_MEM
     };
 
