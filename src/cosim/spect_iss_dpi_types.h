@@ -44,7 +44,11 @@ typedef enum {
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
-    DPI_CHANGE_RAR              = (1 << 5)
+    DPI_CHANGE_RAR              = (1 << 5),
+    DPI_CHANGE_EMEM_IN          = (1 << 6),
+    DPI_CHANGE_EMEM_OUT         = (1 << 7),
+    DPI_CHANGE_RBUS             = (1 << 8),
+    DPI_CHANGE_KBUS             = (1 << 9)
 } dpi_change_kind_t;
 
 typedef enum {
@@ -78,11 +82,15 @@ typedef struct {
 
 inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {
     switch (in){
-    case DPI_CHANGE_GPR  : return std::string("DPI_CHANGE_GPR");
-    case DPI_CHANGE_FLAG : return std::string("DPI_CHANGE_FLAG");
-    case DPI_CHANGE_MEM  : return std::string("DPI_CHANGE_MEM");
-    case DPI_CHANGE_INT  : return std::string("DPI_CHANGE_INT");
-    case DPI_CHANGE_RAR  : return std::string("DPI_CHANGE_RAR");
+    case DPI_CHANGE_GPR      : return std::string("DPI_CHANGE_GPR");
+    case DPI_CHANGE_FLAG     : return std::string("DPI_CHANGE_FLAG");
+    case DPI_CHANGE_MEM      : return std::string("DPI_CHANGE_MEM");
+    case DPI_CHANGE_INT      : return std::string("DPI_CHANGE_INT");
+    case DPI_CHANGE_RAR      : return std::string("DPI_CHANGE_RAR");
+    case DPI_CHANGE_EMEM_IN  : return std::string("DPI_CHANGE_EMEM_IN");
+    case DPI_CHANGE_EMEM_OUT : return std::string("DPI_CHANGE_EMEM_OUT");
+    case DPI_CHANGE_RBUS     : return std::string("DPI_CHANGE_RBUS");
+    case DPI_CHANGE_KBUS     : return std::string("DPI_CHANGE_KBUS");
     }
     return "";
 }
@@ -105,6 +113,8 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
         break;
 
     case DPI_CHANGE_MEM:
+    case DPI_CHANGE_EMEM_IN:
+    case DPI_CHANGE_EMEM_OUT:
         return std::to_string(obj);
         break;
 
@@ -125,6 +135,14 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
         else
             return std::string("UNKNOWN RAR CHANGE TYPE!");
         break;
+
+    case DPI_CHANGE_RBUS:
+        return "n/a";
+        break;
+
+    case DPI_CHANGE_KBUS:
+        return "TODO";
+        break;
     }
     return "";
 }
@@ -144,6 +162,8 @@ typedef struct {
     //      DPI_SPECT_FLAG_ERROR
     //
     //  DPI_CHANGE_MEM:
+    //  DPI_CHANGE_EMEM_IN:
+    //  DPI_CHANGE_EMEM_OUT:
     //      Address in memory on which change occured.
     //
     //  DPI_CHANGE_INT:
@@ -153,6 +173,9 @@ typedef struct {
     //  DPI_CHANGE_RAR:
     //      DPI_RAR_PUSH - Push on stack
     //      DPI_RAR_POP - Pop from stack
+    //
+    //  DPI_CHANGE_RBUS:
+    //      no meaning
     uint32_t          obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -165,6 +188,8 @@ typedef struct {
     //      0 - Value of flag
     //
     //  DPI_CHANGE_MEM:
+    //  DPI_CHANGE_EMEM_IN:
+    //  DPI_CHANGE_EMEM_OUT:
     //      0 - Bits 31:0 of memory location
     //
     //  DPI_CHANGE_INT:
@@ -174,6 +199,9 @@ typedef struct {
     //      obj == DPI_RAR_PUSH (push) - Data pushed on stack
     //      obj == DPI_RAR_POP (pop) - Data popped from stack
     //      both are valid only in "new_val".
+    //
+    //  DPI_CHANGE_RBUS:
+    //      no meaning
     uint32_t          old_val[8] = {0};
     uint32_t          new_val[8] = {0};
 } dpi_state_change_t;

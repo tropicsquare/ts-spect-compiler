@@ -224,6 +224,7 @@ extern "C" {
     {
         DPI_CALL_LOG_ENTER
         spect::Instruction *i = spect::Instruction::DisAssemble(
+            simulator->model_->GetParityType(),
             simulator->model_->GetMemory(((uint16_t)address) >> 2));
         // TODO: How to handle free here? System Verilog side needs to free the buffer!
         buf = new char[32];
@@ -263,10 +264,10 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
-    void spect_dpi_push_ldk_queue(uint32_t data, uint32_t index)
+    void spect_dpi_push_ldk_queue(uint32_t slot, uint32_t offset, uint32_t data)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->LdkQueuePush(index, data);
+        simulator->model_->LdkQueuePush(slot, offset, data);
         DPI_CALL_LOG_EXIT
     }
 
@@ -312,7 +313,9 @@ extern "C" {
             err = simulator->compiler_->CompileFinish();
             if (!err)
                 simulator->compiler_->program_->Assemble(
-                    std::string(hex_path), (spect::HexFileType) internal_hex_type);
+                    std::string(hex_path),
+                    (spect::HexFileType) internal_hex_type,
+                    simulator->model_->GetParityType());
 
         } catch(std::runtime_error &exception) {
             vpi_printf("%s Failed to compile program: %s\n",

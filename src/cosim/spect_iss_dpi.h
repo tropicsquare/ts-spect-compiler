@@ -219,9 +219,10 @@ extern "C" {
     /**
      * @brief Push data for LDK instruction queried via KBUS Handshake interface.
      * @param data Data to push to one of LDK queues.
-     * @param index Index of LDK queue (corresponds to value of spect_kbus_type): 0 - 256.
+     * @param slot Slot of the queue (corresponds to op2[7:0])
+     * @param offset Offset within the slot (corresponds to immediate[4:0])
      */
-    void spect_dpi_push_ldk_queue(uint32_t data, uint32_t index);
+    void spect_dpi_push_ldk_queue(uint32_t slot, uint32_t offset, uint32_t data);
 
     /**
      * @brief Get value of SPECT interrupt output
