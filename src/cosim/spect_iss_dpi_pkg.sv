@@ -22,7 +22,8 @@ package spect_iss_dpi_pkg;
 
   typedef enum {
     DPI_SPECT_FLAG_ZERO         = (1 << 0),
-    DPI_SPECT_FLAG_CARRY        = (1 << 1)
+    DPI_SPECT_FLAG_CARRY        = (1 << 1),
+    DPI_SPECT_FLAG_ERROR        = (1 << 2)
   } dpi_flag_type_t;
 
   typedef enum {
@@ -35,7 +36,11 @@ package spect_iss_dpi_pkg;
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
-    DPI_CHANGE_RAR              = (1 << 5)
+    DPI_CHANGE_RAR              = (1 << 5),
+    DPI_CHANGE_EMEM_IN          = (1 << 6),
+    DPI_CHANGE_EMEM_OUT         = (1 << 7),
+    DPI_CHANGE_RBUS             = (1 << 8),
+    DPI_CHANGE_KBUS             = (1 << 9)
   } dpi_change_kind_t;
 
   typedef enum {
@@ -63,6 +68,8 @@ package spect_iss_dpi_pkg;
     //      DPI_SPECT_FLAG_CARRY
     //
     //  DPI_CHANGE_MEM:
+    //  DPI_CHANGE_EMEM_IN:
+    //  DPI_CHANGE_EMEM_OUT:
     //      Address in memory on which change occured.
     //
     //  DPI_CHANGE_INT:
@@ -72,6 +79,9 @@ package spect_iss_dpi_pkg;
     //  DPI_CHANGE_RAR:
     //      DPI_SPECT_RAR_PUSH - Push on stack
     //      DPI_SPECT_RAR_POP - Pop from stack
+    //
+    //  DPI_CHANGE_RBUS:
+    //      no meaning
     int unsigned      obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -93,6 +103,9 @@ package spect_iss_dpi_pkg;
     //      obj == DPI_SPECT_RAR_PUSH (push) - Data pushed on stack
     //      obj == DPI_SPECT_RAR_POP (pop) - Data popped from stack
     //      both are valid only in "new_val".
+    //
+    //  DPI_CHANGE_RBUS:
+    //      no meaning
     int unsigned      old_val[8] = '{default: 0};
     int unsigned      new_val[8] = '{default: 0};
   } dpi_state_change_t;
