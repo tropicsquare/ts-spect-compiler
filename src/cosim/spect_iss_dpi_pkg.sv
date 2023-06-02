@@ -32,6 +32,20 @@ package spect_iss_dpi_pkg;
   } dpi_int_type_t;
 
   typedef enum {
+    DPI_SPECT_RAR_PUSH          = (1 << 0),
+    DPI_SPECT_RAR_POP           = (1 << 1)
+  } dpi_rar_change_kind_t;
+
+typedef enum {
+    DPI_KBUS_WRITE              = (1 << 0),
+    DPI_KBUS_READ               = (1 << 1),
+    DPI_KBUS_PROGRAM            = (1 << 2),
+    DPI_KBUS_ERASE              = (1 << 3),
+    DPI_KBUS_VERIFY             = (1 << 4),
+    DPI_KBUS_FLUSH              = (1 << 5)
+} dpi_kbus_change_kind_t;
+
+  typedef enum {
     DPI_CHANGE_GPR              = (1 << 0),
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
@@ -42,11 +56,6 @@ package spect_iss_dpi_pkg;
     DPI_CHANGE_RBUS             = (1 << 8),
     DPI_CHANGE_KBUS             = (1 << 9)
   } dpi_change_kind_t;
-
-  typedef enum {
-    DPI_SPECT_RAR_PUSH          = (1 << 0),
-    DPI_SPECT_RAR_POP           = (1 << 1)
-  } dpi_rar_change_kind_t;
 
   typedef enum {
     DPI_HEX_ISS_WORD            = (1 << 0),
@@ -82,6 +91,12 @@ package spect_iss_dpi_pkg;
     //
     //  DPI_CHANGE_RBUS:
     //      no meaning
+    //
+    //  DPI_CHANGE_KBUS:
+    //       2: 0 - operation
+    //       7: 4 - type
+    //      15: 8 - slot
+    //      20:16 - offset
     int unsigned      obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -106,6 +121,10 @@ package spect_iss_dpi_pkg;
     //
     //  DPI_CHANGE_RBUS:
     //      no meaning
+    //
+    //  DPI_CHANGE_KBUS:
+    //      obj[2:0] == DPI_KBUS_STORE - data to write
+    //      otherwise no meaning
     int unsigned      old_val[8] = '{default: 0};
     int unsigned      new_val[8] = '{default: 0};
   } dpi_state_change_t;
@@ -305,12 +324,16 @@ package spect_iss_dpi_pkg;
   import "DPI-C" function void spect_dpi_push_grv_queue(int unsigned data);
 
   /**
-   * @brief Push data for GPK instruction queried via GPK Handshake interface.
-   * @param data Data to push to one of GPK queues.
-   * @param index Index of GPK queue (corresponds to value of spect_prk_type): 0 - 7.
-   *              Corresponds to spect_prk_type[5:3] and immediate[2:0].
+   * @brief Push data for LDK instruction queried via KBUS Handshake interface.
+   * @param data Data to push to one of LDK queues.
    */
-  import "DPI-C" function void spect_dpi_push_gpk_queue(int unsigned data, int unsigned index);
+  import "DPI-C" function void spect_dpi_push_ldk_queue(int unsigned data);
+
+  /**
+   * @brief Push KBUS error flag for LDK/STK/ERK instruction queried via KBUS Handshake interface.
+   * @param error Error to push to KBUS error queue.
+   */
+  import "DPI-C" function void spect_dpi_push_kbus_error_queue(byte unsigned error);
 
   /**
    * @brief Get value of SPECT interrupt output

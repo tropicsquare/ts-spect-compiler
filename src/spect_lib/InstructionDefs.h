@@ -98,6 +98,11 @@
 #define PUT_FLAG_TO_CHANGE(chn, old_or_new, flag)                                               \
     chn.old_or_new[0] = flag;                                                                   \
 
+#define KBUS_OBJ_ENCODE(op, type, slot, offset) \
+    (op       << 0 ) |                          \
+    (type     << 8 ) |                          \
+    (slot     << 12) |                          \
+    (offset   << 20)                            \
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

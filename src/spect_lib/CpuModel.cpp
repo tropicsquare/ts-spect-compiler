@@ -377,21 +377,39 @@ uint32_t spect::CpuModel::GrvQueuePop()
     return rv;
 }
 
-void spect::CpuModel::LdkQueuePush(uint32_t slot, uint32_t offset, uint32_t data)
+void spect::CpuModel::LdkQueuePush(uint32_t data)
 {
-    DebugInfo(VERBOSITY_HIGH, "Pushing to LDK queue[", slot, "][", offset, "]:", data);
-    ldk_q_[slot][offset].push(data);
+    DebugInfo(VERBOSITY_HIGH, "Pushing to LDK queue:", data);
+    ldk_q_.push(data);
 }
 
-uint32_t spect::CpuModel::LdkQueuePop(uint32_t slot, uint32_t offset)
+uint32_t spect::CpuModel::LdkQueuePop()
 {
     uint32_t rv = 0;
-    if (!ldk_q_[slot][offset].empty()) {
-        rv = ldk_q_[slot][offset].front();
-        ldk_q_[slot][offset].pop();
-        DebugInfo(VERBOSITY_HIGH, "Popping from LDK queue[", slot, "][", offset, "]:", tohexs(rv, 8));
+    if (!ldk_q_.empty()) {
+        rv = ldk_q_.front();
+        ldk_q_.pop();
+        DebugInfo(VERBOSITY_HIGH, "Popping from LDK queue:", tohexs(rv, 8));
     } else
         DebugInfo(VERBOSITY_LOW, "Popping from empty LDK queue, LDK returns 0");
+    return rv;
+}
+
+void spect::CpuModel::KbusErrorQueuePush(bool error)
+{
+    DebugInfo(VERBOSITY_HIGH, "Pushing to KBUS Error queue:", error);
+    kbus_error_q_.push(error);
+}
+
+bool spect::CpuModel::KbusErrorQueuePop()
+{
+    bool rv = false;
+    if (!kbus_error_q_.empty()) {
+        rv = kbus_error_q_.front();
+        kbus_error_q_.pop();
+        DebugInfo(VERBOSITY_HIGH, "Popping from KBUS Error queue:", rv);
+    } else
+        DebugInfo(VERBOSITY_LOW, "Popping from empty KBUS Error queue, returns false");
     return rv;
 }
 

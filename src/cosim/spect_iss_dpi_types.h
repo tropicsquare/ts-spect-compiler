@@ -40,6 +40,15 @@ typedef enum {
 } dpi_rar_change_kind_t;
 
 typedef enum {
+    DPI_KBUS_WRITE              = (1 << 0),
+    DPI_KBUS_READ               = (1 << 1),
+    DPI_KBUS_PROGRAM            = (1 << 2),
+    DPI_KBUS_ERASE              = (1 << 3),
+    DPI_KBUS_VERIFY             = (1 << 4),
+    DPI_KBUS_FLUSH              = (1 << 5)
+} dpi_kbus_change_kind_t;
+
+typedef enum {
     DPI_CHANGE_GPR              = (1 << 0),
     DPI_CHANGE_FLAG             = (1 << 1),
     DPI_CHANGE_MEM              = (1 << 2),
@@ -176,6 +185,12 @@ typedef struct {
     //
     //  DPI_CHANGE_RBUS:
     //      no meaning
+    //
+    //  DPI_CHANGE_KBUS:
+    //       5: 0 - operation
+    //      11: 8 - type
+    //      19:12 - slot
+    //      31:20 - offset
     uint32_t          obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -202,6 +217,10 @@ typedef struct {
     //
     //  DPI_CHANGE_RBUS:
     //      no meaning
+    //
+    //  DPI_CHANGE_KBUS:
+    //      obj[2:0] == DPI_KBUS_STORE - data to write
+    //      otherwise no meaning
     uint32_t          old_val[8] = {0};
     uint32_t          new_val[8] = {0};
 } dpi_state_change_t;

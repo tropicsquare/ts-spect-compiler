@@ -264,10 +264,17 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
-    void spect_dpi_push_ldk_queue(uint32_t slot, uint32_t offset, uint32_t data)
+    void spect_dpi_push_ldk_queue(uint32_t data)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->LdkQueuePush(slot, offset, data);
+        simulator->model_->LdkQueuePush(data);
+        DPI_CALL_LOG_EXIT
+    }
+
+    void spect_dpi_push_kbus_error_queue(uint8_t error)
+    {
+        DPI_CALL_LOG_ENTER
+        simulator->model_->KbusErrorQueuePush(error);
         DPI_CALL_LOG_EXIT
     }
 

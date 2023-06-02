@@ -226,21 +226,32 @@ class spect::CpuModel
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Push data to LDK Queue
         /// @param data Data to be pushed to TAIL of the queue.
-        /// @param slot Slot of the queue (corresponds to op2[7:0])
-        /// @param offset Offset within the slot (corresponds to immediate[4:0])
         /// @note This function shall be used by outside world to push data to be returned by LDK
         //        instruction.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void LdkQueuePush(uint32_t slot, uint32_t offset, uint32_t data);
+        void LdkQueuePush(uint32_t data);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Pop data from LDK Queue
-        /// @param slot Slot of the queue (corresponds to op2[7:0])
-        /// @param offset Offset within the slot (corresponds to immediate[4:0])
         /// @returns data from HEAD of the queue
         /// @note This function is used by instruction model when executing LDK instruction.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t LdkQueuePop(uint32_t slot, uint32_t offset);
+        uint32_t LdkQueuePop();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Push error flag to KBUS Error Queue
+        /// @param error Error flag to be pushed to TAIL of the queue.
+        /// @note This function shall be used by outside world to push error flag to be returned by
+        //        KBUS transfers.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void KbusErrorQueuePush(bool error);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Pop data from KBUS Error Queue
+        /// @returns error flag from HEAD of the queue
+        /// @note This function is used by instruction model when executing LDK/STK/ERK instruction.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        bool KbusErrorQueuePop();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Report Change on the CPU model
@@ -407,9 +418,11 @@ class spect::CpuModel
         // Random value queue, source of data provided by GRV instruction
         std::queue<uint32_t> grv_q_;
 
-        // Private Key queues, source of data provided by LDK instruction
-        // queue is selected by op2[7:0] and immediate[4:0]
-        std::queue<uint32_t> ldk_q_[256][32];
+        // Private Key queue, source of data provided by LDK instruction
+        std::queue<uint32_t> ldk_q_;
+
+        // KBUS error queue, source of data provided by LDK instruction
+        std::queue<bool> kbus_error_q_;
 
         // Queue for processor state changes
         std::queue<dpi_state_change_t> change_q_;
