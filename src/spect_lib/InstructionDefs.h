@@ -99,10 +99,10 @@
     chn.old_or_new[0] = flag;                                                                   \
 
 #define KBUS_OBJ_ENCODE(op, type, slot, offset) \
-    (op       << 0 ) |                          \
-    (type     << 8 ) |                          \
-    (slot     << 12) |                          \
-    (offset   << 20)                            \
+    (op       << DPIENC_KBUS_OP_OFFSET)     |   \
+    (type     << DPIENC_KBUS_TYPE_OFFSET)   |   \
+    (slot     << DPIENC_KBUS_SLOT_OFFSET)   |   \
+    (offset   << DPIENC_KBUS_OFFSET_OFFSET)     \
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

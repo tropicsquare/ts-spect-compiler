@@ -15,6 +15,15 @@
 
 #include <string>
 
+#define DPIENC_KBUS_OP_MASK        0x3F
+#define DPIENC_KBUS_TYPE_MASK      0xF
+#define DPIENC_KBUS_SLOT_MASK      0xFF
+#define DPIENC_KBUS_OFFSET_MASK    0x1F
+
+#define DPIENC_KBUS_OP_OFFSET      0
+#define DPIENC_KBUS_TYPE_OFFSET    8
+#define DPIENC_KBUS_SLOT_OFFSET    12
+#define DPIENC_KBUS_OFFSET_OFFSET  20
 
 typedef enum {
     DPI_SPECT_DATA_RAM_IN       = (1 << 0),
@@ -150,7 +159,31 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
         break;
 
     case DPI_CHANGE_KBUS:
-        return "TODO";
+        uint32_t op     = (obj >> DPIENC_KBUS_OP_OFFSET)     & DPIENC_KBUS_OP_MASK;
+        uint32_t type   = (obj >> DPIENC_KBUS_TYPE_OFFSET)   & DPIENC_KBUS_TYPE_MASK;
+        uint32_t slot   = (obj >> DPIENC_KBUS_SLOT_OFFSET)   & DPIENC_KBUS_SLOT_MASK;
+        uint32_t offset = (obj >> DPIENC_KBUS_OFFSET_OFFSET) & DPIENC_KBUS_OFFSET_MASK;
+        std::string operation;
+
+        if (op == DPI_KBUS_WRITE)
+            operation = std::string("KBUS_WRITE");
+        else if (op == DPI_KBUS_READ)
+            operation = std::string("KBUS_READ");
+        else if (op == DPI_KBUS_PROGRAM)
+            operation = std::string("KBUS_PROGRAM");
+        else if (op == DPI_KBUS_ERASE)
+            operation = std::string("KBUS_ERASE");
+        else if (op == DPI_KBUS_VERIFY)
+            operation = std::string("KBUS_VERIFY");
+        else if (op == DPI_KBUS_FLUSH)
+            operation = std::string("KBUS_FLUSH");
+        else
+            operation = std::string("UNKNOWN KBUS OPERATION!");
+
+        return std::string("Operation: ") + operation +
+               std::string(" Type: ") + std::to_string(type) +
+               std::string(" Slot: ") + std::to_string(slot) +
+               std::string(" Offset: ") + std::to_string(offset);
         break;
     }
     return "";
@@ -219,7 +252,7 @@ typedef struct {
     //      no meaning
     //
     //  DPI_CHANGE_KBUS:
-    //      obj[2:0] == DPI_KBUS_STORE - data to write
+    //      operation == DPI_KBUS_WRITE - data to write
     //      otherwise no meaning
     uint32_t          old_val[8] = {0};
     uint32_t          new_val[8] = {0};
