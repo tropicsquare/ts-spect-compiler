@@ -43,7 +43,7 @@ class spect::CpuModel
         /// @param instr_mem_ahb_r Instruction memory readable via AHB
         /// @returns New model object
         ///////////////////////////////////////////////////////////////////////////////////////////
-        CpuModel(bool insr_mem_ahb_w, bool instr_mem_ahb_r);
+        CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief CPU model destructor
@@ -372,6 +372,9 @@ class spect::CpuModel
 
         // Program
         CpuProgram *program_ = NULL;
+
+        // Simulator
+        CpuSimulator *simulator_ = NULL;
 
         // Maximal number of instructions to execute
         uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();

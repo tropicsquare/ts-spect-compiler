@@ -100,10 +100,23 @@
 #endif
 
 // If true, SPECT instruction memory is readable via AHB
-#define SPECT_INSTR_MEM_AHB_R false
+#define SPECT_INSTR_MEM_AHB_R true
 
 // If true, SPECT instruction memory is writable via AHB
 #define SPECT_INSTR_MEM_AHB_W true
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Key memory parameters
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Number of slots
+#ifndef KEY_MEM_SLOT_NUM
+#define KEY_MEM_SLOT_NUM 256
+#endif
+
+// Number of offsets
+#ifndef KEY_MEM_OFFSET_NUM
+#define KEY_MEM_OFFSET_NUM 256
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Internal defines

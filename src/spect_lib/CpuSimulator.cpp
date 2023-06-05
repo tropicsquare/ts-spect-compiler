@@ -20,6 +20,7 @@ spect::CpuSimulator::CpuSimulator()
 {
     model_ = new spect::CpuModel(SPECT_INSTR_MEM_AHB_W, SPECT_INSTR_MEM_AHB_R);
     model_->verbosity_ = VERBOSITY_HIGH;
+    model_->simulator_ = this;
     compiler_ = new spect::Compiler(SPECT_INSTR_MEM_BASE);
 
     auto menu = std::make_unique<cli::Menu>("spect_iss");
@@ -556,5 +557,22 @@ void spect::CpuSimulator::ExecCmdFile(cli::CliLocalTerminalSession &session)
         session.Feed("\n");
     } else {
         std::cout << "Failed to open command file: " << cmd_file_ << "\n";
+    }
+}
+
+uint32_t spect::CpuSimulator::ReadKeyMem(uint32_t slot, uint32_t offset)
+{
+    return key_mem_[slot][offset];
+}
+
+void spect::CpuSimulator::WriteKeyMem(uint32_t slot, uint32_t offset, uint32_t data)
+{
+    key_mem_[slot][offset] &= data;
+}
+
+void spect::CpuSimulator::EraseKeyMem(uint32_t slot)
+{
+    for (uint32_t i = 0; i < KEY_MEM_OFFSET_NUM; i++) {
+      key_mem_[slot][i] = 0xFFFFFFFF;
     }
 }

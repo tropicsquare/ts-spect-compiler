@@ -15,23 +15,23 @@
 #include "Compiler.h"
 #include "CpuModel.h"
 #include "CpuProgram.h"
-#include "CpuSimulator.h"
 #include "HexHandler.h"
 
 #include "vpi_user.h"
 
 #include "spect_iss_dpi.h"
 
-spect::CpuSimulator *simulator = nullptr;
+spect::Compiler *compiler = nullptr;
+spect::CpuModel *model    = nullptr;
 
 #define DPI_CALL_LOG_ENTER                                                                          \
-    assert (simulator->model_ != nullptr &&                                                         \
+    assert (model != nullptr &&                                                         \
             MODEL_LABEL " Model not initalized. Did you forget to call 'spect_dpi_init'?");         \
-    if (simulator->model_->verbosity_ >= VERBOSITY_HIGH)                                            \
+    if (model->verbosity_ >= VERBOSITY_HIGH)                                            \
         vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);                       \
 
 #define DPI_CALL_LOG_EXIT                                                                           \
-    if (simulator->model_->verbosity_ >= VERBOSITY_HIGH)                                            \
+    if (model->verbosity_ >= VERBOSITY_HIGH)                                            \
         vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);                       \
 
 extern "C" {
@@ -42,12 +42,13 @@ extern "C" {
 
         uint32_t rv = 0;
         try {
-            simulator = new spect::CpuSimulator();
+            model    = new spect::CpuModel(SPECT_INSTR_MEM_AHB_W, SPECT_INSTR_MEM_AHB_R);
+            compiler = new spect::Compiler(SPECT_INSTR_MEM_BASE);
 
             // According to C standard, typecasting function pointer is undefined behavior,
             // but we only get rid of "const", so we hope its fine :)
-            simulator->model_->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
-            simulator->compiler_->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
+            model->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
+            compiler->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
         } catch (const std::bad_alloc& e) {
             vpi_printf("%s Failed to initialize SPECT DPI model: %s\n", MODEL_LABEL, e.what());
             rv = 1;
@@ -61,7 +62,8 @@ extern "C" {
     {
         vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
 
-        delete simulator;
+        delete model;
+        delete compiler;
 
         vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
     }
@@ -69,21 +71,21 @@ extern "C" {
     void spect_dpi_reset()
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->Reset();
+        model->Reset();
         DPI_CALL_LOG_EXIT
     }
 
     void spect_dpi_start()
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->Start();
+        model->Start();
         DPI_CALL_LOG_EXIT
     }
 
     uint32_t spect_dpi_is_program_finished()
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->IsFinished();
+        uint32_t rv = model->IsFinished();
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -91,7 +93,7 @@ extern "C" {
     uint32_t spect_dpi_get_memory(uint32_t addr)
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->GetMemory(addr);
+        uint32_t rv = model->GetMemory(addr);
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -99,14 +101,14 @@ extern "C" {
     void spect_dpi_set_memory(uint32_t addr, uint32_t data)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->SetMemory(addr, data);
+        model->SetMemory(addr, data);
         DPI_CALL_LOG_EXIT
     }
 
     uint32_t spect_dpi_ahb_read(uint32_t addr)
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->ReadMemoryAhb(addr);
+        uint32_t rv = model->ReadMemoryAhb(addr);
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -114,7 +116,7 @@ extern "C" {
     void spect_dpi_ahb_write(uint32_t addr, uint32_t data)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->WriteMemoryAhb(addr, data);
+        model->WriteMemoryAhb(addr, data);
         DPI_CALL_LOG_EXIT
     }
 
@@ -169,7 +171,7 @@ extern "C" {
     uint32_t spect_dpi_get_gpr_part(uint32_t gpr, uint32_t part)
     {
         DPI_CALL_LOG_ENTER
-        uint256_t tmp = (simulator->model_->GetGpr(gpr) >> (part * 32)) & uint256_t("0xFFFFFFFF");
+        uint256_t tmp = (model->GetGpr(gpr) >> (part * 32)) & uint256_t("0xFFFFFFFF");
         DPI_CALL_LOG_EXIT
         return (uint32_t)tmp;
     }
@@ -178,9 +180,9 @@ extern "C" {
     {
         DPI_CALL_LOG_ENTER
         uint256_t mask = ~(uint256_t("0xFFFFFFFF") << (part * 32));
-        uint256_t tmp = simulator->model_->GetGpr(gpr) & mask;
+        uint256_t tmp = model->GetGpr(gpr) & mask;
         tmp = tmp | (uint256_t(data) << (part * 32));
-        simulator->model_->SetGpr(gpr, tmp);
+        model->SetGpr(gpr, tmp);
         DPI_CALL_LOG_EXIT
     }
 
@@ -190,13 +192,13 @@ extern "C" {
         uint32_t rv;
         switch (flag_type) {
         case DPI_SPECT_FLAG_ZERO:
-            rv = simulator->model_->GetCpuFlags().zero;
+            rv = model->GetCpuFlags().zero;
             break;
         case DPI_SPECT_FLAG_CARRY:
-            rv = simulator->model_->GetCpuFlags().carry;
+            rv = model->GetCpuFlags().carry;
             break;
         case DPI_SPECT_FLAG_ERROR:
-            rv = simulator->model_->GetCpuFlags().error;
+            rv = model->GetCpuFlags().error;
             break;
         default:
             rv = 0;
@@ -208,7 +210,7 @@ extern "C" {
     uint32_t spect_dpi_get_pc()
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = (uint32_t)simulator->model_->GetPc();
+        uint32_t rv = (uint32_t)model->GetPc();
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -216,7 +218,7 @@ extern "C" {
     void spect_dpi_set_pc(uint32_t value)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->SetPc((uint16_t)value);
+        model->SetPc((uint16_t)value);
         DPI_CALL_LOG_EXIT
     }
 
@@ -224,8 +226,8 @@ extern "C" {
     {
         DPI_CALL_LOG_ENTER
         spect::Instruction *i = spect::Instruction::DisAssemble(
-            simulator->model_->GetParityType(),
-            simulator->model_->GetMemory(((uint16_t)address) >> 2));
+            model->GetParityType(),
+            model->GetMemory(((uint16_t)address) >> 2));
         // TODO: How to handle free here? System Verilog side needs to free the buffer!
         buf = new char[32];
         std::stringstream ss;
@@ -244,7 +246,7 @@ extern "C" {
     uint32_t spect_dpi_get_rar_value(uint32_t address)
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->GetRarAt(address);
+        uint32_t rv = model->GetRarAt(address);
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -252,7 +254,7 @@ extern "C" {
     uint32_t spect_dpi_get_rar_sp()
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->GetRarSp();
+        uint32_t rv = model->GetRarSp();
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -260,21 +262,21 @@ extern "C" {
     void spect_dpi_push_grv_queue(uint32_t data)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->GrvQueuePush(data);
+        model->GrvQueuePush(data);
         DPI_CALL_LOG_EXIT
     }
 
     void spect_dpi_push_ldk_queue(uint32_t data)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->LdkQueuePush(data);
+        model->LdkQueuePush(data);
         DPI_CALL_LOG_EXIT
     }
 
     void spect_dpi_push_kbus_error_queue(uint8_t error)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->KbusErrorQueuePush(error);
+        model->KbusErrorQueuePush(error);
         DPI_CALL_LOG_EXIT
     }
 
@@ -284,10 +286,10 @@ extern "C" {
         uint32_t rv = 0;
         switch (int_type) {
         case DPI_SPECT_INT_DONE :
-            rv = simulator->model_->GetInterrrupt(spect::CpuIntType::INT_DONE);
+            rv = model->GetInterrrupt(spect::CpuIntType::INT_DONE);
             break;
         case DPI_SPECT_INT_ERR :
-            rv = simulator->model_->GetInterrrupt(spect::CpuIntType::INT_ERR);
+            rv = model->GetInterrrupt(spect::CpuIntType::INT_ERR);
             break;
         default:
             rv = 0;
@@ -303,7 +305,7 @@ extern "C" {
         uint32_t err;
 
         try {
-            simulator->compiler_->Compile(std::string(program_path));
+            compiler->Compile(std::string(program_path));
 
             spect::HexFileType internal_hex_type;
             switch (hex_format) {
@@ -317,12 +319,12 @@ extern "C" {
                 internal_hex_type = spect::HexFileType::VERILOG_ADDR_WORD;
                 break;
             }
-            err = simulator->compiler_->CompileFinish();
+            err = compiler->CompileFinish();
             if (!err)
-                simulator->compiler_->program_->Assemble(
+                compiler->program_->Assemble(
                     std::string(hex_path),
                     (spect::HexFileType) internal_hex_type,
-                    simulator->model_->GetParityType());
+                    model->GetParityType());
 
         } catch(std::runtime_error &exception) {
             vpi_printf("%s Failed to compile program: %s\n",
@@ -337,7 +339,7 @@ extern "C" {
     uint32_t spect_dpi_get_compiled_program_start_address()
     {
         DPI_CALL_LOG_ENTER
-        spect::Symbol* s_start_addr = simulator->compiler_->symbols_->GetSymbol(START_SYMBOL);
+        spect::Symbol* s_start_addr = compiler->symbols_->GetSymbol(START_SYMBOL);
         uint32_t rv = 0;
         if (s_start_addr)
             rv = s_start_addr->val_;
@@ -350,14 +352,14 @@ extern "C" {
     void spect_dpi_set_model_start_pc(uint32_t start_pc)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->SetStartPc(start_pc);
+        model->SetStartPc(start_pc);
         DPI_CALL_LOG_EXIT
     }
 
     uint32_t spect_dpi_load_hex_file(const char *path, const uint32_t offset)
     {
         DPI_CALL_LOG_ENTER
-        spect::HexHandler::LoadHexFile(std::string(path), simulator->model_->GetMemoryPtr(), offset);
+        spect::HexHandler::LoadHexFile(std::string(path), model->GetMemoryPtr(), offset);
         // TODO: Here it might be good to check that hex file spans out of
         //       memory.
         DPI_CALL_LOG_EXIT
@@ -367,7 +369,7 @@ extern "C" {
     uint32_t spect_dpi_program_step(uint32_t cycle_count)
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->StepSingle(cycle_count);
+        uint32_t rv = model->StepSingle(cycle_count);
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -375,14 +377,14 @@ extern "C" {
     void spect_dpi_get_last_instr(dpi_instruction_t *dpi_instruction)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->GetLastInstruction(dpi_instruction);
+        model->GetLastInstruction(dpi_instruction);
         DPI_CALL_LOG_EXIT
     }
 
     void spect_dpi_set_change_reporting(uint32_t enable)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->change_reporting_ = enable;
+        model->change_reporting_ = enable;
         DPI_CALL_LOG_EXIT
     }
 
@@ -390,10 +392,10 @@ extern "C" {
     {
         DPI_CALL_LOG_ENTER
         uint32_t rv;
-        if (!simulator->model_->HasChange()) {
+        if (!model->HasChange()) {
             rv = 1;
         } else {
-            *change = simulator->model_->ConsumeChange();
+            *change = model->ConsumeChange();
             rv = 0;
         }
         DPI_CALL_LOG_EXIT
@@ -403,7 +405,7 @@ extern "C" {
     uint32_t spect_dpi_program_run(uint32_t instructions)
     {
         DPI_CALL_LOG_ENTER
-        uint32_t rv = simulator->model_->Step(instructions);
+        uint32_t rv = model->Step(instructions);
         DPI_CALL_LOG_EXIT
         return rv;
     }
@@ -411,7 +413,7 @@ extern "C" {
     void spect_dpi_set_verbosity(uint32_t level)
     {
         DPI_CALL_LOG_ENTER
-        simulator->model_->verbosity_ = level;
+        model->verbosity_ = level;
         DPI_CALL_LOG_EXIT
     }
 }

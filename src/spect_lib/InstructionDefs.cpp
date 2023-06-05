@@ -814,6 +814,13 @@ bool spect::InstructionLDK::Execute()
     uint256_t tmp = 0;
     for (int i = 0; i < 8; i++) {
         DEFINE_CHANGE(ch_kbus_read, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_READ, type, slot, (offset*8+i)));
+
+        // If running with CPU Simulator, preload key from simulator memory to queue
+        if (model_->simulator_ != NULL) {
+          uint32_t part = model_->simulator_->ReadKeyMem(slot, offset*8+i);
+          model_->LdkQueuePush(part);
+        }
+
         uint256_t part = model_->LdkQueuePop();
         part = part << (32 * i);
         tmp = tmp | part;
@@ -857,11 +864,16 @@ bool spect::InstructionSTK::Execute()
     bool     error;
 
     // Write
-    uint256_t tmp = 0;
+    uint256_t tmp = model_->GetGpr(TO_INT(op1_));
     for (int i = 0; i < 8; i++) {
         DEFINE_CHANGE(ch_kbus_write, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_WRITE, type, slot, (offset*8+i)));
-        ch_kbus_write.new_val[0] = uint32_t(model_->GetGpr(TO_INT(op1_) >> (32 * i)));
+        ch_kbus_write.new_val[0] = uint32_t(tmp >> (32 * i));
         model_->ReportChange(ch_kbus_write);
+
+        // If running with CPU Simulator, store key to simulator memory
+        if (model_->simulator_ != NULL) {
+          model_->simulator_->WriteKeyMem(slot, offset*8+i, uint32_t(tmp >> (32 * i)));
+        }
 
         error = model_->KbusErrorQueuePop();
         DEFINE_CHANGE(ch_ef_write, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
@@ -912,6 +924,11 @@ bool spect::InstructionERK::Execute()
     // Erase
     DEFINE_CHANGE(ch_kbus_erase, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_ERASE, type, slot, (offset*8)));
     model_->ReportChange(ch_kbus_erase);
+
+    // If running with CPU Simulator, erase slot in simulator memory
+    if (model_->simulator_ != NULL) {
+      model_->simulator_->EraseKeyMem(slot);
+    }
 
     error = model_->KbusErrorQueuePop();
     DEFINE_CHANGE(ch_ef_erase, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);

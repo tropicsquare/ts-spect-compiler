@@ -379,7 +379,7 @@ uint32_t spect::CpuModel::GrvQueuePop()
 
 void spect::CpuModel::LdkQueuePush(uint32_t data)
 {
-    DebugInfo(VERBOSITY_HIGH, "Pushing to LDK queue:", data);
+    DebugInfo(VERBOSITY_HIGH, "Pushing to LDK queue:", tohexs(data, 8));
     ldk_q_.push(data);
 }
 

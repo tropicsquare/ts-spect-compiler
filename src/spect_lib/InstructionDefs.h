@@ -16,6 +16,7 @@
 #include "spect.h"
 
 #include "CpuModel.h"
+#include "CpuSimulator.h"
 #include "Instruction.h"
 
 #include "InstructionR.h"
