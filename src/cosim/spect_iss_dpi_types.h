@@ -225,7 +225,8 @@ typedef struct {
     //      DPI_RAR_POP - Pop from stack
     //
     //  DPI_CHANGE_RBUS:
-    //      no meaning
+    //      DPI_RBUS_FRESH_ENT - Fresh entropy
+    //      DPI_RBUS_NO_FRESH_ENT - No fresh entropy
     //
     //  DPI_CHANGE_KBUS:
     //       5: 0 - operation

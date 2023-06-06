@@ -95,13 +95,14 @@ typedef enum {
     //      DPI_SPECT_RAR_POP - Pop from stack
     //
     //  DPI_CHANGE_RBUS:
-    //      no meaning
+    //      DPI_RBUS_FRESH_ENT - Fresh entropy
+    //      DPI_RBUS_NO_FRESH_ENT - No fresh entropy
     //
     //  DPI_CHANGE_KBUS:
-    //       2: 0 - operation
-    //       7: 4 - type
-    //      15: 8 - slot
-    //      20:16 - offset
+    //       5: 0 - operation
+    //      11: 8 - type
+    //      19:12 - slot
+    //      31:20 - offset
     int unsigned      obj = 0;
 
     // Old / New value of the object based  on 'kind':
@@ -114,6 +115,8 @@ typedef enum {
     //      0 - Value of flag
     //
     //  DPI_CHANGE_MEM:
+    //  DPI_CHANGE_EMEM_IN:
+    //  DPI_CHANGE_EMEM_OUT:
     //      0 - Bits 31:0 of memory location
     //
     //  DPI_CHANGE_INT:
@@ -128,7 +131,7 @@ typedef enum {
     //      no meaning
     //
     //  DPI_CHANGE_KBUS:
-    //      obj[2:0] == DPI_KBUS_STORE - data to write
+    //      operation == DPI_KBUS_WRITE - data to write
     //      otherwise no meaning
     int unsigned      old_val[8] = '{default: 0};
     int unsigned      new_val[8] = '{default: 0};
