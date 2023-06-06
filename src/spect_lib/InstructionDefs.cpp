@@ -482,22 +482,23 @@ bool spect::InstructionHASH::Execute()
 
 bool spect::InstructionGRV::Execute()
 {
-    DEFINE_CHANGE(ch_rbus, DPI_CHANGE_RBUS, 0);
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
-
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
     uint256_t tmp = 0;
     for (int i = 0; i < 8; i++) {
+        DEFINE_CHANGE(ch_rbus, DPI_CHANGE_RBUS, (i == 0) ? DPI_RBUS_FRESH_ENT : DPI_RBUS_NO_FRESH_ENT);
+
         uint256_t part = model_->GrvQueuePop();
         part = part << (32 * i);
         tmp = tmp | part;
+
+        model_->ReportChange(ch_rbus);
     }
+
     model_->SetGpr(TO_INT(op1_), tmp);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
-
-    model_->ReportChange(ch_rbus);
     model_->ReportChange(ch_gpr);
 
     return true;

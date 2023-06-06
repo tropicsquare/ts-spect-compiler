@@ -49,6 +49,11 @@ typedef enum {
 } dpi_rar_change_kind_t;
 
 typedef enum {
+    DPI_RBUS_FRESH_ENT          = (1 << 0),
+    DPI_RBUS_NO_FRESH_ENT       = (1 << 1)
+} dpi_rbus_change_kind_t;
+
+typedef enum {
     DPI_KBUS_WRITE              = (1 << 0),
     DPI_KBUS_READ               = (1 << 1),
     DPI_KBUS_PROGRAM            = (1 << 2),
@@ -155,7 +160,10 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
         break;
 
     case DPI_CHANGE_RBUS:
-        return "n/a";
+        if (obj == DPI_RBUS_FRESH_ENT)
+            return std::string("RBUS_FRESH_ENT");
+        else
+            return std::string("RBUS_NO_FRESH_ENT");
         break;
 
     case DPI_CHANGE_KBUS:
