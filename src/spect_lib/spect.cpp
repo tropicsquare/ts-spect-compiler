@@ -47,20 +47,26 @@ std::ostream& operator << ( std::ostream& os, const spect::ParityType& parity_ty
     }
 }
 
+inline uint32_t stou (const std::string& str, std::size_t* pos = nullptr, int base = 10)
+{
+    return uint32_t(std::stoul(str, pos, base));
+}
+
+
 uint32_t stoint(std::string str)
 {
     if (str.size() < 2) {
-        return std::stoi (str, nullptr);
+        return stou (str, nullptr);
     } else if (str[0] == '0') {
         if (str[1] == 'x' || str[1] == 'X') {
-            return std::stoi(str, nullptr, 16);
+            return stou(str, nullptr, 16);
         } else if (str[1] == 'b' || str[1] == 'B') {
-            return std::stoi(str, nullptr, 2);
+            return stou(str, nullptr, 2);
         } else {
-            return std::stoi(str, nullptr);
+            return stou(str, nullptr);
         }
     } else {
-        return std::stoi(str, nullptr);
+        return stou (str, nullptr);
     }
 }
 
