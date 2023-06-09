@@ -56,10 +56,8 @@ typedef enum {
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
     DPI_CHANGE_RAR              = (1 << 5),
-    DPI_CHANGE_EMEM_IN          = (1 << 6),
-    DPI_CHANGE_EMEM_OUT         = (1 << 7),
-    DPI_CHANGE_RBUS             = (1 << 8),
-    DPI_CHANGE_KBUS             = (1 << 9)
+    DPI_CHANGE_RBUS             = (1 << 6),
+    DPI_CHANGE_KBUS             = (1 << 7)
   } dpi_change_kind_t;
 
   typedef enum {
@@ -82,8 +80,6 @@ typedef enum {
     //      DPI_SPECT_FLAG_CARRY
     //
     //  DPI_CHANGE_MEM:
-    //  DPI_CHANGE_EMEM_IN:
-    //  DPI_CHANGE_EMEM_OUT:
     //      Address in memory on which change occured.
     //
     //  DPI_CHANGE_INT:
@@ -115,8 +111,6 @@ typedef enum {
     //      0 - Value of flag
     //
     //  DPI_CHANGE_MEM:
-    //  DPI_CHANGE_EMEM_IN:
-    //  DPI_CHANGE_EMEM_OUT:
     //      0 - Bits 31:0 of memory location
     //
     //  DPI_CHANGE_INT:

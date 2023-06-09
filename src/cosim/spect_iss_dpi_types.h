@@ -68,10 +68,8 @@ typedef enum {
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
     DPI_CHANGE_RAR              = (1 << 5),
-    DPI_CHANGE_EMEM_IN          = (1 << 6),
-    DPI_CHANGE_EMEM_OUT         = (1 << 7),
-    DPI_CHANGE_RBUS             = (1 << 8),
-    DPI_CHANGE_KBUS             = (1 << 9)
+    DPI_CHANGE_RBUS             = (1 << 6),
+    DPI_CHANGE_KBUS             = (1 << 7)
 } dpi_change_kind_t;
 
 typedef enum {
@@ -110,8 +108,6 @@ inline std::string dpi_change_kind_to_str(dpi_change_kind_t in) {
     case DPI_CHANGE_MEM      : return std::string("DPI_CHANGE_MEM");
     case DPI_CHANGE_INT      : return std::string("DPI_CHANGE_INT");
     case DPI_CHANGE_RAR      : return std::string("DPI_CHANGE_RAR");
-    case DPI_CHANGE_EMEM_IN  : return std::string("DPI_CHANGE_EMEM_IN");
-    case DPI_CHANGE_EMEM_OUT : return std::string("DPI_CHANGE_EMEM_OUT");
     case DPI_CHANGE_RBUS     : return std::string("DPI_CHANGE_RBUS");
     case DPI_CHANGE_KBUS     : return std::string("DPI_CHANGE_KBUS");
     }
@@ -136,8 +132,6 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
         break;
 
     case DPI_CHANGE_MEM:
-    case DPI_CHANGE_EMEM_IN:
-    case DPI_CHANGE_EMEM_OUT:
         return std::to_string(obj);
         break;
 
@@ -212,8 +206,6 @@ typedef struct {
     //      DPI_SPECT_FLAG_ERROR
     //
     //  DPI_CHANGE_MEM:
-    //  DPI_CHANGE_EMEM_IN:
-    //  DPI_CHANGE_EMEM_OUT:
     //      Address in memory on which change occured.
     //
     //  DPI_CHANGE_INT:
@@ -245,8 +237,6 @@ typedef struct {
     //      0 - Value of flag
     //
     //  DPI_CHANGE_MEM:
-    //  DPI_CHANGE_EMEM_IN:
-    //  DPI_CHANGE_EMEM_OUT:
     //      0 - Bits 31:0 of memory location
     //
     //  DPI_CHANGE_INT:
