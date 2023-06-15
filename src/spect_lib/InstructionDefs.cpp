@@ -732,20 +732,6 @@ IMPLEMENT_I_32_LOGIC_OP(InstructionANDI,&)
 IMPLEMENT_I_32_LOGIC_OP(InstructionORI,|)
 IMPLEMENT_I_32_LOGIC_OP(InstructionXORI,^)
 
-
-bool spect::InstructionCMPA::Execute()
-{
-    DEFINE_CHANGE(ch_zf, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ZERO);
-    PUT_FLAG_TO_CHANGE(ch_zf, old_val, model_->GetCpuFlag(CpuFlagType::ZERO));
-
-    model_->SetCpuFlag(CpuFlagType::ZERO, model_->GetGpr(TO_INT(op2_)) == uint256_t(immediate_));
-
-    PUT_FLAG_TO_CHANGE(ch_zf, new_val, model_->GetCpuFlag(CpuFlagType::ZERO));
-    model_->ReportChange(ch_zf);
-
-    return true;
-}
-
 bool spect::InstructionMOVI::Execute()
 {
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
