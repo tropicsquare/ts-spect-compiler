@@ -46,7 +46,6 @@ I              CMPI            0b0100        0b001          0b011           fals
 I              ANDI            0b0001        0b010          0b111           false               true                0
 I               ORI            0b0010        0b010          0b111           false               true                0
 I              XORI            0b0100        0b010          0b111           false               true                0
-I              CMPA            0b1000        0b101          0b011           false               true                0
 I              MOVI            0b0001        0b101          0b101           false               true                0
 I           HASH_IT            0b0110        0b111          0b000           false               true                0
 I           TMAC_IS            0b0010        0b111          0b011           false               true                0
