@@ -299,7 +299,8 @@ extern "C" {
     }
 
     uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
-                                       const dpi_hex_file_type_t hex_format)
+                                       const dpi_hex_file_type_t hex_format,
+                                       const dpi_parity_type_t parity_type)
     {
         DPI_CALL_LOG_ENTER
         uint32_t err;
@@ -319,12 +320,25 @@ extern "C" {
                 internal_hex_type = spect::HexFileType::VERILOG_ADDR_WORD;
                 break;
             }
+
+            spect::ParityType internal_parity_type;
+            switch (parity_type) {
+            case DPI_PARITY_ODD:
+                internal_parity_type = spect::ParityType::ODD;
+                break;
+            case DPI_PARITY_EVEN:
+                internal_parity_type = spect::ParityType::EVEN;
+                break;
+            case DPI_PARITY_NONE:
+                internal_parity_type = spect::ParityType::NONE;
+                break;
+            }
             err = compiler->CompileFinish();
             if (!err)
                 compiler->program_->Assemble(
                     std::string(hex_path),
                     (spect::HexFileType) internal_hex_type,
-                    model->GetParityType());
+                    internal_parity_type);
 
         } catch(std::runtime_error &exception) {
             vpi_printf("%s Failed to compile program: %s\n",
@@ -414,6 +428,42 @@ extern "C" {
     {
         DPI_CALL_LOG_ENTER
         model->verbosity_ = level;
+        DPI_CALL_LOG_EXIT
+    }
+
+    dpi_parity_type_t spect_dpi_get_parity_type()
+    {
+        DPI_CALL_LOG_ENTER
+        dpi_parity_type_t rv;
+        switch (model->GetParityType()) {
+        case spect::ParityType::ODD:
+            rv = DPI_PARITY_ODD;
+            break;
+        case spect::ParityType::EVEN:
+            rv = DPI_PARITY_EVEN;
+            break;
+        default:
+            rv = DPI_PARITY_NONE;
+            break;
+        }
+        DPI_CALL_LOG_EXIT
+        return rv;
+    }
+
+    void spect_dpi_set_parity_type(dpi_parity_type_t parity_type)
+    {
+        DPI_CALL_LOG_ENTER
+        switch (parity_type) {
+        case DPI_PARITY_ODD:
+            model->SetParityType(spect::ParityType::ODD);
+            break;
+        case DPI_PARITY_EVEN:
+            model->SetParityType(spect::ParityType::EVEN);
+            break;
+        default:
+            model->SetParityType(spect::ParityType::NONE);
+            break;
+        }
         DPI_CALL_LOG_EXIT
     }
 }

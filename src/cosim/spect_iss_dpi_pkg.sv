@@ -66,6 +66,12 @@ typedef enum {
     DPI_HEX_VERILOG_ADDR_WORD   = (1 << 2)
   } dpi_hex_file_type_t;
 
+typedef enum {
+    DPI_PARITY_ODD              = (1 << 0),
+    DPI_PARITY_EVEN             = (1 << 1),
+    DPI_PARITY_NONE             = (1 << 2)
+} dpi_parity_type_t;
+
   typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
@@ -353,12 +359,17 @@ typedef enum {
    *              DPI_HEX_ISS_WORD            - Instruction set simulator
    *              DPI_HEX_VERILOG_RAW_WORD    - Verilog unadressed
    *              DPI_HEX_VERILOG_ADDR_WORD   - Verilog addressed
+   *  @param parity_type Parity type to be applied.
+   *              DPI_PARITY_ODD              - Odd parity
+   *              DPI_PARITY_EVEN             - Even parity
+   *              DPI_PARITY_NONE             - No parity calculated
    *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
   import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
-                                                                 dpi_hex_file_type_t hex_format);
+                                                                 dpi_hex_file_type_t hex_format,
+                                                                 dpi_parity_type_t parity_type);
 
   /**
    *  @returns Start address from previously compiled program (value of `_start` symbol.)
@@ -467,6 +478,21 @@ typedef enum {
    *  @note Debug prints from model execution to standard output.
    */
   import "DPI-C" function void spect_dpi_set_verbosity(int unsigned level);
+
+  /**
+   * @brief Returns parity type checked by model
+   * @returns Parity type.
+   */
+  import "DPI-C" function dpi_parity_type_t spect_dpi_get_parity_type();
+
+  /**
+   * @brief Set parity type checked by model
+   * @param parity_type Parity type:
+   *              DPI_PARITY_ODD  - Odd parity
+   *              DPI_PARITY_EVEN - Even parity
+   *              DPI_PARITY_NONE - No parity calculated
+   */
+  import "DPI-C" function void spect_dpi_set_parity_type(dpi_parity_type_t parity_type);
 
 endpackage : spect_iss_dpi_pkg
 

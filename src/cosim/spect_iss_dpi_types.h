@@ -78,6 +78,12 @@ typedef enum {
     DPI_HEX_VERILOG_ADDR_WORD   = (1 << 2)
 } dpi_hex_file_type_t;
 
+typedef enum {
+    DPI_PARITY_ODD              = (1 << 0),
+    DPI_PARITY_EVEN             = (1 << 1),
+    DPI_PARITY_NONE             = (1 << 2)
+} dpi_parity_type_t;
+
 typedef struct {
     uint32_t i_type;
     uint32_t opcode;
