@@ -63,7 +63,6 @@ typedef enum bit[8:0] {
     I_ANDI = 9'b01_0001_010, 
     I_ORI = 9'b01_0010_010, 
     I_XORI = 9'b01_0100_010, 
-    I_CMPA = 9'b01_1000_101, 
     I_MOVI = 9'b01_0001_101, 
     I_HASH_IT = 9'b01_0110_111, 
     I_TMAC_IS = 9'b01_0010_111, 
@@ -131,6 +130,23 @@ covergroup register_arith_cov with function sample(logic[255:0] value, int posit
     ignore_bins ignore = {[32:255]};
   }
 endgroup : register_arith_cov
+
+
+// Special case for SBIT/CBIT
+covergroup register_bit_cov with function sample(logic[255:0] value, int position);
+  // Track coverage information for each instance
+  option.per_instance = 1;
+
+  cp_register_zero: coverpoint position iff (value[position] == 0) {
+    bins b[] = {[0:255]};
+  }
+
+  cp_register_one: coverpoint position iff (value[position] == 1) {
+    bins        b[]    = {[0:7]};
+    // Bit position is 8-bit (0-255), upper bits are cleared to 0
+    ignore_bins ignore = {[8:255]};
+  }
+endgroup : register_bit_cov
 
 
 // Special case for LSR
@@ -477,7 +493,6 @@ class spect_instr_gen_coverage extends uvm_component;
   operands_2_regs_cov         m_ANDI_instruction_ops_cov;
   operands_2_regs_cov         m_ORI_instruction_ops_cov;
   operands_2_regs_cov         m_XORI_instruction_ops_cov;
-  operands_1_reg_cov          m_CMPA_instruction_ops_cov;
   operands_1_reg_cov          m_MOVI_instruction_ops_cov;
   operands_1_reg_cov          m_TMAC_IS_instruction_ops_cov;
   operands_2_regs_cov         m_LDK_instruction_ops_cov;
@@ -495,8 +510,8 @@ class spect_instr_gen_coverage extends uvm_component;
   register_cov          m_OR_reg_cov[1:3];
   register_cov          m_XOR_reg_cov[1:3];
   register_cov          m_NOT_reg_cov[1:2];
-  register_cov          m_SBIT_reg_cov[1:3];
-  register_cov          m_CBIT_reg_cov[1:3];
+  register_cov          m_SBIT_reg_cov[1:2];
+  register_cov          m_CBIT_reg_cov[1:2];
   register_cov          m_LSL_reg_cov[2:2];
   register_cov          m_LSR_reg_cov[2:2];
   register_cov          m_ROL_reg_cov[1:2];
@@ -529,7 +544,6 @@ class spect_instr_gen_coverage extends uvm_component;
   register_cov          m_ANDI_reg_cov[1:2];
   register_cov          m_ORI_reg_cov[1:2];
   register_cov          m_XORI_reg_cov[1:2];
-  register_cov          m_CMPA_reg_cov[2:2];
   register_movi_cov     m_MOVI_reg_cov[1:1];
   register_cov          m_TMAC_IS_reg_cov[2:2];
   register_cov          m_LDK_reg_cov[1:2];
@@ -547,6 +561,10 @@ class spect_instr_gen_coverage extends uvm_component;
   register_arith_cov  m_SUBI_res_reg_cov;
 
 
+  register_bit_cov    m_SBIT_op3_reg_cov;
+  register_bit_cov    m_CBIT_op3_reg_cov;
+
+
   // Coverage for toggling on Immediate
   immediate_cov       m_ADDI_imm_cov;
   immediate_cov       m_SUBI_imm_cov;
@@ -554,7 +572,6 @@ class spect_instr_gen_coverage extends uvm_component;
   immediate_cov       m_ANDI_imm_cov;
   immediate_cov       m_ORI_imm_cov;
   immediate_cov       m_XORI_imm_cov;
-  immediate_cov       m_CMPA_imm_cov;
   immediate_cov       m_MOVI_imm_cov;
   immediate_cov       m_TMAC_IS_imm_cov;
   immediate_cov       m_LDK_imm_cov;
@@ -645,7 +662,6 @@ class spect_instr_gen_coverage extends uvm_component;
     m_ANDI_instruction_ops_cov = new;
     m_ORI_instruction_ops_cov = new;
     m_XORI_instruction_ops_cov = new;
-    m_CMPA_instruction_ops_cov = new;
     m_MOVI_instruction_ops_cov = new;
     m_TMAC_IS_instruction_ops_cov = new;
     m_LDK_instruction_ops_cov = new;
@@ -695,7 +711,6 @@ class spect_instr_gen_coverage extends uvm_component;
     foreach (m_ANDI_reg_cov[i]) m_ANDI_reg_cov[i] = new;
     foreach (m_ORI_reg_cov[i]) m_ORI_reg_cov[i] = new;
     foreach (m_XORI_reg_cov[i]) m_XORI_reg_cov[i] = new;
-    foreach (m_CMPA_reg_cov[i]) m_CMPA_reg_cov[i] = new;
     foreach (m_MOVI_reg_cov[i]) m_MOVI_reg_cov[i] = new;
     foreach (m_TMAC_IS_reg_cov[i]) m_TMAC_IS_reg_cov[i] = new;
     foreach (m_LDK_reg_cov[i]) m_LDK_reg_cov[i] = new;
@@ -711,13 +726,15 @@ class spect_instr_gen_coverage extends uvm_component;
     m_ADDI_res_reg_cov = new;
     m_SUBI_res_reg_cov = new;
 
+    m_SBIT_op3_reg_cov = new;
+    m_CBIT_op3_reg_cov = new;
+
     m_ADDI_imm_cov = new;
     m_SUBI_imm_cov = new;
     m_CMPI_imm_cov = new;
     m_ANDI_imm_cov = new;
     m_ORI_imm_cov = new;
     m_XORI_imm_cov = new;
-    m_CMPA_imm_cov = new;
     m_MOVI_imm_cov = new;
     m_TMAC_IS_imm_cov = new;
     m_LDK_imm_cov = new;
@@ -845,7 +862,7 @@ class spect_instr_gen_coverage extends uvm_component;
           for (int i=0; i<256; i++) begin
             m_SBIT_reg_cov[1].sample(op1, i);
             m_SBIT_reg_cov[2].sample(op2, i);
-            m_SBIT_reg_cov[3].sample(op3, i);
+            m_SBIT_op3_reg_cov.sample(op3, i);
           end
 
         end
@@ -855,7 +872,7 @@ class spect_instr_gen_coverage extends uvm_component;
           for (int i=0; i<256; i++) begin
             m_CBIT_reg_cov[1].sample(op1, i);
             m_CBIT_reg_cov[2].sample(op2, i);
-            m_CBIT_reg_cov[3].sample(op3, i);
+            m_CBIT_op3_reg_cov.sample(op3, i);
           end
 
         end
@@ -1177,17 +1194,6 @@ class spect_instr_gen_coverage extends uvm_component;
           end
           for (int i=0; i<12; i++) begin
             m_XORI_imm_cov.sample(dpi_instruction.immediate, i);
-          end
-
-        end
-      
-        I_CMPA: begin
-          m_CMPA_instruction_ops_cov.sample(dpi_instruction.op2);
-          for (int i=0; i<256; i++) begin
-            m_CMPA_reg_cov[2].sample(op2, i);
-          end
-          for (int i=0; i<12; i++) begin
-            m_CMPA_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
