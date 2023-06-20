@@ -241,8 +241,8 @@ bool spect::InstructionSBIT::Execute()
 
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    // TODO issue warning when op3>255?
-    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(model_->GetGpr(TO_INT(op3_)));
+    uint256_t shift = model_->GetGpr(TO_INT(op3_)) & uint256_t("0xFF");
+    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(shift);
     model_->SetGpr( TO_INT(op1_), model_->GetGpr(TO_INT(op2_)) | mask);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
@@ -258,7 +258,8 @@ bool spect::InstructionCBIT::Execute()
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
     // TODO issue warning when op3>255?
-    uint256_t mask = uint256_t("0x1") << static_cast<uint32_t>(model_->GetGpr(TO_INT(op3_)));
+    uint256_t shift = model_->GetGpr(TO_INT(op3_)) & uint256_t("0xFF");
+    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(shift);
     model_->SetGpr( TO_INT(op1_), model_->GetGpr(TO_INT(op2_)) & ~mask);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
