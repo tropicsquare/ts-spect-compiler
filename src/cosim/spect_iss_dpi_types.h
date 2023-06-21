@@ -15,15 +15,15 @@
 
 #include <string>
 
-#define DPIENC_KBUS_OP_MASK        0x3F
+#define DPIENC_KBUS_OP_MASK        0xF
 #define DPIENC_KBUS_TYPE_MASK      0xF
 #define DPIENC_KBUS_SLOT_MASK      0xFF
 #define DPIENC_KBUS_OFFSET_MASK    0x1F
 
 #define DPIENC_KBUS_OP_OFFSET      0
-#define DPIENC_KBUS_TYPE_OFFSET    8
-#define DPIENC_KBUS_SLOT_OFFSET    12
-#define DPIENC_KBUS_OFFSET_OFFSET  20
+#define DPIENC_KBUS_TYPE_OFFSET    4
+#define DPIENC_KBUS_SLOT_OFFSET    8
+#define DPIENC_KBUS_OFFSET_OFFSET  16
 
 typedef enum {
     DPI_SPECT_DATA_RAM_IN       = (1 << 0),
@@ -54,12 +54,22 @@ typedef enum {
 } dpi_rbus_change_kind_t;
 
 typedef enum {
-    DPI_KBUS_WRITE              = (1 << 0),
-    DPI_KBUS_READ               = (1 << 1),
-    DPI_KBUS_PROGRAM            = (1 << 2),
-    DPI_KBUS_ERASE              = (1 << 3),
-    DPI_KBUS_VERIFY             = (1 << 4),
-    DPI_KBUS_FLUSH              = (1 << 5)
+    DPI_KBUS_WRITE              = 0,
+    DPI_KBUS_READ               = 1,
+    DPI_KBUS_PROGRAM            = 2,
+    DPI_KBUS_ERASE              = 3,
+    DPI_KBUS_VERIFY             = 4,
+    DPI_KBUS_FLUSH              = 5,
+    DPI_KBUS_UNDEFINED_0        = 6,
+    DPI_KBUS_UNDEFINED_1        = 7,
+    DPI_KBUS_UNDEFINED_2        = 8,
+    DPI_KBUS_UNDEFINED_3        = 9,
+    DPI_KBUS_UNDEFINED_4        = 10,
+    DPI_KBUS_UNDEFINED_5        = 11,
+    DPI_KBUS_UNDEFINED_6        = 12,
+    DPI_KBUS_UNDEFINED_7        = 13,
+    DPI_KBUS_UNDEFINED_8        = 14,
+    DPI_KBUS_UNDEFINED_9        = 15
 } dpi_kbus_change_kind_t;
 
 typedef enum {
@@ -185,6 +195,26 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
             operation = std::string("KBUS_VERIFY");
         else if (op == DPI_KBUS_FLUSH)
             operation = std::string("KBUS_FLUSH");
+        else if (op == DPI_KBUS_UNDEFINED_0)
+            operation = std::string("KBUS_UNDEFINED_0");
+        else if (op == DPI_KBUS_UNDEFINED_1)
+            operation = std::string("KBUS_UNDEFINED_1");
+        else if (op == DPI_KBUS_UNDEFINED_2)
+            operation = std::string("KBUS_UNDEFINED_2");
+        else if (op == DPI_KBUS_UNDEFINED_3)
+            operation = std::string("KBUS_UNDEFINED_3");
+        else if (op == DPI_KBUS_UNDEFINED_4)
+            operation = std::string("KBUS_UNDEFINED_4");
+        else if (op == DPI_KBUS_UNDEFINED_5)
+            operation = std::string("KBUS_UNDEFINED_5");
+        else if (op == DPI_KBUS_UNDEFINED_6)
+            operation = std::string("KBUS_UNDEFINED_6");
+        else if (op == DPI_KBUS_UNDEFINED_7)
+            operation = std::string("KBUS_UNDEFINED_7");
+        else if (op == DPI_KBUS_UNDEFINED_8)
+            operation = std::string("KBUS_UNDEFINED_8");
+        else if (op == DPI_KBUS_UNDEFINED_9)
+            operation = std::string("KBUS_UNDEFINED_9");
         else
             operation = std::string("UNKNOWN KBUS OPERATION!");
 

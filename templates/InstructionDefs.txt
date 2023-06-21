@@ -51,7 +51,7 @@ I           HASH_IT            0b0110        0b111          0b000           fals
 I           TMAC_IS            0b0010        0b111          0b011           false               true                0
 I               LDK            0b1010        0b111          0b111           false               false               0
 I               STK            0b1011        0b111          0b111           false               false               0
-I               ERK            0b1100        0b111          0b011           false               false               0
+I               KBO            0b1100        0b111          0b011           false               false               0
 
 
 M                LD            0b0010        0b101          0b110           false               false               0

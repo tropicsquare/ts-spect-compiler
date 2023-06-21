@@ -42,12 +42,13 @@ typedef enum {
 } dpi_rbus_change_kind_t;
 
 typedef enum {
-    DPI_KBUS_WRITE              = (1 << 0),
-    DPI_KBUS_READ               = (1 << 1),
-    DPI_KBUS_PROGRAM            = (1 << 2),
-    DPI_KBUS_ERASE              = (1 << 3),
-    DPI_KBUS_VERIFY             = (1 << 4),
-    DPI_KBUS_FLUSH              = (1 << 5)
+    DPI_KBUS_WRITE              = 0,
+    DPI_KBUS_READ               = 1,
+    DPI_KBUS_PROGRAM            = 2,
+    DPI_KBUS_ERASE              = 3,
+    DPI_KBUS_VERIFY             = 4,
+    DPI_KBUS_FLUSH              = 5,
+    DPI_KBUS_UNDEFINED[10]      = 6
 } dpi_kbus_change_kind_t;
 
   typedef enum {

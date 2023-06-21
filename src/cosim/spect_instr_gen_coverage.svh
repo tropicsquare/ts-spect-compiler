@@ -68,7 +68,7 @@ typedef enum bit[8:0] {
     I_TMAC_IS = 9'b01_0010_111, 
     I_LDK = 9'b01_1010_111, 
     I_STK = 9'b01_1011_111, 
-    I_ERK = 9'b01_1100_111, 
+    I_KBO = 9'b01_1100_111, 
     I_LD = 9'b10_0010_101, 
     I_ST = 9'b10_0100_101, 
     I_CALL = 9'b00_0001_000, 
@@ -497,7 +497,7 @@ class spect_instr_gen_coverage extends uvm_component;
   operands_1_reg_cov          m_TMAC_IS_instruction_ops_cov;
   operands_2_regs_cov         m_LDK_instruction_ops_cov;
   operands_2_regs_cov         m_STK_instruction_ops_cov;
-  operands_1_reg_cov          m_ERK_instruction_ops_cov;
+  operands_1_reg_cov          m_KBO_instruction_ops_cov;
   operands_1_reg_cov          m_LD_instruction_ops_cov;
   operands_1_reg_cov          m_ST_instruction_ops_cov;
 
@@ -548,7 +548,7 @@ class spect_instr_gen_coverage extends uvm_component;
   register_cov          m_TMAC_IS_reg_cov[2:2];
   register_cov          m_LDK_reg_cov[1:2];
   register_cov          m_STK_reg_cov[1:2];
-  register_cov          m_ERK_reg_cov[2:2];
+  register_cov          m_KBO_reg_cov[2:2];
   register_cov          m_LD_reg_cov[1:1];
   register_cov          m_ST_reg_cov[1:1];
 
@@ -576,7 +576,7 @@ class spect_instr_gen_coverage extends uvm_component;
   immediate_cov       m_TMAC_IS_imm_cov;
   immediate_cov       m_LDK_imm_cov;
   immediate_cov       m_STK_imm_cov;
-  immediate_cov       m_ERK_imm_cov;
+  immediate_cov       m_KBO_imm_cov;
 
 
   // Coverage for toggling on NewPC
@@ -666,7 +666,7 @@ class spect_instr_gen_coverage extends uvm_component;
     m_TMAC_IS_instruction_ops_cov = new;
     m_LDK_instruction_ops_cov = new;
     m_STK_instruction_ops_cov = new;
-    m_ERK_instruction_ops_cov = new;
+    m_KBO_instruction_ops_cov = new;
     m_LD_instruction_ops_cov = new;
     m_ST_instruction_ops_cov = new;
 
@@ -715,7 +715,7 @@ class spect_instr_gen_coverage extends uvm_component;
     foreach (m_TMAC_IS_reg_cov[i]) m_TMAC_IS_reg_cov[i] = new;
     foreach (m_LDK_reg_cov[i]) m_LDK_reg_cov[i] = new;
     foreach (m_STK_reg_cov[i]) m_STK_reg_cov[i] = new;
-    foreach (m_ERK_reg_cov[i]) m_ERK_reg_cov[i] = new;
+    foreach (m_KBO_reg_cov[i]) m_KBO_reg_cov[i] = new;
     foreach (m_LD_reg_cov[i]) m_LD_reg_cov[i] = new;
     foreach (m_ST_reg_cov[i]) m_ST_reg_cov[i] = new;
 
@@ -739,7 +739,7 @@ class spect_instr_gen_coverage extends uvm_component;
     m_TMAC_IS_imm_cov = new;
     m_LDK_imm_cov = new;
     m_STK_imm_cov = new;
-    m_ERK_imm_cov = new;
+    m_KBO_imm_cov = new;
 
     m_CALL_newpc_cov = new;
     m_BRZ_newpc_cov = new;
@@ -1248,13 +1248,13 @@ class spect_instr_gen_coverage extends uvm_component;
 
         end
       
-        I_ERK: begin
-          m_ERK_instruction_ops_cov.sample(dpi_instruction.op2);
+        I_KBO: begin
+          m_KBO_instruction_ops_cov.sample(dpi_instruction.op2);
           for (int i=0; i<256; i++) begin
-            m_ERK_reg_cov[2].sample(op2, i);
+            m_KBO_reg_cov[2].sample(op2, i);
           end
           for (int i=0; i<12; i++) begin
-            m_ERK_imm_cov.sample(dpi_instruction.immediate, i);
+            m_KBO_imm_cov.sample(dpi_instruction.immediate, i);
           end
 
         end
