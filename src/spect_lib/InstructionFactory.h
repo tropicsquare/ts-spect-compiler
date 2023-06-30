@@ -60,22 +60,37 @@ class spect::InstructionFactory
         ///////////////////////////////////////////////////////////////////////////////////////////
         static bool IteratorIsLast(std::map<std::string, spect::Instruction*>::iterator &it);
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @returns True if iterator is at the last instruction
+        /// @param isa_version Version of ISA under which to register an Instruction
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        static void SetActiveISAVersion(int isa_version);
+
     private:
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Register instruction within Instruction factory
         /// @param instr Pointer to instruction to register
+        /// @param isa_version Version of ISA under which to register an Instruction
         ///////////////////////////////////////////////////////////////////////////////////////////
-        static void Register(spect::Instruction *instr);
+        static void Register(int isa_version, spect::Instruction *instr);
 
         // True - Factory is initialized (All instructions registered), False otherwise
         static bool initialized_;
 
-        // Hash map with instructions: mnemonic -> *Instruction
-        static std::map<std::string, spect::Instruction*> mnemonic_map_;
+        // Current active version of ISA
+        // Used to select a mnemonic map from array of mnemonic maps, each holding instructions
+        // for a single ISA version.
+        //  active_isa_map_index = isa_version - 1
+        static int active_isa_map_index;
 
-        // Hash map with instructions: encoding -> *Instruction
-        static std::map<uint32_t, spect::Instruction*> encoding_map_;
+        // Hash maps with instructions: mnemonic -> *Instruction
+        // Single map for each ISA version
+        static std::map<std::string, spect::Instruction*> mnemonic_maps_[NUM_ISA_VERSIONS];
+
+        // Hash maps with instructions: encoding -> *Instruction
+        // Single map for each ISA version
+        static std::map<uint32_t, spect::Instruction*> encoding_maps_[NUM_ISA_VERSIONS];
 };
 
 #endif

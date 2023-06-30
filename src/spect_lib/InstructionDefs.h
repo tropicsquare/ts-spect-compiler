@@ -30,7 +30,7 @@
 // Macros for definitions of instructions
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DEFINE_R_INSTRUCTION(name,mnemonic,opcode,func, op_mask, r31_dep, c_time)               \
+#define DEFINE_R_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
     class name : public spect::InstructionR {                                                   \
         public:                                                                                 \
             name(CpuGpr op1, CpuGpr op2, CpuGpr op3) :                                          \
@@ -43,7 +43,7 @@
             bool Execute();                                                                     \
     };
 
-#define DEFINE_I_INSTRUCTION(name,mnemonic,opcode,func, op_mask, r31_dep, c_time)               \
+#define DEFINE_I_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
     class name : public spect::InstructionI {                                                   \
         public:                                                                                 \
             name(CpuGpr op1, CpuGpr op2, uint16_t immediate) :                                  \
@@ -56,7 +56,7 @@
             bool Execute();                                                                     \
     };                                                                                          \
 
-#define DEFINE_M_INSTRUCTION(name,mnemonic,opcode,func, op_mask, r31_dep, c_time)               \
+#define DEFINE_M_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
     class name : public spect::InstructionM {                                                   \
         public:                                                                                 \
             name(CpuGpr op1, uint16_t addr) :                                                   \
@@ -69,7 +69,7 @@
             bool Execute();                                                                     \
     };                                                                                          \
 
-#define DEFINE_J_INSTRUCTION(name,mnemonic,opcode,func, op_mask, r31_dep, c_time)               \
+#define DEFINE_J_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
     class name : public spect::InstructionJ {                                                   \
         public:                                                                                 \
             name(uint16_t new_pc) :                                                             \
@@ -117,7 +117,8 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 namespace spect {
 
-    SPECT_DEFINE_INSTRUCTIONS
+    SPECT_DEFINE_INSTRUCTIONS_V1
+    SPECT_DEFINE_INSTRUCTIONS_V2
 
 }
 

@@ -142,7 +142,8 @@ namespace spect {
     class InstructionJ;
     class InstructionM;
 
-    SPECT_SUM_INSTRUCTIONS
+    SPECT_SUM_INSTRUCTIONS_V1
+    SPECT_SUM_INSTRUCTIONS_V2
 
     class CpuModel;
     class CpuSimulator;
@@ -160,6 +161,8 @@ namespace spect {
 
     #define TO_INT(x) static_cast<int>(x)
     #define TO_CPU_GPR(x) static_cast<spect::CpuGpr>(x)
+
+    #define NUM_ISA_VERSIONS 2
 
     #define INSTR_ENCODE(func, opcode, itype)                                   \
         ((func           & IENC_FUNC_MASK)      << IENC_FUNC_OFFSET)        |   \

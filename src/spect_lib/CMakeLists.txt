@@ -14,7 +14,8 @@ add_library (SPECT STATIC
     InstructionJ.cpp
 
     InstructionFactory.cpp
-    InstructionDefs.cpp
+    InstructionDefsV1.cpp
+    InstructionDefsV2.cpp
 
     CpuModel.cpp
     CpuProgram.cpp
@@ -36,49 +37,66 @@ function(string_starts_with str search)
   return(false)
 endfunction()
 
+###################################################################################################
+# Load all available ISA versions
+###################################################################################################
+LIST (APPEND ISA_LIST InstructionDefs_v1)
+LIST (APPEND ISA_LIST InstructionDefs_v2)
 
-file(STRINGS ${TS_SPECT_COMPILER_ROOT}/templates/InstructionDefs.txt IDEF_LIST)
+foreach (ISA_TEMPLATE ${ISA_LIST})
 
-set(DEF_STR "")
-set(REG_STR "")
-set(SUM_STR "")
+  file(STRINGS ${TS_SPECT_COMPILER_ROOT}/templates/${ISA_TEMPLATE}.txt IDEF_LIST)
 
-string(ASCII 27 Esc)
-set(ColourReset         "${Esc}[m")
-set(InstructionColor    "${Esc}[1;36m")
+  set(DEF_STR "")
+  set(REG_STR "")
+  set(SUM_STR "")
 
-message("${InstructionColor} Loading available SPECT instructions:${ColourReset}")
-foreach(LINE ${IDEF_LIST})
-    if (${LINE} MATCHES "^[RIJM]")
-        separate_arguments(LINE_LIST UNIX_COMMAND ${LINE})
+  list(GET IDEF_LIST 0 FIRST_LINE)
+  separate_arguments(FIRST_LINE_LIST UNIX_COMMAND ${FIRST_LINE})
+  list(GET FIRST_LINE_LIST 1 ISA_VERSION)
 
-        list(GET LINE_LIST 0 ITYPE)
-        list(GET LINE_LIST 1 MNEMONIC)
-        list(GET LINE_LIST 2 OPCODE)
-        list(GET LINE_LIST 3 FUNC)
-        list(GET LINE_LIST 4 OPMASK)
-        list(GET LINE_LIST 5 R31_DEP)
-        list(GET LINE_LIST 6 C_TIME)
-        list(GET LINE_LIST 7 CROSS_COVER)
+  string(ASCII 27 Esc)
+  set(ColourReset         "${Esc}[m")
+  set(InstructionColor    "${Esc}[1;36m")
 
-        message("   ${InstructionColor}${MNEMONIC}${ColourReset}")
+  message("${InstructionColor} Loading SPECT instructions from ISA version ${ISA_VERSION}:${ColourReset}")
+  foreach(LINE ${IDEF_LIST})
+      if (${LINE} MATCHES "^[RIJM]")
+          separate_arguments(LINE_LIST UNIX_COMMAND ${LINE})
 
-        # Instruction definitions (header + implicit constructor)
-        set(DEF_STR "${DEF_STR} DEFINE_${ITYPE}_INSTRUCTION(Instruction${MNEMONIC},\"${MNEMONIC}\",${OPCODE},${FUNC},${OPMASK},${R31_DEP},${C_TIME}) ")
+          list(GET LINE_LIST 0 ITYPE)
+          list(GET LINE_LIST 1 MNEMONIC)
+          list(GET LINE_LIST 2 OPCODE)
+          list(GET LINE_LIST 3 FUNC)
+          list(GET LINE_LIST 4 OPMASK)
+          list(GET LINE_LIST 5 R31_DEP)
+          list(GET LINE_LIST 6 C_TIME)
+          list(GET LINE_LIST 7 CROSS_COVER)
 
-        # Instruction registration within instruction factory
-        set(REG_STR "${REG_STR} REGISTER_${ITYPE}_INSTRUCTION(spect::Instruction${MNEMONIC}) ")
+          message("   ${InstructionColor}${MNEMONIC}${ColourReset}")
 
-        # Instruction class forward definition
-        set(SUM_STR "${SUM_STR} class Instruction${MNEMONIC}\\\; ")
+          # Instruction definitions (header + implicit constructor)
+          set(DEF_STR "${DEF_STR} DEFINE_${ITYPE}_INSTRUCTION(V${ISA_VERSION}Instruction${MNEMONIC},\"${MNEMONIC}\",${OPCODE},${FUNC},${OPMASK},${R31_DEP},${C_TIME}) ")
 
-    endif()
+          # Instruction registration within instruction factory
+          set(REG_STR "${REG_STR} REGISTER_${ITYPE}_INSTRUCTION(${ISA_VERSION},spect::V${ISA_VERSION}Instruction${MNEMONIC}) ")
+
+          # Instruction class forward definition
+          set(SUM_STR "${SUM_STR} class V${ISA_VERSION}Instruction${MNEMONIC}\\\; ")
+
+      endif()
+  endforeach()
+
+  #message(${SUM_STR})
+  #message(${REG_STR})
+
+  target_compile_definitions(SPECT PUBLIC
+                             SPECT_DEFINE_INSTRUCTIONS_V${ISA_VERSION}=${DEF_STR}
+                             SPECT_REGISTER_INSTRUCTIONS_V${ISA_VERSION}=${REG_STR}
+                             SPECT_SUM_INSTRUCTIONS_V${ISA_VERSION}=${SUM_STR})
+
 endforeach()
 
-#message(${SUM_STR})
-#message(${REG_STR})
-
-target_compile_definitions(SPECT PUBLIC SPECT_DEFINE_INSTRUCTIONS=${DEF_STR} SPECT_REGISTER_INSTRUCTIONS=${REG_STR} SPECT_SUM_INSTRUCTIONS=${SUM_STR})
 
 # Waivers
 set_source_files_properties(InstructionDefs.cpp PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
