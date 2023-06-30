@@ -28,6 +28,7 @@ enum  optionIndex {
     FIRST_ADDR,
     HEX_FORMAT,
     HEX_FILE,
+    ISA_VERSION,
     PARITY,
     DUMP_PROGRAM,
     DUMP_SYMBOLS
@@ -35,13 +36,16 @@ enum  optionIndex {
 
 const option::Descriptor usage[] =
 {
-    {UNKNOWN,          0,  "" ,    ""               ,option::Arg::None,     "USAGE: spect_compiler [options]\n\n" "Options:" },
+    {UNKNOWN,          0,  "" ,    ""               ,option::Arg::None,     "USAGE: spect_compiler [options] [source_file_1 [source_file_2] ...]\n\n" "Options:" },
     {HELP,             0,  "h" ,    "help"          ,option::Arg::None,     "  --help                  Print usage and exit." },
     {FIRST_ADDR,       0,  ""  ,    "first-address" ,option::Arg::Optional, "  --first-address=<addr>  Address to place first instruction from first compiled file." },
     {HEX_FORMAT,       0,  ""  ,    "hex-format"    ,option::Arg::Optional, "  --hex-format=<type>     Format of hex file:\n"
                                                                             "                           0 - Hex file for Instruction simulator or SPECT DPI model (default).\n"
                                                                             "                           1 - Hex file for Verilog model (address not included)\n"
                                                                             "                           2 - Hex file for Verilog model (address included).\n"},
+    {ISA_VERSION,      0,  ""  ,    "isa-version"   ,option::Arg::Optional, "  --isa-version=<version>  Version of Instruction set architecture:\n"
+                                                                            "                            1 - For SPECT design spec version <= 1.0 (TROPIC01 MPW1)\n"
+                                                                            "                            2 - For SPECT design spec version > 1.0 (default)\n"},
     {HEX_FILE,         0,  ""  ,    "hex-file"      ,option::Arg::Optional, "  --hex-file=<file>       HEX file for simulator where code will be assembled."},
     {PARITY,           0,  ""  ,    "parity"        ,option::Arg::Optional, "  --parity=<type>         Parity type:\n"
                                                                             "                           1 - Odd parity.\n"
@@ -95,6 +99,15 @@ int main(int argc, char** argv)
         comp->Warning("'--first-address' undefined. First instruction will be placed at start of"
                       " instruction memory.");
     }
+
+    if (options[ISA_VERSION]) {
+        std::stringstream ss;
+        int isa_version;
+        ss << options[ISA_VERSION].arg;
+        ss >> isa_version;
+        spect::InstructionFactory::SetActiveISAVersion(isa_version);
+    }
+    std::cout << "Using ISA version: " << spect::InstructionFactory::GetActiveISAVersion() << std::endl;
 
     // All remaining arguments are input source files
     try {

@@ -101,6 +101,10 @@ void spect::InstructionFactory::SetActiveISAVersion(int isa_version)
     active_isa_map_index = isa_version - 1;
 }
 
+int spect::InstructionFactory::GetActiveISAVersion(void)
+{
+    return active_isa_map_index + 1;
+}
 
 std::map<std::string, spect::Instruction*> spect::InstructionFactory::mnemonic_maps_[NUM_ISA_VERSIONS];;
 

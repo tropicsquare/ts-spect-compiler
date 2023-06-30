@@ -1,7 +1,7 @@
 
 
 set (CC spect_compiler)
-set (CARGS --first-address=0x8000)
+set (CARGS --first-address=0x8000 --isa-version=1)
 
 macro(ADD_UNIT_TEST TEST_NAME)
     add_test(NAME ${TEST_NAME} COMMAND ${CC} ${CARGS} --hex-file=${CMAKE_CURRENT_SOURCE_DIR}/build/${TEST_NAME}.hex

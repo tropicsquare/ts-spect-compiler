@@ -13,6 +13,7 @@
 #include "CpuModel.h"
 #include "CpuProgram.h"
 #include "HexHandler.h"
+#include "InstructionFactory.h"
 
 
 enum  optionIndex {
@@ -20,6 +21,7 @@ enum  optionIndex {
     HELP,
     PROGRAM,
     FIRST_ADDR,
+    ISA_VERSION,
     START_PC,
     PARITY,
     CMD_FILE,
@@ -42,10 +44,13 @@ const option::Descriptor usage[] =
     {FIRST_ADDR,            0,  ""  ,    "first-address"        ,option::Arg::Optional,     "  --first-address=<addr>       Address to place first instruction from first compiled file. Use this "
                                                                                                                            "option only when loading program via '--program' switch. Option is ignored"
                                                                                                                            "when loading program from HEX file.\n" },
+    {ISA_VERSION,           0,  ""  ,    "isa-version"          ,option::Arg::Optional,     "  --isa-version=<version>      Version of Instruction set architecture:\n"
+                                                                                            "                                   1 - For SPECT design spec version <= 1.0 (TROPIC01 MPW1)\n"
+                                                                                            "                                   2 - For SPECT design spec version > 1.0 (default)\n"},
     {START_PC,              0,  ""  ,    "start-pc"             ,option::Arg::Optional,     "  --start-pc=<addr>            Address of first instruction to be executed by model.\n"},
     {PARITY,                0,  ""  ,    "parity"               ,option::Arg::Optional,     "  --parity=<type>              Parity type:\n"
-                                                                                            "                               1 - Odd parity.\n"
-                                                                                            "                               2 - Even parity.\n"
+                                                                                            "                                   1 - Odd parity.\n"
+                                                                                            "                                   2 - Even parity.\n"
                                                                                             "                               else - No parity (default).\n"},
     {CMD_FILE,              0,  ""  ,    "cmd-file"             ,option::Arg::Optional,     "  --cmd-file=<file>            Execute file with simulator shell commands.\n"},
     {SHELL,                 0,  ""  ,    "shell"                ,option::Arg::Optional,     "  --shell                      Launch simulator in the interactive shell.\n"},
@@ -110,6 +115,18 @@ int main(int argc, char** argv)
     // Initialize CPU simulator
     ///////////////////////////////////////////////////////////////////////////////////////////////
     simulator = new spect::CpuSimulator();
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Configure used ISA version
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    if (options[ISA_VERSION]) {
+        std::stringstream ss;
+        int isa_version;
+        ss << options[ISA_VERSION].arg;
+        ss >> isa_version;
+        spect::InstructionFactory::SetActiveISAVersion(isa_version);
+    }
+    std::cout << "Using ISA version: " << spect::InstructionFactory::GetActiveISAVersion() << std::endl;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Configure parity type
