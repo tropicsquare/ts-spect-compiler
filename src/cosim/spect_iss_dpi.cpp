@@ -237,12 +237,6 @@ extern "C" {
         DPI_CALL_LOG_EXIT
     }
 
-    // TODO remove
-    uint32_t spect_dpi_get_srr(uint32_t part)
-    {
-        return 0;
-    }
-
     uint32_t spect_dpi_get_rar_value(uint32_t address)
     {
         DPI_CALL_LOG_ENTER

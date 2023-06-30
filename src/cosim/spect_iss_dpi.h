@@ -183,17 +183,6 @@ extern "C" {
     void spect_dpi_dump_instruction(uint32_t address, char *buf);
 
     /**
-     * @brief Get part of SPECTs SRR register.
-     * @param part - Part of the SRR register:
-     *                  0 - Bits 31:0
-     *                  1 - Bits 63:32
-     *                  ...
-     *                  8 - Bits 255:224
-     * @returns Value in selected part of SRR register.
-     */
-    uint32_t spect_dpi_get_srr(uint32_t part);
-
-    /**
      * @brief Get value in RAR stack.
      * @param address Address to get from RAR stack:
      *                  0 - Bottom of stack,

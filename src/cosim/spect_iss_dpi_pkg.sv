@@ -298,17 +298,6 @@ typedef enum {
   import "DPI-C" function void spect_dpi_dump_instruction(int unsigned address, string buffer);
 
   /**
-   * @brief Get part of SPECTs SRR register.
-   * @param part - Part of the SRR register:
-   *                  0 - Bits 31:0
-   *                  1 - Bits 63:32
-   *                  ...
-   *                  8 - Bits 255:224
-   * @returns Value in selected part of SRR register.
-   */
-  import "DPI-C" function int unsigned spect_dpi_get_srr(int unsigned part);
-
-  /**
    * @brief Get value in RAR stack.
    * @param address Address to get from RAR stack:
    *                  0 - Bottom of stack,
