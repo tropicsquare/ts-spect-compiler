@@ -219,7 +219,7 @@ bool spect::V1InstructionNOT::Execute()
         binary_logic_op_lsb(model_->GetGpr(TO_INT(op2_)),
                             model_->GetGpr(TO_INT(op3_)),
                             8,
-            [] (const uint256_t &lhs, const uint256_t &rhs) -> uint256_t {
+            [] (const uint256_t &lhs, [[maybe_unused]] const uint256_t &rhs) -> uint256_t {
                 // Need copy, since ~ modifies passed reference
                 uint256_t cpy = lhs;
                 return mask_n_lsb_digits(~cpy, 8);
