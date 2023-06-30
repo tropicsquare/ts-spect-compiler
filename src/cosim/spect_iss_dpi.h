@@ -233,12 +233,17 @@ extern "C" {
      *              DPI_HEX_ISS_WORD            - Instruction set simulator
      *              DPI_HEX_VERILOG_RAW_WORD    - Verilog unadressed
      *              DPI_HEX_VERILOG_ADDR_WORD   - Verilog addressed
+     *  @param parity_type Parity type to be applied.
+     *              DPI_PARITY_ODD              - Odd parity
+     *              DPI_PARITY_EVEN             - Even parity
+     *              DPI_PARITY_NONE             - No parity calculated
      *  @returns 0 - Program compiled succesfully
      *           non-zero - Compilation failed.
      *  @note This function fails if the S file does not define '_start' symbol.
      */
     uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
-                                       const dpi_hex_file_type_t hex_format);
+                                       const dpi_hex_file_type_t hex_format,
+                                       const dpi_parity_type_t parity_type);
 
     /**
      *  @returns Start address from previously compiled program (value of `_start` symbol.)
@@ -347,6 +352,21 @@ extern "C" {
      *  @note Debug prints from model execution to standard output.
      */
     void spect_dpi_set_verbosity(uint32_t level);
+
+    /**
+     * @brief Returns parity type checked by model
+     * @returns Parity type.
+     */
+    dpi_parity_type_t spect_dpi_get_parity_type();
+
+    /**
+     * @brief Set parity type checked by model
+     * @param parity_type Parity type:
+     *              DPI_PARITY_ODD  - Odd parity
+     *              DPI_PARITY_EVEN - Even parity
+     *              DPI_PARITY_NONE - No parity calculated
+     */
+    void spect_dpi_set_parity_type(dpi_parity_type_t parity_type);
 
 }
 

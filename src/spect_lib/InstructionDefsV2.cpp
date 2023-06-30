@@ -241,8 +241,8 @@ bool spect::V2InstructionSBIT::Execute()
 
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    // TODO issue warning when op3>255?
-    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(model_->GetGpr(TO_INT(op3_)));
+    uint256_t shift = model_->GetGpr(TO_INT(op3_)) & uint256_t("0xFF");
+    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(shift);
     model_->SetGpr( TO_INT(op1_), model_->GetGpr(TO_INT(op2_)) | mask);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
@@ -257,8 +257,8 @@ bool spect::V2InstructionCBIT::Execute()
 
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
 
-    // TODO issue warning when op3>255?
-    uint256_t mask = uint256_t("0x1") << static_cast<uint32_t>(model_->GetGpr(TO_INT(op3_)));
+    uint256_t shift = model_->GetGpr(TO_INT(op3_)) & uint256_t("0xFF");
+    uint256_t mask  = uint256_t("0x1") << static_cast<uint32_t>(shift);
     model_->SetGpr( TO_INT(op1_), model_->GetGpr(TO_INT(op2_)) & ~mask);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
@@ -732,20 +732,6 @@ IMPLEMENT_I_32_LOGIC_OP(V2InstructionANDI,&)
 IMPLEMENT_I_32_LOGIC_OP(V2InstructionORI,|)
 IMPLEMENT_I_32_LOGIC_OP(V2InstructionXORI,^)
 
-
-bool spect::V2InstructionCMPA::Execute()
-{
-    DEFINE_CHANGE(ch_zf, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ZERO);
-    PUT_FLAG_TO_CHANGE(ch_zf, old_val, model_->GetCpuFlag(CpuFlagType::ZERO));
-
-    model_->SetCpuFlag(CpuFlagType::ZERO, model_->GetGpr(TO_INT(op2_)) == uint256_t(immediate_));
-
-    PUT_FLAG_TO_CHANGE(ch_zf, new_val, model_->GetCpuFlag(CpuFlagType::ZERO));
-    model_->ReportChange(ch_zf);
-
-    return true;
-}
-
 bool spect::V2InstructionMOVI::Execute()
 {
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
@@ -814,7 +800,7 @@ bool spect::V2InstructionLDK::Execute()
     // Read
     uint256_t tmp = 0;
     for (int i = 0; i < 8; i++) {
-        DEFINE_CHANGE(ch_kbus_read, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_READ, type, slot, (offset*8+i)));
+        DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_READ, type, slot, (offset*8+i)));
 
         // If running with CPU Simulator, preload key from simulator memory to queue
         if (model_->simulator_ != NULL) {
@@ -825,30 +811,19 @@ bool spect::V2InstructionLDK::Execute()
         uint256_t part = model_->LdkQueuePop();
         part = part << (32 * i);
         tmp = tmp | part;
-        model_->ReportChange(ch_kbus_read);
+        model_->ReportChange(ch_kbus);
 
         error = model_->KbusErrorQueuePop();
-        DEFINE_CHANGE(ch_ef_read, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-        PUT_FLAG_TO_CHANGE(ch_ef_read, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
+        DEFINE_CHANGE(ch_ef, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
+        PUT_FLAG_TO_CHANGE(ch_ef, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
         model_->SetCpuFlag(CpuFlagType::ERROR, error);
-        PUT_FLAG_TO_CHANGE(ch_ef_read, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-        model_->ReportChange(ch_ef_read);
+        PUT_FLAG_TO_CHANGE(ch_ef, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
+        model_->ReportChange(ch_ef);
 
         if (error)
           return true;
     }
     model_->SetGpr(TO_INT(op1_), tmp);
-
-    // Flush
-    DEFINE_CHANGE(ch_kbus_flush, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_FLUSH, type, slot, (offset*8)));
-    model_->ReportChange(ch_kbus_flush);
-
-    error = model_->KbusErrorQueuePop();
-    DEFINE_CHANGE(ch_ef_flush, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-    PUT_FLAG_TO_CHANGE(ch_ef_flush, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->SetCpuFlag(CpuFlagType::ERROR, error);
-    PUT_FLAG_TO_CHANGE(ch_ef_flush, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->ReportChange(ch_ef_flush);
 
     PUT_GPR_TO_CHANGE(ch_gpr, new_val, model_->GetGpr(TO_INT(op1_)));
     model_->ReportChange(ch_gpr);
@@ -867,9 +842,9 @@ bool spect::V2InstructionSTK::Execute()
     // Write
     uint256_t tmp = model_->GetGpr(TO_INT(op1_));
     for (int i = 0; i < 8; i++) {
-        DEFINE_CHANGE(ch_kbus_write, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_WRITE, type, slot, (offset*8+i)));
-        ch_kbus_write.new_val[0] = uint32_t(tmp >> (32 * i));
-        model_->ReportChange(ch_kbus_write);
+        DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_WRITE, type, slot, (offset*8+i)));
+        ch_kbus.new_val[0] = uint32_t(tmp >> (32 * i));
+        model_->ReportChange(ch_kbus);
 
         // If running with CPU Simulator, store key to simulator memory
         if (model_->simulator_ != NULL) {
@@ -877,80 +852,44 @@ bool spect::V2InstructionSTK::Execute()
         }
 
         error = model_->KbusErrorQueuePop();
-        DEFINE_CHANGE(ch_ef_write, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-        PUT_FLAG_TO_CHANGE(ch_ef_write, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
+        DEFINE_CHANGE(ch_ef, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
+        PUT_FLAG_TO_CHANGE(ch_ef, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
         model_->SetCpuFlag(CpuFlagType::ERROR, error);
-        PUT_FLAG_TO_CHANGE(ch_ef_write, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-        model_->ReportChange(ch_ef_write);
+        PUT_FLAG_TO_CHANGE(ch_ef, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
+        model_->ReportChange(ch_ef);
 
         if (error)
           return true;
     }
 
-    // Program
-    DEFINE_CHANGE(ch_kbus_program, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_PROGRAM, type, slot, (offset*8)));
-    model_->ReportChange(ch_kbus_program);
-
-    error = model_->KbusErrorQueuePop();
-    DEFINE_CHANGE(ch_ef_program, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-    PUT_FLAG_TO_CHANGE(ch_ef_program, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->SetCpuFlag(CpuFlagType::ERROR, error);
-    PUT_FLAG_TO_CHANGE(ch_ef_program, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->ReportChange(ch_ef_program);
-
-    if (error)
-      return true;
-
-    // Flush
-    DEFINE_CHANGE(ch_kbus_flush, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_FLUSH, type, slot, (offset*8)));
-    model_->ReportChange(ch_kbus_flush);
-
-    error = model_->KbusErrorQueuePop();
-    DEFINE_CHANGE(ch_ef_flush, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-    PUT_FLAG_TO_CHANGE(ch_ef_flush, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->SetCpuFlag(CpuFlagType::ERROR, error);
-    PUT_FLAG_TO_CHANGE(ch_ef_flush, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->ReportChange(ch_ef_flush);
-
     return true;
 }
 
-bool spect::V2InstructionERK::Execute()
+bool spect::V2InstructionKBO::Execute()
 {
     uint32_t slot   = (uint32_t)(model_->GetGpr(TO_INT(op2_)) & uint256_t("0xFF"));
     uint32_t type   = (immediate_ >> 8) & 0xF;
-    uint32_t offset = immediate_ & 0x1F;
+    uint32_t opcode = static_cast<dpi_kbus_change_kind_t>(immediate_ & 0x1F);
     bool     error;
 
-    // Erase
-    DEFINE_CHANGE(ch_kbus_erase, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_ERASE, type, slot, (offset*8)));
-    model_->ReportChange(ch_kbus_erase);
+    DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(opcode, type, slot, 0));
+    model_->ReportChange(ch_kbus);
 
-    // If running with CPU Simulator, erase slot in simulator memory
-    if (model_->simulator_ != NULL) {
-      model_->simulator_->EraseKeyMem(slot);
+    // If running with CPU Simulator, update simulator memory
+    if (model_->simulator_ != NULL && opcode == DPI_KBUS_ERASE) {
+      if (opcode == DPI_KBUS_WRITE)
+        model_->simulator_->WriteKeyMem(slot, 0, 0);
+      else if (opcode == DPI_KBUS_ERASE)
+        model_->simulator_->EraseKeyMem(slot);
     }
 
     error = model_->KbusErrorQueuePop();
-    DEFINE_CHANGE(ch_ef_erase, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-    PUT_FLAG_TO_CHANGE(ch_ef_erase, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
+
+    DEFINE_CHANGE(ch_ef, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
+    PUT_FLAG_TO_CHANGE(ch_ef, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
     model_->SetCpuFlag(CpuFlagType::ERROR, error);
-    PUT_FLAG_TO_CHANGE(ch_ef_erase, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->ReportChange(ch_ef_erase);
-
-    if (error)
-      return true;
-
-    // Verify
-    DEFINE_CHANGE(ch_kbus_verify, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_VERIFY, type, slot, (offset*8)));
-    model_->ReportChange(ch_kbus_verify);
-
-    error = model_->KbusErrorQueuePop();
-    DEFINE_CHANGE(ch_ef_verify, DPI_CHANGE_FLAG, DPI_SPECT_FLAG_ERROR);
-    PUT_FLAG_TO_CHANGE(ch_ef_verify, old_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->SetCpuFlag(CpuFlagType::ERROR, error);
-    PUT_FLAG_TO_CHANGE(ch_ef_verify, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
-    model_->ReportChange(ch_ef_verify);
+    PUT_FLAG_TO_CHANGE(ch_ef, new_val, model_->GetCpuFlag(CpuFlagType::ERROR));
+    model_->ReportChange(ch_ef);
 
     return true;
 }

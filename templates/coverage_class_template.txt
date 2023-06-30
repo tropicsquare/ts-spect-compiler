@@ -73,6 +73,23 @@ covergroup register_arith_cov with function sample(logic[255:0] value, int posit
 endgroup : register_arith_cov
 
 
+// Special case for SBIT/CBIT
+covergroup register_bit_cov with function sample(logic[255:0] value, int position);
+  // Track coverage information for each instance
+  option.per_instance = 1;
+
+  cp_register_zero: coverpoint position iff (value[position] == 0) {
+    bins b[] = {[0:255]};
+  }
+
+  cp_register_one: coverpoint position iff (value[position] == 1) {
+    bins        b[]    = {[0:7]};
+    // Bit position is 8-bit (0-255), upper bits have no meaning
+    ignore_bins ignore = {[8:255]};
+  }
+endgroup : register_bit_cov
+
+
 // Special case for LSR
 covergroup register_lsr_cov with function sample(logic[255:0] value, int position);
   // Track coverage information for each instance
@@ -383,6 +400,8 @@ class spect_instr_gen_coverage extends uvm_component;
 
 {% for instruction in instructions %}{{instruction.res_val_cov_def}}{% endfor %}
 
+{% for instruction in instructions %}{{instruction.op3_val_cov_def}}{% endfor %}
+
   // Coverage for toggling on Immediate
 {% for instruction in instructions %}{{instruction.imm_cov_def}}{% endfor %}
 
@@ -415,6 +434,7 @@ class spect_instr_gen_coverage extends uvm_component;
 {% for instruction in instructions %}{% if 'op_cov_constr' in instruction %}{{instruction.op_cov_constr}}{% endif %}{% endfor %}
 {% for instruction in instructions %}{% if 'val_cov_constr' in instruction %}{{instruction.val_cov_constr}}{% endif %}{% endfor %}
 {% for instruction in instructions %}{% if 'res_val_cov_constr' in instruction %}{{instruction.res_val_cov_constr}}{% endif %}{% endfor %}
+{% for instruction in instructions %}{% if 'op3_val_cov_constr' in instruction %}{{instruction.op3_val_cov_constr}}{% endif %}{% endfor %}
 {% for instruction in instructions %}{% if 'imm_cov_constr' in instruction %}{{instruction.imm_cov_constr}}{% endif %}{% endfor %}
 {% for instruction in instructions %}{% if 'newpc_cov_constr' in instruction %}{{instruction.newpc_cov_constr}}{% endif %}{% endfor %}
 {% for instruction in instructions %}{% if 'addr_cov_constr' in instruction %}{{instruction.addr_cov_constr}}{% endif %}{% endfor %}

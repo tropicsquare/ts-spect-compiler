@@ -42,12 +42,13 @@ typedef enum {
 } dpi_rbus_change_kind_t;
 
 typedef enum {
-    DPI_KBUS_WRITE              = (1 << 0),
-    DPI_KBUS_READ               = (1 << 1),
-    DPI_KBUS_PROGRAM            = (1 << 2),
-    DPI_KBUS_ERASE              = (1 << 3),
-    DPI_KBUS_VERIFY             = (1 << 4),
-    DPI_KBUS_FLUSH              = (1 << 5)
+    DPI_KBUS_WRITE              = 0,
+    DPI_KBUS_READ               = 1,
+    DPI_KBUS_PROGRAM            = 2,
+    DPI_KBUS_ERASE              = 3,
+    DPI_KBUS_VERIFY             = 4,
+    DPI_KBUS_FLUSH              = 5,
+    DPI_KBUS_UNDEFINED[10]      = 6
 } dpi_kbus_change_kind_t;
 
   typedef enum {
@@ -56,10 +57,8 @@ typedef enum {
     DPI_CHANGE_MEM              = (1 << 2),
     DPI_CHANGE_INT              = (1 << 4),
     DPI_CHANGE_RAR              = (1 << 5),
-    DPI_CHANGE_EMEM_IN          = (1 << 6),
-    DPI_CHANGE_EMEM_OUT         = (1 << 7),
-    DPI_CHANGE_RBUS             = (1 << 8),
-    DPI_CHANGE_KBUS             = (1 << 9)
+    DPI_CHANGE_RBUS             = (1 << 6),
+    DPI_CHANGE_KBUS             = (1 << 7)
   } dpi_change_kind_t;
 
   typedef enum {
@@ -67,6 +66,12 @@ typedef enum {
     DPI_HEX_VERILOG_RAW_WORD    = (1 << 1),
     DPI_HEX_VERILOG_ADDR_WORD   = (1 << 2)
   } dpi_hex_file_type_t;
+
+typedef enum {
+    DPI_PARITY_ODD              = (1 << 0),
+    DPI_PARITY_EVEN             = (1 << 1),
+    DPI_PARITY_NONE             = (1 << 2)
+} dpi_parity_type_t;
 
   typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
@@ -82,8 +87,6 @@ typedef enum {
     //      DPI_SPECT_FLAG_CARRY
     //
     //  DPI_CHANGE_MEM:
-    //  DPI_CHANGE_EMEM_IN:
-    //  DPI_CHANGE_EMEM_OUT:
     //      Address in memory on which change occured.
     //
     //  DPI_CHANGE_INT:
@@ -115,8 +118,6 @@ typedef enum {
     //      0 - Value of flag
     //
     //  DPI_CHANGE_MEM:
-    //  DPI_CHANGE_EMEM_IN:
-    //  DPI_CHANGE_EMEM_OUT:
     //      0 - Bits 31:0 of memory location
     //
     //  DPI_CHANGE_INT:
@@ -348,12 +349,17 @@ typedef enum {
    *              DPI_HEX_ISS_WORD            - Instruction set simulator
    *              DPI_HEX_VERILOG_RAW_WORD    - Verilog unadressed
    *              DPI_HEX_VERILOG_ADDR_WORD   - Verilog addressed
+   *  @param parity_type Parity type to be applied.
+   *              DPI_PARITY_ODD              - Odd parity
+   *              DPI_PARITY_EVEN             - Even parity
+   *              DPI_PARITY_NONE             - No parity calculated
    *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
   import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
-                                                                 dpi_hex_file_type_t hex_format);
+                                                                 dpi_hex_file_type_t hex_format,
+                                                                 dpi_parity_type_t parity_type);
 
   /**
    *  @returns Start address from previously compiled program (value of `_start` symbol.)
@@ -462,6 +468,21 @@ typedef enum {
    *  @note Debug prints from model execution to standard output.
    */
   import "DPI-C" function void spect_dpi_set_verbosity(int unsigned level);
+
+  /**
+   * @brief Returns parity type checked by model
+   * @returns Parity type.
+   */
+  import "DPI-C" function dpi_parity_type_t spect_dpi_get_parity_type();
+
+  /**
+   * @brief Set parity type checked by model
+   * @param parity_type Parity type:
+   *              DPI_PARITY_ODD  - Odd parity
+   *              DPI_PARITY_EVEN - Even parity
+   *              DPI_PARITY_NONE - No parity calculated
+   */
+  import "DPI-C" function void spect_dpi_set_parity_type(dpi_parity_type_t parity_type);
 
 endpackage : spect_iss_dpi_pkg
 

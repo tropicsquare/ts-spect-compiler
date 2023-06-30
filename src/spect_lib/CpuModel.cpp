@@ -188,7 +188,7 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
         rv = memory_[address >> 2];
 
     if (IsWithinMem(CpuMemory::EMEM_IN, address)) {
-        DEFINE_CHANGE(ch_emem, DPI_CHANGE_EMEM_IN, address);
+        DEFINE_CHANGE(ch_emem, DPI_CHANGE_MEM, address);
         rv = memory_[address >> 2];
         ReportChange(ch_emem);
     }
@@ -212,7 +212,7 @@ void spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
     }
 
     if (IsWithinMem(CpuMemory::EMEM_OUT, address)) {
-        DEFINE_CHANGE(ch_emem, DPI_CHANGE_EMEM_OUT, address);
+        DEFINE_CHANGE(ch_emem, DPI_CHANGE_MEM, address);
         ch_emem.new_val[0] = data;
         ReportChange(ch_emem);
     }

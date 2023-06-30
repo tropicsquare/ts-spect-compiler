@@ -37,7 +37,7 @@ int main()
     spect_dpi_reset();
 
     // TODO: Adjust paths to be raltive to some var
-    rv = spect_dpi_compile_program(DPI_TEST_FW, "tmp.hex", DPI_HEX_ISS_WORD);
+    rv = spect_dpi_compile_program(DPI_TEST_FW, "tmp.hex", DPI_HEX_ISS_WORD, DPI_PARITY_NONE);
     assert(rv == 0);
 
     spect_dpi_exit();

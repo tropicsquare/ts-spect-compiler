@@ -12,6 +12,6 @@ add_custom_target(XKCP_BUILD ALL
 add_library(XKCP SHARED IMPORTED GLOBAL)
 set_target_properties(XKCP PROPERTIES
     IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/../modules/ts-crypto-blocks/modules/xkcp/bin/generic64/libXKCP.so
-    INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/../modules/ts-crypto-blocks/modules/xkcp/bin/generic64/libXKCP.so.headers
+    #INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/../modules/ts-crypto-blocks/modules/xkcp/bin/generic64/libXKCP.so.headers
     IMPORTED_NO_SONAME ON
 )

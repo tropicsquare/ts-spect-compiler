@@ -23,9 +23,9 @@ R             ROLIN            0b1110        0b100          0b111           fals
 R             RORIN            0b1101        0b100          0b111           false               true                0
 R               SWE            0b1100        0b100          0b110           false               true                0
 R               MOV            0b0001        0b101          0b110           false               true                0
-R               LDR            0b0010        0b101          0b110           false               true                0
+R               LDR            0b0010        0b101          0b110           false               false               0
 R               STR            0b0100        0b101          0b110           false               false               0
-R             CSWAP            0b0011        0b101          0b110           false               false               0
+R             CSWAP            0b0011        0b101          0b110           false               true                0
 R             ZSWAP            0b0111        0b101          0b110           false               true                0
 R              HASH            0b0101        0b111          0b110           false               true                0
 R               GRV            0b1001        0b111          0b100           false               false               0
@@ -47,13 +47,12 @@ I              CMPI            0b0100        0b001          0b011           fals
 I              ANDI            0b0001        0b010          0b111           false               true                0
 I               ORI            0b0010        0b010          0b111           false               true                0
 I              XORI            0b0100        0b010          0b111           false               true                0
-I              CMPA            0b1000        0b101          0b011           false               true                0
 I              MOVI            0b0001        0b101          0b101           false               true                0
 I           HASH_IT            0b0110        0b111          0b000           false               true                0
 I           TMAC_IS            0b0010        0b111          0b011           false               true                0
 I               LDK            0b1010        0b111          0b111           false               false               0
 I               STK            0b1011        0b111          0b111           false               false               0
-I               ERK            0b1100        0b111          0b011           false               false               0
+I               KBO            0b1100        0b111          0b011           false               false               0
 
 
 M                LD            0b0010        0b101          0b110           false               false               0
