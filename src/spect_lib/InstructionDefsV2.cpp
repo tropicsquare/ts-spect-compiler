@@ -700,7 +700,7 @@ IMPLEMENT_I_32_AIRTH_OP(V2InstructionSUBI,-,true)
 IMPLEMENT_I_32_AIRTH_OP(V2InstructionCMPI,-,false)
 
 
-#define IMPLEMENT_I_32_LOGIC_OP(classname,operand)                                              \
+#define IMPLEMENT_I_LOGIC_OP(classname,operand)                                              \
     bool spect::classname::Execute()                                                            \
     {                                                                                           \
         DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));                                    \
@@ -717,7 +717,7 @@ IMPLEMENT_I_32_AIRTH_OP(V2InstructionCMPI,-,false)
                     return lhs operand rhs;                                                     \
                 }                                                                               \
             ));                                                                                 \
-        bool new_flag_val = is_32_lsb_bits_zero(model_->GetGpr(TO_INT(op1_)));                  \
+        bool new_flag_val = (model_->GetGpr(TO_INT(op1_)) == uint256_t("0x0"));                 \
         model_->SetCpuFlag(CpuFlagType::ZERO, new_flag_val);                                    \
                                                                                                 \
         PUT_FLAG_TO_CHANGE(ch_zf, new_val, model_->GetCpuFlag(CpuFlagType::ZERO));              \
@@ -728,9 +728,9 @@ IMPLEMENT_I_32_AIRTH_OP(V2InstructionCMPI,-,false)
         return true;                                                                            \
     }
 
-IMPLEMENT_I_32_LOGIC_OP(V2InstructionANDI,&)
-IMPLEMENT_I_32_LOGIC_OP(V2InstructionORI,|)
-IMPLEMENT_I_32_LOGIC_OP(V2InstructionXORI,^)
+IMPLEMENT_I_LOGIC_OP(V2InstructionANDI,&)
+IMPLEMENT_I_LOGIC_OP(V2InstructionORI,|)
+IMPLEMENT_I_LOGIC_OP(V2InstructionXORI,^)
 
 bool spect::V2InstructionMOVI::Execute()
 {
