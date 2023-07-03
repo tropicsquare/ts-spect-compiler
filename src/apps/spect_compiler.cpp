@@ -90,6 +90,15 @@ int main(int argc, char** argv)
         return 0;
     }
 
+    if (options[ISA_VERSION]) {
+        std::stringstream ss;
+        int isa_version;
+        ss << options[ISA_VERSION].arg;
+        ss >> isa_version;
+        spect::InstructionFactory::SetActiveISAVersion(isa_version);
+    }
+    std::cout << "Using ISA version: " << spect::InstructionFactory::GetActiveISAVersion() << std::endl;
+
     comp = new spect::Compiler(SPECT_INSTR_MEM_BASE);
     if (options[FIRST_ADDR]) {
         std::stringstream ss;
@@ -99,15 +108,6 @@ int main(int argc, char** argv)
         comp->Warning("'--first-address' undefined. First instruction will be placed at start of"
                       " instruction memory.");
     }
-
-    if (options[ISA_VERSION]) {
-        std::stringstream ss;
-        int isa_version;
-        ss << options[ISA_VERSION].arg;
-        ss >> isa_version;
-        spect::InstructionFactory::SetActiveISAVersion(isa_version);
-    }
-    std::cout << "Using ISA version: " << spect::InstructionFactory::GetActiveISAVersion() << std::endl;
 
     // All remaining arguments are input source files
     try {

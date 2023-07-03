@@ -49,6 +49,17 @@ class spect::Compiler
         int CompileFinish();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Adds conditional define
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void CondDefAdd(std::string ident);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Checks if conditional define exists
+        /// @returns true if "ioent" is existing conditional define
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        bool CondDefExists(std::string ident);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Throw compiler error
         /// @param err Error message to print
         /// @throw std::runtime_error
@@ -115,7 +126,6 @@ class spect::Compiler
 
         std::list<bool> cond_stack_;
         std::vector<std::string> cond_defs_;
-        bool CondDefExists(std::string ident);
         bool ShouldParse(void);
 };
 

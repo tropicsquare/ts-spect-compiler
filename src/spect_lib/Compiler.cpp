@@ -41,6 +41,8 @@ spect::Compiler::Compiler(uint32_t first_addr) :
     program_->first_addr_ = first_addr;
     program_->compiler_ = this;
     print_fnc = &(printf);
+
+    CondDefAdd(std::string("SPECT_ISA_VERSION_") + std::to_string(InstructionFactory::GetActiveISAVersion()));
 }
 
 spect::Compiler::~Compiler()
@@ -168,6 +170,19 @@ void spect::Compiler::ParseArgument(spect::SourceFile *sf, int line_nr, spect::I
     }
 }
 
+void spect::Compiler::CondDefAdd(std::string ident)
+{
+    cond_defs_.push_back(ident);
+}
+
+bool spect::Compiler::CondDefExists(std::string ident)
+{
+    for (const auto & tmp : cond_defs_)
+        if (tmp == ident)
+            return true;
+    return false;
+}
+
 bool spect::Compiler::ShouldParse(void)
 {
     if (cond_defs_.empty())
@@ -185,15 +200,14 @@ bool spect::Compiler::ParseCondCompile(spect::SourceFile *sf, std::string &line_
     if (ShouldParse()) {
         if (std::regex_match(line_buf, std::regex("^" DEFINE_KEYWORD "[ ]+" IDENT_REGEX))) {
             std::string ident = line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
-            cond_defs_.push_back(ident);
+            CondDefAdd(ident);
             return true;
         }
     }
 
     if (std::regex_match(line_buf, std::regex("^" IFDEF_KEYWORD "[ ]+" IDENT_REGEX))) {
         std::string ident = line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
-        bool is_not_defined = (std::find(cond_defs_.begin(), cond_defs_.end(), ident) == cond_defs_.end());
-        cond_stack_.push_front(is_not_defined);
+        cond_stack_.push_front(!CondDefExists(ident));
         return true;
     }
 
