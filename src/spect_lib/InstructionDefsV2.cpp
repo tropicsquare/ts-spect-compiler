@@ -314,8 +314,8 @@ IMPLEMENT_R_32_SHIFT_OP(V2InstructionROL,     <<, >>, 1, true,  false, true)
 IMPLEMENT_R_32_SHIFT_OP(V2InstructionROR,     >>, <<, 1, true,  false, true)
 IMPLEMENT_R_32_SHIFT_OP(V2InstructionROL8,    <<, >>, 8, true,  false, false)
 IMPLEMENT_R_32_SHIFT_OP(V2InstructionROR8,    >>, <<, 8, true,  false, false)
-IMPLEMENT_R_32_SHIFT_OP(V2InstructionROLIN,   <<, >>, 8, true,  true,  false)
-IMPLEMENT_R_32_SHIFT_OP(V2InstructionRORIN,   >>, <<, 8, true,  true,  false)
+IMPLEMENT_R_32_SHIFT_OP(V2InstructionROLIN,   <<, >>, 8, false, true,  false)
+IMPLEMENT_R_32_SHIFT_OP(V2InstructionRORIN,   >>, <<, 8, false, true,  false)
 
 
 bool spect::V2InstructionSWE::Execute()
