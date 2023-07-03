@@ -177,6 +177,10 @@ namespace spect {
     #define START_SYMBOL "_start"
     #define INCLUDE_KEYWORD "(\\.include)"
     #define EQ_KEYWORD "(\\.eq)"
+    #define IFDEF_KEYWORD "(\\.ifdef)"
+    #define ELSE_KEYWORD "(\\.else)"
+    #define ENDIF_KEYWORD "(\\.endif)"
+    #define DEFINE_KEYWORD "(\\.define)"
 
     #define VERBOSITY_NONE 0
     #define VERBOSITY_LOW 1

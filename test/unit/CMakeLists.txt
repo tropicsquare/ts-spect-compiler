@@ -20,3 +20,4 @@ ADD_UNIT_TEST(eq_test 1)
 ADD_UNIT_TEST(include_test 1)
 
 ADD_UNIT_TEST(isa_v2_test 2)
+ADD_UNIT_TEST(cond_defs 2)

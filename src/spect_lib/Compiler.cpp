@@ -168,6 +168,54 @@ void spect::Compiler::ParseArgument(spect::SourceFile *sf, int line_nr, spect::I
     }
 }
 
+bool spect::Compiler::ShouldParse(void)
+{
+    if (cond_defs_.empty())
+        return true;
+
+    for (const auto & is_undef : cond_stack_)
+        if (is_undef)
+            return false;
+
+    return true;
+}
+
+bool spect::Compiler::ParseCondCompile(spect::SourceFile *sf, std::string &line_buf, int line_nr)
+{
+    if (ShouldParse()) {
+        if (std::regex_match(line_buf, std::regex("^" DEFINE_KEYWORD "[ ]+" IDENT_REGEX))) {
+            std::string ident = line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
+            cond_defs_.push_back(ident);
+            return true;
+        }
+    }
+
+    if (std::regex_match(line_buf, std::regex("^" IFDEF_KEYWORD "[ ]+" IDENT_REGEX))) {
+        std::string ident = line_buf.substr(line_buf.find_last_of(' ') + 1, line_buf.size() - 1);
+        bool is_not_defined = (std::find(cond_defs_.begin(), cond_defs_.end(), ident) == cond_defs_.end());
+        cond_stack_.push_front(is_not_defined);
+        return true;
+    }
+
+    if (std::regex_match(line_buf, std::regex("^" ELSE_KEYWORD))) {
+        if (cond_stack_.empty())
+            ErrorAt("No previous 'ifdef' defined!", sf, line_nr);
+        bool top = cond_stack_.front();
+        cond_stack_.pop_front();
+        cond_stack_.push_front(!top);
+        return true;
+    }
+
+    if (std::regex_match(line_buf, std::regex("^" ENDIF_KEYWORD))) {
+        if (cond_stack_.empty())
+            ErrorAt("No previous 'ifdef' defined!", sf, line_nr);
+        cond_stack_.pop_front();
+        return true;
+    }
+
+    return false;
+}
+
 spect::Symbol* spect::Compiler::ParseLabel(spect::SourceFile *sf, std::string &line_buf,
                                            int line_nr)
 {
@@ -331,6 +379,14 @@ void spect::Compiler::Compile(std::string path)
         // Remove comments
         line_buf = std::regex_replace(line_buf, std::regex(";.*"), "");
         TrimSpaces(line_buf);
+
+        // Check for conditional compilation keywords
+        if (ParseCondCompile(sf, line_buf, line_nr))
+            continue;
+
+        // Skip Parsing due to conditional compile
+        if (!ShouldParse())
+            continue;
 
         // Parse Label
         label = ParseLabel(sf, line_buf, line_nr);

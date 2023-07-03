@@ -111,6 +111,12 @@ class spect::Compiler
         spect::Instruction* ParseInstruction(spect::SourceFile *sf, std::string &line_buf,
                                              int line_nr,  spect::Symbol *label);
         spect::CpuGpr ParseOp(spect::SourceFile *sf, int line_nr, std::string &arg);
+        bool ParseCondCompile(spect::SourceFile *sf, std::string &line_buf, int line_nr);
+
+        std::list<bool> cond_stack_;
+        std::vector<std::string> cond_defs_;
+        bool CondDefExists(std::string ident);
+        bool ShouldParse(void);
 };
 
 #endif
