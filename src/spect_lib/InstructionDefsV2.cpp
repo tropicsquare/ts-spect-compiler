@@ -869,7 +869,7 @@ bool spect::V2InstructionKBO::Execute()
 {
     uint32_t slot   = (uint32_t)(model_->GetGpr(TO_INT(op2_)) & uint256_t("0xFF"));
     uint32_t type   = (immediate_ >> 8) & 0xF;
-    uint32_t opcode = static_cast<dpi_kbus_change_kind_t>(immediate_ & 0x1F);
+    uint32_t opcode = static_cast<dpi_kbus_change_kind_t>(immediate_ & 0xF);
     bool     error;
 
     DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(opcode, type, slot, 0));
