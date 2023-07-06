@@ -167,6 +167,7 @@ uint32_t spect::CpuModel::ReadMemoryAhb(uint16_t address)
     uint32_t rv = 0;
 
     if ( IsWithinMem(CpuMemory::DATA_RAM_OUT, address) ||
+         IsWithinMem(CpuMemory::CONST_ROM, address)    ||
         (IsWithinMem(CpuMemory::INSTR_MEM, address) && instr_mem_ahb_r_))
         rv = memory_[address >> 2];
 
