@@ -15,15 +15,15 @@
 
 #include <string>
 
-#define DPIENC_KBUS_OP_MASK        0xF
+#define DPIENC_KBUS_OP_MASK        0x1F
 #define DPIENC_KBUS_TYPE_MASK      0xF
 #define DPIENC_KBUS_SLOT_MASK      0xFF
 #define DPIENC_KBUS_OFFSET_MASK    0x1F
 
 #define DPIENC_KBUS_OP_OFFSET      0
-#define DPIENC_KBUS_TYPE_OFFSET    4
-#define DPIENC_KBUS_SLOT_OFFSET    8
-#define DPIENC_KBUS_OFFSET_OFFSET  16
+#define DPIENC_KBUS_TYPE_OFFSET    5
+#define DPIENC_KBUS_SLOT_OFFSET    9
+#define DPIENC_KBUS_OFFSET_OFFSET  17
 
 typedef enum {
     DPI_SPECT_DATA_RAM_IN       = (1 << 0),
@@ -69,7 +69,9 @@ typedef enum {
     DPI_KBUS_UNDEFINED_6        = 12,
     DPI_KBUS_UNDEFINED_7        = 13,
     DPI_KBUS_UNDEFINED_8        = 14,
-    DPI_KBUS_UNDEFINED_9        = 15
+    DPI_KBUS_UNDEFINED_9        = 15,
+    DPI_KBUS_STK_WRITE          = 16,
+    DPI_KBUS_LDK_READ           = 17
 } dpi_kbus_change_kind_t;
 
 typedef enum {
@@ -183,9 +185,9 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
         uint32_t offset = (obj >> DPIENC_KBUS_OFFSET_OFFSET) & DPIENC_KBUS_OFFSET_MASK;
         std::string operation;
 
-        if (op == DPI_KBUS_WRITE)
+        if (op == DPI_KBUS_WRITE || op == DPI_KBUS_STK_WRITE)
             operation = std::string("KBUS_WRITE");
-        else if (op == DPI_KBUS_READ)
+        else if (op == DPI_KBUS_READ || op == DPI_KBUS_LDK_READ)
             operation = std::string("KBUS_READ");
         else if (op == DPI_KBUS_PROGRAM)
             operation = std::string("KBUS_PROGRAM");
@@ -260,7 +262,8 @@ typedef struct {
     //       5: 0 - operation
     //      11: 8 - type
     //      19:12 - slot
-    //      31:20 - offset
+    //      30:20 - offset
+    //         31 - is KBO
     uint32_t          obj = 0;
 
     // Old / New value of the object based  on 'kind':

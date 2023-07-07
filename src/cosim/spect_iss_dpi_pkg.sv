@@ -48,7 +48,9 @@ typedef enum {
     DPI_KBUS_ERASE              = 3,
     DPI_KBUS_VERIFY             = 4,
     DPI_KBUS_FLUSH              = 5,
-    DPI_KBUS_UNDEFINED[10]      = 6
+    DPI_KBUS_UNDEFINED[10]      = 6,
+    DPI_KBUS_STK_WRITE          = 16,
+    DPI_KBUS_LDK_READ           = 17
 } dpi_kbus_change_kind_t;
 
   typedef enum {
@@ -102,10 +104,10 @@ typedef enum {
     //      DPI_RBUS_NO_FRESH_ENT - No fresh entropy
     //
     //  DPI_CHANGE_KBUS:
-    //       5: 0 - operation
-    //      11: 8 - type
-    //      19:12 - slot
-    //      31:20 - offset
+    //       4: 0 - operation
+    //       8: 5 - type
+    //      16: 9 - slot
+    //      31:17 - offset
     int unsigned      obj = 0;
 
     // Old / New value of the object based  on 'kind':
