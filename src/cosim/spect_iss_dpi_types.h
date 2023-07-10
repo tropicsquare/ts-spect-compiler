@@ -259,11 +259,10 @@ typedef struct {
     //      DPI_RBUS_NO_FRESH_ENT - No fresh entropy
     //
     //  DPI_CHANGE_KBUS:
-    //       5: 0 - operation
-    //      11: 8 - type
-    //      19:12 - slot
-    //      30:20 - offset
-    //         31 - is KBO
+    //       4: 0 - operation
+    //       8: 5 - type
+    //      16: 9 - slot
+    //      31:17 - offset
     uint32_t          obj = 0;
 
     // Old / New value of the object based  on 'kind':
