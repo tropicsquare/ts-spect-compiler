@@ -596,8 +596,12 @@ bool spect::V2InstructionSUBP::Execute()
 bool spect::V2InstructionTMAC_IT::Execute()
 {
     // Initialize Keccak
-    if (KeccakWidth400_SpongeInitialize(&(model_->keccak_inst_), KECCAK_RATE, KECCAK_CAPACITY) != 0)
+    if (KeccakWidth400_SpongeInitialize(&(model_->keccak_inst_), KECCAK_RATE, KECCAK_CAPACITY) != 0) {
+        std::stringstream ss;
+        ss << "Error: Calling KeccakWidth400_SpongeInitialize() failed.";
+        model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
         return false;
+    }
 
     return true;
 }
@@ -605,6 +609,7 @@ bool spect::V2InstructionTMAC_IT::Execute()
 bool spect::V2InstructionTMAC_UP::Execute()
 {
     unsigned char msg[KECCAK_RATE/8];
+    std::stringstream ss;
 
     // Convert register op2_ to input message (must be character stream)
     uint256_t tmp = model_->GetGpr(TO_INT(op2_));
@@ -614,16 +619,19 @@ bool spect::V2InstructionTMAC_UP::Execute()
 
     // Print Message
     model_->DebugInfo(VERBOSITY_HIGH, "Keccak input message:");
-    std::stringstream ss;
     ss << std::hex << std::setw(2);
     for (int i = 0; i < KECCAK_RATE/8; i++)
         ss << (int)msg[i] << " ";
     model_->DebugInfo(VERBOSITY_HIGH, ss.str().c_str());
     model_->DebugInfo(VERBOSITY_HIGH, "");
+    ss.str("");
 
     // Process by Keccak
-    if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_RATE/8) != 0)
+    if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_RATE/8) != 0) {
+        ss << "Error: Calling KeccakWidth400_SpongeAbsorb() failed.";
+        model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
         return false;
+    }
 
     return true;
 }
@@ -631,6 +639,7 @@ bool spect::V2InstructionTMAC_UP::Execute()
 bool spect::V2InstructionTMAC_RD::Execute()
 {
     unsigned char msg[KECCAK_CAPACITY/8];
+    std::stringstream ss;
 
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
@@ -639,12 +648,14 @@ bool spect::V2InstructionTMAC_RD::Execute()
     model_->keccak_inst_.squeezing = 1;
 
     // Get Keccak output
-    if (KeccakWidth400_SpongeSqueeze(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_CAPACITY/8) != 0)
+    if (KeccakWidth400_SpongeSqueeze(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_CAPACITY/8) != 0) {
+        ss << "Error: Calling KeccakWidth400_SpongeSqueeze() failed.";
+        model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
         return false;
+    }
 
     // Print Message
     model_->DebugInfo(VERBOSITY_HIGH, "Keccak output message:");
-    std::stringstream ss;
     ss << std::hex << std::setw(2);
     for (int i = 0; i < KECCAK_CAPACITY/8; i++)
         ss << (int)msg[i] << " ";
@@ -755,6 +766,7 @@ bool spect::V2InstructionTMAC_IS::Execute()
 {
     // Init string in format {nonce, key length, key, 0x00, 0x00}
     unsigned char initstr[36];
+    std::stringstream ss;
 
     // Nonce
     initstr[0] = uint8_t(immediate_ & 0xFF);
@@ -771,17 +783,20 @@ bool spect::V2InstructionTMAC_IS::Execute()
 
     // Print Init string
     model_->DebugInfo(VERBOSITY_HIGH, "Keccak Init string:");
-    std::stringstream ss;
     ss << std::hex << std::setw(2);
     for (int i = 0; i < 36; i++)
         ss << (int)initstr[i] << " ";
     model_->DebugInfo(VERBOSITY_HIGH, ss.str().c_str());
     model_->DebugInfo(VERBOSITY_HIGH, "");
+    ss.str("");
 
     // Process by Keccak
     for (int j = 0; j < 2; j++) {
-        if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)(&initstr[j*KECCAK_RATE/8]), KECCAK_RATE/8) != 0)
+        if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)(&initstr[j*KECCAK_RATE/8]), KECCAK_RATE/8) != 0) {
+            ss << "Error: Calling KeccakWidth400_SpongeAbsorb() failed.";
+            model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
             return false;
+        }
     }
 
     return true;
