@@ -214,6 +214,7 @@ void spect::CpuModel::WriteMemoryCoreData(uint16_t address, uint32_t data)
 
     if (IsWithinMem(CpuMemory::EMEM_OUT, address)) {
         DEFINE_CHANGE(ch_emem, DPI_CHANGE_MEM, address);
+        memory_[address >> 2] = data;
         ch_emem.new_val[0] = data;
         ReportChange(ch_emem);
     }

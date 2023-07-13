@@ -30,6 +30,8 @@ enum  optionIndex {
     CONST_ROM_HEX,
     DATA_RAM_IN_HEX,
     DATA_RAM_OUT_HEX,
+    EMEM_IN_HEX,
+    EMEM_OUT_HEX,
     GRV_HEX,
     MAX_INSTR_CNT,
     DUMP_CONTEXT,
@@ -58,6 +60,8 @@ const option::Descriptor usage[] =
     {CONST_ROM_HEX,         0,  ""  ,    "const-rom"            ,option::Arg::Optional,     "  --const-rom=<hex-file>       Content of Constant ROM to be loaded.\n"},
     {DATA_RAM_IN_HEX,       0,  ""  ,    "data-ram-in"          ,option::Arg::Optional,     "  --data-ram-in=<hex-file>     Content of Data RAM IN to be loaded.\n"},
     {DATA_RAM_OUT_HEX,      0,  ""  ,    "data-ram-out"         ,option::Arg::Optional,     "  --data-ram-out=<hex-file>    Path where content of Data RAM out will be dumped.\n"},
+    {EMEM_IN_HEX,           0,  ""  ,    "emem-in"              ,option::Arg::Optional,     "  --emem-in=<hex-file>         Content of EMEM IN to be loaded.\n"},
+    {EMEM_OUT_HEX,          0,  ""  ,    "emem-out"             ,option::Arg::Optional,     "  --emem-out=<hex-file>        Path where content of EMEM OUT will be dumped.\n"},
     {GRV_HEX,               0,  ""  ,    "grv-hex"              ,option::Arg::Optional,     "  --grv-hex=<hex-file>         Data for GRV instruction (HEX file without address - no '@' in the file). \n"},
     {MAX_INSTR_CNT,         0,  ""  ,    "max-instr-cnt"        ,option::Arg::Optional,     "  --max-instr-cnt=<n>          Limit for number of instructions executed by the simulator. When reached, simulator exits (default = 10^8). Decimal value. \n"},
     {DUMP_CONTEXT,          0,  ""  ,    "dump-context"         ,option::Arg::Optional,     "  --dump-context=<file>        Dump context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) after execution to file. \n"},
@@ -196,6 +200,13 @@ int main(int argc, char** argv)
         })
     }
 
+    if (options[EMEM_IN_HEX]) {
+        EXEC_WITH_ERR_HANDLER({
+            std::string path = std::string(options[EMEM_IN_HEX].arg);
+            spect::HexHandler::LoadHexFile(path, m_mem, SPECT_EMEM_IN_BASE);
+        })
+    }
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,6 +278,12 @@ int main(int argc, char** argv)
         spect::HexHandler::DumpHexFile(std::string(options[DATA_RAM_OUT_HEX].arg),
             spect::HexFileType::ISS_WORD, simulator->model_->GetMemoryPtr(), SPECT_DATA_RAM_OUT_BASE,
             SPECT_DATA_RAM_OUT_SIZE);
+    }
+
+    if (options[EMEM_OUT_HEX]) {
+        spect::HexHandler::DumpHexFile(std::string(options[EMEM_OUT_HEX].arg),
+            spect::HexFileType::ISS_WORD, simulator->model_->GetMemoryPtr(), SPECT_EMEM_OUT_BASE,
+            SPECT_EMEM_OUT_SIZE);
     }
 
     if (options[DUMP_CONTEXT]) {
