@@ -60,6 +60,8 @@ build_and_test_compiler:
     paths:
       - build/src/apps/spect_*
       - build/src/cosim/libspect_iss_dpi.so
+      - src/cosim/spect_iss_dpi_pkg.sv
+      - src/cosim/spect_instr_gen_coverage.svh
 
 
 ###################################################################################################
@@ -83,6 +85,10 @@ deploy_compiler:
 
     - cp build/src/apps/spect_* $DEST_FOLDER/$VERSION
     - cp build/src/cosim/libspect_iss_dpi.so $DEST_FOLDER/$VERSION
+
+    - cp src/cosim/spect_iss_dpi_pkg.sv $DEST_FOLDER/$VERSION
+    - cp src/cosim/spect_instr_gen_coverage.svh $DEST_FOLDER/$VERSION
+
     - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf $DEST_FOLDER/$VERSION
 
 
