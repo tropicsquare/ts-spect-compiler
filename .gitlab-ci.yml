@@ -4,6 +4,7 @@ variables:
 stages:
   - doc
   - build_and_test
+  - deploy
   - publish
 
 
@@ -57,7 +58,30 @@ build_and_test_compiler:
   artifacts:
     when: always
     paths:
-      - compiler/build/src/apps/spect_*
+      - build/src/apps/spect_*
+
+
+###################################################################################################
+# Deploy the compiler
+###################################################################################################
+deploy_compiler:
+  stage: deploy
+  only:
+    - tags
+  tags:
+    - shell
+  script:
+    - export VERSION=`git describe --tags --abbrev=0`
+    - export DEST_FOLDER=/tools/tropic/ts-spect-compiler
+
+    # Will fail if concrete version directory already exists. This will avoid
+    # re-placing older version with new if we forget to add new tag!
+    - mkdir -p $DEST_FOLDER
+    - mkdir $DEST_FOLDER/$VERSION
+
+    - cp compiler/build/src/apps/spect_* $DEST_FOLDER
+    - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf $DEST_FOLDER
+
 
 
 ###################################################################################################
