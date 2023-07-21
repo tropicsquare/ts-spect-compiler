@@ -13,7 +13,7 @@ include_directories(
     "src/spect_lib"
     "src/cosim"
     "modules/cli/include/cli"
-    "modules/xkcp/bin/generic64/libXKCP.so.headers"
+    "modules/xkcp/bin/generic64/libXKCP.a.headers"
 )
 
 add_compile_options(-Wall -Wextra -Wshadow -fPIC -fdump-tree-original)
