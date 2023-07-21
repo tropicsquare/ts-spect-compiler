@@ -59,6 +59,7 @@ build_and_test_compiler:
     when: always
     paths:
       - build/src/apps/spect_*
+      - build/src/cosim/libspect_iss_dpi.so
 
 
 ###################################################################################################
@@ -81,8 +82,8 @@ deploy_compiler:
     - mkdir $DEST_FOLDER/$VERSION
 
     - cp build/src/apps/spect_* $DEST_FOLDER/$VERSION
+    - cp build/src/cosim/libspect_iss_dpi.so $DEST_FOLDER/$VERSION
     - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf $DEST_FOLDER/$VERSION
-
 
 
 ###################################################################################################
