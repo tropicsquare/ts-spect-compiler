@@ -12,8 +12,8 @@ include_directories(
     "src/common"
     "src/spect_lib"
     "src/cosim"
-    "../modules/cli/include/cli"
-    "../modules/ts-crypto-blocks/modules/xkcp/bin/generic64/libXKCP.so.headers"
+    "modules/cli/include/cli"
+    "modules/xkcp/bin/generic64/libXKCP.so.headers"
 )
 
 add_compile_options(-Wall -Wextra -Wshadow -fPIC -fdump-tree-original)
