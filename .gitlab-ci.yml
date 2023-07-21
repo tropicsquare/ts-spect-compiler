@@ -80,8 +80,8 @@ deploy_compiler:
     - mkdir -p $DEST_FOLDER
     - mkdir $DEST_FOLDER/$VERSION
 
-    - cp build/src/apps/spect_* $DEST_FOLDER
-    - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf $DEST_FOLDER
+    - cp build/src/apps/spect_* $DEST_FOLDER/$VERSION
+    - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf $DEST_FOLDER/$VERSION
 
 
 
