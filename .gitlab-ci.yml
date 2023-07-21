@@ -1,0 +1,78 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - doc
+  - build_and_test
+  - publish
+
+
+.junit-artifacts: &junit-artifacts
+  artifacts:
+    when: always
+    paths:
+      - sim/sim_logs/ts_sim_junit_out.xml
+    reports:
+      junit: sim/sim_logs/ts_sim_junit_out.xml
+
+
+.coverage-and-junit-artifacts: &coverage-and-junit-artifacts
+  artifacts:
+    when: always
+    paths:
+      - sim/sim_logs/ts_sim_junit_out.xml
+      - sim/coverage_output/
+    reports:
+      junit: sim/sim_logs/ts_sim_junit_out.xml
+
+
+build_programmers_guide:
+  stage: doc
+  tags:
+      - shell
+  script:
+    - source ./setup_env
+    - cd doc/programmer_guide
+    - ts_latex_build.py spect_programmers_guide.tex
+  artifacts:
+    when: always
+    paths:
+      - doc/programmer_guide/build/pdf/spect_programmers_guide.pdf
+
+
+###################################################################################################
+# Build compiler and test it
+###################################################################################################
+build_and_test_compiler:
+  stage: build_and_test
+  tags:
+    - shell
+  script:
+    - source ./setup_env
+    - ./build.sh
+
+    - cd build
+    - make test
+
+  artifacts:
+    when: always
+    paths:
+      - compiler/build/src/apps/spect_*
+
+
+###################################################################################################
+# Publish built documentation
+###################################################################################################
+pages:
+    tags:
+      - shell
+    stage: publish
+    when: always
+    script:
+      - echo "Publishing pages..."
+      - mkdir -p public
+      - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf public
+
+    artifacts:
+      paths:
+        - public
