@@ -127,33 +127,14 @@ class spect::CpuSimulator
         ///////////////////////////////////////////////////////////////////////////////////////////
         bool CheckRunning();
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Read Key Memory
-        /// @param slot Slot in memory
-        /// @param offset Offset within the slot
-        /// @returns Read data.
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t ReadKeyMem(uint32_t slot, uint32_t offset);
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Write Key Memory
-        /// @param slot Slot in memory
-        /// @param offset Offset within the slot
-        /// @param data Data to be written
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        void WriteKeyMem(uint32_t slot, uint32_t offset, uint32_t data);
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Erase Key Memory
-        /// @param slot Slot in memory
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        void EraseKeyMem(uint32_t slot);
-
         // Reference to CPU model executing the code
         CpuModel *model_;
 
         // Reference to compiler which compiled this program
         Compiler *compiler_;
+
+        // Reference to key memory
+        KeyMemory *key_memory_;
 
         // Objects handling CLI and interactive simulation
         cli::Cli *cli_;
@@ -161,7 +142,7 @@ class spect::CpuSimulator
         // Path to CPU model context file to be preloaded before model execution
         std::string model_context_;
 
-        // Paht to command file for simulator
+        // Path to command file for simulator
         std::string cmd_file_;
 
     private:
@@ -181,9 +162,6 @@ class spect::CpuSimulator
 
         // Array of breakpoints break-points
         std::vector<uint32_t> breakpoints_;
-
-        // Key memory
-        uint32_t key_mem_[KEY_MEM_SLOT_NUM][KEY_MEM_OFFSET_NUM];
 
         // Indication model execution is in progress
         bool program_running_ = false;

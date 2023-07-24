@@ -819,7 +819,7 @@ bool spect::V2InstructionLDK::Execute()
 
         // If running with CPU Simulator, preload key from simulator memory to queue
         if (model_->simulator_ != NULL) {
-          uint32_t part = model_->simulator_->ReadKeyMem(slot, offset*8+i);
+          uint32_t part = model_->simulator_->key_memory_->Read(type, slot, offset*8+i);
           model_->LdkQueuePush(part);
         }
 
@@ -863,7 +863,7 @@ bool spect::V2InstructionSTK::Execute()
 
         // If running with CPU Simulator, store key to simulator memory
         if (model_->simulator_ != NULL) {
-          model_->simulator_->WriteKeyMem(slot, offset*8+i, uint32_t(tmp >> (32 * i)));
+          model_->simulator_->key_memory_->Write(type, slot, offset*8+i, uint32_t(tmp >> (32 * i)));
         }
 
         error = model_->KbusErrorQueuePop();
@@ -891,11 +891,11 @@ bool spect::V2InstructionKBO::Execute()
     model_->ReportChange(ch_kbus);
 
     // If running with CPU Simulator, update simulator memory
-    if (model_->simulator_ != NULL && opcode == DPI_KBUS_ERASE) {
+    if (model_->simulator_ != NULL) {
       if (opcode == DPI_KBUS_WRITE)
-        model_->simulator_->WriteKeyMem(slot, 0, 0);
+        model_->simulator_->key_memory_->Write(type, slot, 0, 0x0BAD1DEA);
       else if (opcode == DPI_KBUS_ERASE)
-        model_->simulator_->EraseKeyMem(slot);
+        model_->simulator_->key_memory_->Erase(type, slot);
     }
 
     error = model_->KbusErrorQueuePop();

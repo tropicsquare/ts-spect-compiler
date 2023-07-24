@@ -21,6 +21,8 @@ add_library (SPECT STATIC
     CpuProgram.cpp
     CpuSimulator.cpp
 
+    KeyMemory.cpp
+
     HexHandler.cpp
 
     ordt_pio_common.cpp

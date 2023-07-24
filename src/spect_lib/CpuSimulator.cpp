@@ -15,6 +15,7 @@
 #include "Compiler.h"
 #include "CpuSimulator.h"
 #include "HexHandler.h"
+#include "KeyMemory.h"
 
 spect::CpuSimulator::CpuSimulator()
 {
@@ -22,6 +23,7 @@ spect::CpuSimulator::CpuSimulator()
     model_->verbosity_ = VERBOSITY_HIGH;
     model_->simulator_ = this;
     compiler_ = new spect::Compiler(SPECT_INSTR_MEM_BASE);
+    key_memory_ = new spect::KeyMemory();
 
     auto menu = std::make_unique<cli::Menu>("spect_iss");
     BuildCliCommands(menu);
@@ -353,6 +355,31 @@ void spect::CpuSimulator::CmdGet(A_UNUSED std::ostream &out, std::string arg1)
             out << tohexs(model_->GetMemory(addr), 8) << "\n";
         }
         model_->verbosity_ = tmp_verbosity;
+    } else if (std::regex_match(arg1, std::regex("^keymem\\[" NUM_REGEX "\\]\\[" NUM_REGEX "\\]\\[" NUM_REGEX "\\](\\+" NUM_REGEX ")?"))) {
+        // Check if multiple offsets should be shown
+        int n_pos = 1;
+        if (arg1.find('+') != std::string::npos)
+            n_pos = stoint(arg1.substr(arg1.find('+') + 1, arg1.size() - 1));
+
+        // Parse out type, slot and offset
+        int type_b_low = arg1.find("[");
+        int type_b_high = arg1.find("]");
+        int slot_b_low = arg1.find("[", type_b_high+1);
+        int slot_b_high = arg1.find("]", type_b_high+1);
+        int offset_b_low = arg1.find("[", slot_b_high+1);
+        int offset_b_high = arg1.find("]", slot_b_high+1);
+        std::string type_str = arg1.substr(type_b_low + 1, type_b_high - type_b_low - 1);
+        std::string slot_str = arg1.substr(slot_b_low + 1, slot_b_high - slot_b_low - 1);
+        std::string offset_str = arg1.substr(offset_b_low + 1, offset_b_high - offset_b_low - 1);
+
+        // print data in HEX-like format
+        uint8_t type   = stoint(type_str);
+        uint8_t slot   = stoint(slot_str);
+        uint8_t offset = stoint(offset_str);
+        for (uint8_t i = 0; i <= n_pos; i++) {
+            out << "[" << type_str << "][" << slot_str << "][" << std::to_string(offset+i) << "] = ";
+            out << tohexs(key_memory_->Get(type, slot, offset+i), 8) << "\n";
+        }
     } else {
         std::cout << "Invalid object: " << arg1 << "\n";
     }
@@ -371,6 +398,19 @@ void spect::CpuSimulator::CmdSet(A_UNUSED std::ostream &out, std::string arg1, s
         int to = arg1.find("]");
         std::string i_str = arg1.substr(from + 1, to - from - 1);
         model_->SetMemory(stoint(i_str), stoint(arg2));
+    } else if (std::regex_match(arg1, std::regex("^keymem\\[" NUM_REGEX "\\]\\[" NUM_REGEX "\\]\\[" NUM_REGEX "\\]"))) {
+        // Parse out type, slot and offset
+        int type_b_low = arg1.find("[");
+        int type_b_high = arg1.find("]");
+        int slot_b_low = arg1.find("[", type_b_high+1);
+        int slot_b_high = arg1.find("]", type_b_high+1);
+        int offset_b_low = arg1.find("[", slot_b_high+1);
+        int offset_b_high = arg1.find("]", slot_b_high+1);
+        std::string type_str = arg1.substr(type_b_low + 1, type_b_high - type_b_low - 1);
+        std::string slot_str = arg1.substr(slot_b_low + 1, slot_b_high - slot_b_low - 1);
+        std::string offset_str = arg1.substr(offset_b_low + 1, offset_b_high - offset_b_low - 1);
+
+        key_memory_->Set(stoint(type_str), stoint(slot_str), stoint(offset_str), stoint(arg2));
     }
 }
 
@@ -457,16 +497,19 @@ void spect::CpuSimulator::BuildCliCommands(std::unique_ptr<cli::Menu> &menu)
                     CmdGet(out, arg1);
                 },
                 "Get object value:\n"
-                "            get RX                - Get GPR register X value.\n"
-                "            get mem[address]      - Get value at memory address.\n"
-                "            get mem[address]+X    - Get value at memory address + X next addresses\n");
+                "            get RX                           - Get GPR register X value.\n"
+                "            get mem[address]                 - Get value at memory address.\n"
+                "            get mem[address]+X               - Get value at memory address + X next addresses\n"
+                "            get keymem[type][slot][offset]   - Get value of key memory for given type, slot and offset.\n"
+                "            get keymem[type][slot][offset]+X - Get value of key memory for given type, slot and offset + X next offsets\n");
 
     menu->Insert("set", [&](std::ostream &out, std::string arg1, std::string arg2){
                     CmdSet(out, arg1, arg2);
                 },
                 "Set object to a value:\n"
-                "            set RX <value>             - Set GPR register X to <value>.\n"
-                "            set mem[address] <value>   - Set memory address to <value>\n");
+                "            set RX <value>                         - Set GPR register X to <value>.\n"
+                "            set mem[address] <value>               - Set memory address to <value>\n"
+                "            set keymem[type][slot][offset] <value> - Set key memory for given type, slot and offset to to <value>\n");
 
     menu->Insert("load", [&](std::ostream &out, std::string arg1){
                     CmdLoad(out, arg1, 0);
@@ -560,19 +603,3 @@ void spect::CpuSimulator::ExecCmdFile(cli::CliLocalTerminalSession &session)
     }
 }
 
-uint32_t spect::CpuSimulator::ReadKeyMem(uint32_t slot, uint32_t offset)
-{
-    return key_mem_[slot][offset];
-}
-
-void spect::CpuSimulator::WriteKeyMem(uint32_t slot, uint32_t offset, uint32_t data)
-{
-    key_mem_[slot][offset] &= data;
-}
-
-void spect::CpuSimulator::EraseKeyMem(uint32_t slot)
-{
-    for (uint32_t i = 0; i < KEY_MEM_OFFSET_NUM; i++) {
-      key_mem_[slot][i] = 0xFFFFFFFF;
-    }
-}

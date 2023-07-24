@@ -13,6 +13,7 @@
 #include "CpuModel.h"
 #include "CpuProgram.h"
 #include "HexHandler.h"
+#include "KeyMemory.h"
 #include "InstructionFactory.h"
 
 
@@ -36,6 +37,8 @@ enum  optionIndex {
     MAX_INSTR_CNT,
     DUMP_CONTEXT,
     LOAD_CONTEXT,
+    DUMP_KEYMEM,
+    LOAD_KEYMEM
 };
 
 const option::Descriptor usage[] =
@@ -66,6 +69,8 @@ const option::Descriptor usage[] =
     {MAX_INSTR_CNT,         0,  ""  ,    "max-instr-cnt"        ,option::Arg::Optional,     "  --max-instr-cnt=<n>          Limit for number of instructions executed by the simulator. When reached, simulator exits (default = 10^8). Decimal value. \n"},
     {DUMP_CONTEXT,          0,  ""  ,    "dump-context"         ,option::Arg::Optional,     "  --dump-context=<file>        Dump context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) after execution to file. \n"},
     {LOAD_CONTEXT,          0,  ""  ,    "load-context"         ,option::Arg::Optional,     "  --load-context=<file>        Load context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) before execution from file. \n"},
+    {DUMP_KEYMEM,           0,  ""  ,    "dump-keymem"          ,option::Arg::Optional,     "  --dump-keymem=<file>         Dump Key memory after execution to file. \n"},
+    {LOAD_KEYMEM,           0,  ""  ,    "load-keymem"          ,option::Arg::Optional,     "  --load-keymem=<file>         Load Key memory before execution from file. \n"},
 
     {0,0,0,0,0,0}
 };
@@ -270,6 +275,9 @@ int main(int argc, char** argv)
     if (options[LOAD_CONTEXT])
         simulator->model_context_ = std::string(options[LOAD_CONTEXT].arg);
 
+    if (options[LOAD_KEYMEM])
+        simulator->key_memory_->Load(std::string(options[LOAD_KEYMEM].arg));
+
     EXEC_WITH_ERR_HANDLER({
         simulator->Start(batch_mode);
     })
@@ -288,6 +296,10 @@ int main(int argc, char** argv)
 
     if (options[DUMP_CONTEXT]) {
         simulator->model_->DumpContext(std::string(options[DUMP_CONTEXT].arg));
+    }
+
+    if (options[DUMP_KEYMEM]) {
+        simulator->key_memory_->Dump(std::string(options[DUMP_KEYMEM].arg));
     }
 
     return 0;
