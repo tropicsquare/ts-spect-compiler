@@ -24,6 +24,7 @@ spect::CpuSimulator::CpuSimulator()
     model_->simulator_ = this;
     compiler_ = new spect::Compiler(SPECT_INSTR_MEM_BASE);
     key_memory_ = new spect::KeyMemory();
+    key_memory_->verbosity_ = VERBOSITY_HIGH;
 
     auto menu = std::make_unique<cli::Menu>("spect_iss");
     BuildCliCommands(menu);

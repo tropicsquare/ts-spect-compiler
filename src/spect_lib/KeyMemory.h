@@ -15,6 +15,11 @@
 class spect::KeyMemory
 {
     public:
+        // Slot status
+        enum SlotStatus {
+            EMPTY,
+            FULL
+        };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief New Key Memory constructor
@@ -50,25 +55,48 @@ class spect::KeyMemory
         /// @param type Key type
         /// @param slot Slot in memory
         /// @param offset Offset within the slot
-        /// @returns Read data.
+        /// @param data Read data
+        /// @returns Error flag (0 - no error, else error)
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t Read(uint32_t type, uint32_t slot, uint32_t offset);
+        int Read(uint32_t type, uint32_t slot, uint32_t offset, uint32_t &data);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @brief Write Key Memory
-        /// @param type Key type
-        /// @param slot Slot in memory
+        /// @brief Write RAM Buffer
         /// @param offset Offset within the slot
         /// @param data Data to be written
+        /// @returns Error flag (0 - no error, else error)
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Write(uint32_t type, uint32_t slot, uint32_t offset, uint32_t data);
+        int Write(uint32_t offset, uint32_t data);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Program Key Memory
+        /// @param type Key type
+        /// @param slot Slot in memory
+        /// @returns Error flag (0 - no error, else error)
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        int Program(uint32_t type, uint32_t slot);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Erase Key Memory
         /// @param type Key type
         /// @param slot Slot in memory
+        /// @returns Error flag (0 - no error, else error)
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Erase(uint32_t type, uint32_t slot);
+        int Erase(uint32_t type, uint32_t slot);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Verify Erase of Key Memory
+        /// @param type Key type
+        /// @param slot Slot in memory
+        /// @returns Error flag (0 - no error, else error)
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        int VerifyErase(uint32_t type, uint32_t slot);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Flush RAM Buffer
+        /// @returns Error flag (0 - no error, else error)
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        int Flush();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Dump Key Memory
@@ -82,11 +110,44 @@ class spect::KeyMemory
         ///////////////////////////////////////////////////////////////////////////////////////////
         void Load(const std::string &path);
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Print debug message in the model
+        /// @param verbosity_level Verbosity of the message
+        ///         VERBOSITY_NONE      - Always shown
+        ///         VERBOSITY_LOW       - Shown when verbosity is 1 or higher
+        ///         VERBOSITY_MEDIUM    - Shown when verbosity is 2 or higher
+        ///         VERBOSITY_HIGH      - Shown when verbosity is 3 or higher
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        template<class... T>
+        void DebugInfo(uint32_t verbosity_level, const T ...args);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @section Public attributes
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////////
+
+        // Verbosity level of the model
+        uint32_t verbosity_ = 0;
+
     private:
 
         // Key memory
         uint32_t key_mem_[KEY_MEM_TYPE_NUM][KEY_MEM_SLOT_NUM][KEY_MEM_OFFSET_NUM];
 
+        // RAM Buffer
+        uint32_t ram_buffer_[KEY_MEM_OFFSET_NUM];
+
+        // Slot Status
+        SlotStatus slot_status_[KEY_MEM_TYPE_NUM][KEY_MEM_SLOT_NUM];
+
+        void PrintArgs();
+
+        template<typename Arg>
+        void PrintArgs(Arg arg);
+
+        template<typename First, typename... Args>
+        void PrintArgs(First first, Args... args);
 };
 
 #endif

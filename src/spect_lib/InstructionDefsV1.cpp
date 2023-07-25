@@ -632,8 +632,9 @@ bool spect::V1InstructionGPK::Execute()
         // This-way using GPK in ISS with ISA V1 will give you data from Key Memory.
         // Locate each Key at offset 0x0 within a Slot.
         if (model_->simulator_ != NULL) {
-          uint32_t part = model_->simulator_->key_memory_->Read(0, index, i);
-          model_->LdkQueuePush(part);
+            uint32_t part;
+            model_->simulator_->key_memory_->Read(0, index, i, part);
+            model_->LdkQueuePush(part);
         }
 
         uint256_t part = model_->LdkQueuePop();
