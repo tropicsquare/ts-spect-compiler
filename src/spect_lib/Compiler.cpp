@@ -290,6 +290,8 @@ bool spect::Compiler::ParseConstant(spect::SourceFile *sf, std::string &line_buf
 bool spect::Compiler::ParseIncludeFile(spect::SourceFile *sf, std::string &line_buf)
 {
     if (std::regex_match(line_buf, std::regex("^" INCLUDE_KEYWORD "[ ]+" FILE_REGEX))) {
+        // Store parent file handler
+        SourceFile *parent_file = symbols_->curr_file_;
 
         // TODO: Make this universal across OS type!
         std::string new_file = sf->path_.substr(0, sf->path_.find_last_of("/")) + "/" +
@@ -297,6 +299,9 @@ bool spect::Compiler::ParseIncludeFile(spect::SourceFile *sf, std::string &line_
                                                 line_buf.size() - 1);
         print_fnc("Loading included file: %s\n", new_file.c_str());
         Compile(new_file);
+        // Restore parent file handler
+        print_fnc("Back to file: %s\n", parent_file->path_.c_str());
+        symbols_->curr_file_ = parent_file;
         return true;
     }
     return false;
@@ -479,18 +484,17 @@ void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr
 {
     print_fnc("\033[1m");
     print_fnc("%s:%d:", sf->path_.c_str(), line_nr);
-    print_fnc("\033[1m \033[31m Error:\033[0m");
+    print_fnc("\033[1m\033[31m Error: \033[0m");
     print_fnc("%s\n", err.c_str());
     if (line_nr - 2 >= 0) {
-        print_fnc("%d:%s\n", line_nr - 1, sf->lines_[line_nr - 2].c_str());
+        print_fnc("%4d:%s\n", line_nr - 1, sf->lines_[line_nr - 2].c_str());
     }
     print_fnc("\033[1m");
-    print_fnc("%d:", line_nr);
+    print_fnc("%4d:", line_nr);
     print_fnc("%s\n", sf->lines_[line_nr - 1].c_str());
-    // TODO: Right Adjust the line numbers!
     print_fnc("\033[0m");
     if ((size_t)line_nr < sf->lines_.size())
-        print_fnc("%d:%s\n", (line_nr + 1), sf->lines_[line_nr]);
+        print_fnc("%4d:%s\n", (line_nr + 1), sf->lines_[line_nr].c_str());
 
     std::string msg = std::string(80, '*') +
                       std::string("\nCompilation failed\n") +
