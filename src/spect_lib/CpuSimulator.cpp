@@ -357,7 +357,7 @@ void spect::CpuSimulator::CmdGet(A_UNUSED std::ostream &out, std::string arg1)
         model_->verbosity_ = tmp_verbosity;
     } else if (std::regex_match(arg1, std::regex("^keymem\\[" NUM_REGEX "\\]\\[" NUM_REGEX "\\]\\[" NUM_REGEX "\\](\\+" NUM_REGEX ")?"))) {
         // Check if multiple offsets should be shown
-        int n_pos = 1;
+        int n_pos = 0;
         if (arg1.find('+') != std::string::npos)
             n_pos = stoint(arg1.substr(arg1.find('+') + 1, arg1.size() - 1));
 
