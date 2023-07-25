@@ -14,7 +14,15 @@
 #include "KeyMemory.h"
 
 spect::KeyMemory::KeyMemory()
-{}
+{
+    for (uint32_t type = 0; type < KEY_MEM_TYPE_NUM; type++) {
+        for (uint32_t slot = 0; slot < KEY_MEM_SLOT_NUM; slot++) {
+            for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
+                key_mem_[type][slot][offset] = 0xFFFFFFFF;
+            }
+        }
+    }
+}
 
 spect::KeyMemory::~KeyMemory()
 {}
@@ -41,8 +49,8 @@ void spect::KeyMemory::Write(uint32_t type, uint32_t slot, uint32_t offset, uint
 
 void spect::KeyMemory::Erase(uint32_t type, uint32_t slot)
 {
-    for (uint32_t i = 0; i < KEY_MEM_OFFSET_NUM; i++) {
-      key_mem_[type][slot][i] = 0xFFFFFFFF;
+    for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
+        key_mem_[type][slot][offset] = 0xFFFFFFFF;
     }
 }
 
