@@ -37,6 +37,7 @@ uint32_t spect::KeyMemory::Get(uint8_t type, uint8_t slot, uint8_t offset)
 void spect::KeyMemory::Set(uint8_t type, uint8_t slot, uint8_t offset, uint32_t data)
 {
     key_mem_[type][slot][offset] = data;
+    slot_status_[type][slot] = SlotStatus::FULL;
 }
 
 int spect::KeyMemory::Read(uint32_t type, uint32_t slot, uint32_t offset, uint32_t &data)
