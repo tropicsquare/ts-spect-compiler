@@ -132,6 +132,7 @@ void spect::KeyMemory::Dump(const std::string &path)
             for (uint32_t slot = 0; slot < KEY_MEM_SLOT_NUM; slot++) {
                 ss << "Type: " << type << " Slot: " << slot;
                 PUT_COMMENT_LINE(ss.str());
+                ofs << "Status: " << ((slot_status_[type][slot] == SlotStatus::EMPTY) ? "EMPTY" : "FULL") << "\n";
                 for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
                   ofs << std::setw(8) << key_mem_[type][slot][offset] << "\n";
                 }
@@ -160,6 +161,9 @@ void spect::KeyMemory::Load(const std::string &path)
         for (uint32_t type = 0; type < KEY_MEM_TYPE_NUM; type++) {
             for (uint32_t slot = 0; slot < KEY_MEM_SLOT_NUM; slot++) {
                 SKIP_COMMENT_LINES
+                std::getline(ifs, line);
+                std::string i_str = line.substr(8, line.size() - 1);
+                slot_status_[type][slot] = (i_str == "EMPTY") ? SlotStatus::EMPTY : SlotStatus::FULL;
                 for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
                     std::getline(ifs, line);
                     uint32_t num;
