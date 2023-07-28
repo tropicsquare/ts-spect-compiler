@@ -133,8 +133,10 @@ void spect::KeyMemory::Dump(const std::string &path)
                 ss << "Type: " << type << " Slot: " << slot;
                 PUT_COMMENT_LINE(ss.str());
                 ofs << "Status: " << ((slot_status_[type][slot] == SlotStatus::EMPTY) ? "EMPTY" : "FULL") << "\n";
-                for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
-                  ofs << std::setw(8) << key_mem_[type][slot][offset] << "\n";
+                if (slot_status_[type][slot] == SlotStatus::FULL) {
+                    for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
+                      ofs << std::setw(8) << key_mem_[type][slot][offset] << "\n";
+                    }
                 }
                 ss.str("");
             }
@@ -164,12 +166,14 @@ void spect::KeyMemory::Load(const std::string &path)
                 std::getline(ifs, line);
                 std::string i_str = line.substr(8, line.size() - 1);
                 slot_status_[type][slot] = (i_str == "EMPTY") ? SlotStatus::EMPTY : SlotStatus::FULL;
-                for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
-                    std::getline(ifs, line);
-                    uint32_t num;
-                    std::istringstream iss(line);
-                    iss >> std::hex >> num;
-                    key_mem_[type][slot][offset] = num;
+                if (slot_status_[type][slot] == SlotStatus::FULL) {
+                    for (uint32_t offset = 0; offset < KEY_MEM_OFFSET_NUM; offset++) {
+                        std::getline(ifs, line);
+                        uint32_t num;
+                        std::istringstream iss(line);
+                        iss >> std::hex >> num;
+                        key_mem_[type][slot][offset] = num;
+                    }
                 }
             }
         }
