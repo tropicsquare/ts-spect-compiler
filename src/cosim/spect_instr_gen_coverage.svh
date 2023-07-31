@@ -143,7 +143,7 @@ covergroup register_bit_cov with function sample(logic[255:0] value, int positio
 
   cp_register_one: coverpoint position iff (value[position] == 1) {
     bins        b[]    = {[0:7]};
-    // Bit position is 8-bit (0-255), upper bits are cleared to 0
+    // Bit position is 8-bit (0-255), upper bits have no meaning
     ignore_bins ignore = {[8:255]};
   }
 endgroup : register_bit_cov
