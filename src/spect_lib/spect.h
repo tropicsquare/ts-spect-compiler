@@ -149,6 +149,7 @@ namespace spect {
     class CpuSimulator;
     class CpuProgram;
     class HexHandler;
+    class KeyMemory;
 
     class Compiler;
     class Symbol;

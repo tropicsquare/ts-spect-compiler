@@ -817,10 +817,14 @@ bool spect::V2InstructionLDK::Execute()
     for (int i = 0; i < 8; i++) {
         DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_LDK_READ, type, slot, (offset*8+i)));
 
-        // If running with CPU Simulator, preload key from simulator memory to queue
+        // If running with CPU Simulator, preload key from simulator Key Memory to queue
         if (model_->simulator_ != NULL) {
-          uint32_t part = model_->simulator_->ReadKeyMem(slot, offset*8+i);
-          model_->LdkQueuePush(part);
+            uint32_t part;
+            int      error_flag;
+
+            error_flag = model_->simulator_->key_memory_->Read(type, slot, offset*8+i, part);
+            model_->KbusErrorQueuePush(error_flag == 0 ? false : true);
+            model_->LdkQueuePush(part);
         }
 
         uint256_t part = model_->LdkQueuePop();
@@ -861,9 +865,10 @@ bool spect::V2InstructionSTK::Execute()
         ch_kbus.new_val[0] = uint32_t(tmp >> (32 * i));
         model_->ReportChange(ch_kbus);
 
-        // If running with CPU Simulator, store key to simulator memory
+        // If running with CPU Simulator, store key to simulator Key Memory
         if (model_->simulator_ != NULL) {
-          model_->simulator_->WriteKeyMem(slot, offset*8+i, uint32_t(tmp >> (32 * i)));
+            int error_flag = model_->simulator_->key_memory_->Write(offset*8+i, uint32_t(tmp >> (32 * i)));
+            model_->KbusErrorQueuePush(error_flag == 0 ? false : true);
         }
 
         error = model_->KbusErrorQueuePop();
@@ -890,12 +895,25 @@ bool spect::V2InstructionKBO::Execute()
     DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(opcode, type, slot, 0));
     model_->ReportChange(ch_kbus);
 
-    // If running with CPU Simulator, update simulator memory
-    if (model_->simulator_ != NULL && opcode == DPI_KBUS_ERASE) {
-      if (opcode == DPI_KBUS_WRITE)
-        model_->simulator_->WriteKeyMem(slot, 0, 0);
-      else if (opcode == DPI_KBUS_ERASE)
-        model_->simulator_->EraseKeyMem(slot);
+    // If running with CPU Simulator, update simulator Key Memory
+    if (model_->simulator_ != NULL) {
+        uint32_t data;
+        int      error_flag;
+
+        if (opcode == DPI_KBUS_WRITE)
+            error_flag = model_->simulator_->key_memory_->Write(0, 0x0BAD1DEA);
+        else if (opcode == DPI_KBUS_READ)
+            error_flag = model_->simulator_->key_memory_->Read(type, slot, 0, data);
+        else if (opcode == DPI_KBUS_PROGRAM)
+            error_flag = model_->simulator_->key_memory_->Program(type, slot);
+        else if (opcode == DPI_KBUS_ERASE)
+            error_flag = model_->simulator_->key_memory_->Erase(type, slot);
+        else if (opcode == DPI_KBUS_VERIFY)
+            error_flag = model_->simulator_->key_memory_->VerifyErase(type, slot);
+        else if (opcode == DPI_KBUS_FLUSH)
+            error_flag = model_->simulator_->key_memory_->Flush();
+
+        model_->KbusErrorQueuePush(error_flag == 0 ? false : true);
     }
 
     error = model_->KbusErrorQueuePop();
