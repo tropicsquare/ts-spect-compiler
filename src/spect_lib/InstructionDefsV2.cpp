@@ -600,7 +600,6 @@ bool spect::V2InstructionTMAC_IT::Execute()
         std::stringstream ss;
         ss << "Error: Calling KeccakWidth400_SpongeInitialize() failed.";
         model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
-        return false;
     }
 
     return true;
@@ -630,7 +629,6 @@ bool spect::V2InstructionTMAC_UP::Execute()
     if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_RATE/8) != 0) {
         ss << "Error: Calling KeccakWidth400_SpongeAbsorb() failed.";
         model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
-        return false;
     }
 
     return true;
@@ -651,7 +649,6 @@ bool spect::V2InstructionTMAC_RD::Execute()
     if (KeccakWidth400_SpongeSqueeze(&(model_->keccak_inst_), (unsigned char *)msg, KECCAK_CAPACITY/8) != 0) {
         ss << "Error: Calling KeccakWidth400_SpongeSqueeze() failed.";
         model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
-        return false;
     }
 
     // Print Message
@@ -795,7 +792,6 @@ bool spect::V2InstructionTMAC_IS::Execute()
         if (KeccakWidth400_SpongeAbsorb(&(model_->keccak_inst_), (unsigned char *)(&initstr[j*KECCAK_RATE/8]), KECCAK_RATE/8) != 0) {
             ss << "Error: Calling KeccakWidth400_SpongeAbsorb() failed.";
             model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
-            return false;
         }
     }
 
