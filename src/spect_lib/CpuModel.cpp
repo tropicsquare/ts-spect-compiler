@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <cstdarg>
+#include <unistd.h>
 
 #include "CpuModel.h"
 
@@ -38,6 +39,11 @@ spect::CpuModel::~CpuModel()
 void spect::CpuModel::Start()
 {
     DebugInfo(VERBOSITY_LOW, "Starting program execution...");
+    if (timing_accurate_sim_) {
+        char buf[12];
+        sprintf(buf, "%10d", execution_time_step_);
+        DebugInfo(VERBOSITY_LOW, "Running in timing accurate mode with time step:", buf, "us.");
+    }
     DebugInfo(VERBOSITY_LOW, "First instruction address:", tohexs(start_pc_, 4));
     SetPc(start_pc_);
 
@@ -768,27 +774,33 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     // Sample input operands and values for DPI readout
     instr->SampleInputs(&(last_instr), this);
 
-    // Execute instruction
-    instr->model_ = this;
-    if (instr->Execute())
-        SetPc(GetPc() + 0x4);
-
     // Check last execution time of instruction with the same mnemonic
     // Hold execution time of instruction per-mnemonic in Instruction Factory.
     // Ignore cases where:
-    //      1. Instruction is executed first time (gold->cycles_ == 0)
-    //      2. We stop measurement for whatever reason (cycles == 0).
-    //      3. Instruction has 'c_time' = false. Such instruction can last
+    //      1. We stop measurement for whatever reason (cycles == 0).
+    //      2. Instruction has 'c_time' = false. Such instruction can last
     //         variable amount of clock cycles.
     int rv = 0;
     Instruction *gold = spect::InstructionFactory::GetInstruction(instr->mnemonic_);
-    if (cycles > 0 && gold->cycles_ > 0 && cycles != gold->cycles_)
+    if (cycles > 0 && cycles != gold->cycles_)
         rv = gold->cycles_;
     if (!gold->c_time_)
         rv = 0;
 
-    gold->cycles_ = cycles;
+    if (timing_accurate_sim_)
+        // When in timing accurate mode, insert sleep to mimic execution
+        // duration on RTL
+        usleep(gold->cycles_ * execution_time_step_);
+    else
+        // Otherwise store observed execution duration for comparison/reports
+        gold->cycles_ = cycles;
+
     gold->exec_cnt_++;
+
+    // Execute instruction
+    instr->model_ = this;
+    if (instr->Execute())
+        SetPc(GetPc() + 0x4);
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);

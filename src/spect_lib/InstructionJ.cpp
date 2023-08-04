@@ -16,8 +16,8 @@
 #include "Symbol.h"
 
 spect::InstructionJ::InstructionJ(std::string mnemonic, uint32_t opcode, uint32_t func, int op_mask,
-                                  uint16_t new_pc, bool r31_dep, bool c_time) :
-    Instruction(mnemonic, InstructionType::J, opcode, func, op_mask, r31_dep, c_time),
+                                  uint16_t new_pc, bool r31_dep, bool c_time, int cycles) :
+    Instruction(mnemonic, InstructionType::J, opcode, func, op_mask, r31_dep, c_time, cycles),
     new_pc_(new_pc)
 {}
 

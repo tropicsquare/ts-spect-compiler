@@ -382,6 +382,12 @@ class spect::CpuModel
         // Number of already executed instructions since start
         uint64_t instr_cnt_ = 0;
 
+        // Timing accurate simulation flag
+        bool timing_accurate_sim_ = false;
+
+        // Execution time step for timing accurate simulation (in us)
+        int execution_time_step_ = 10;
+
         // Print function
         int (*print_fnc)(const char *format, ...);
 
