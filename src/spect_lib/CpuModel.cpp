@@ -497,6 +497,21 @@ void spect::CpuModel::DumpContext(const std::string &path)
         for (int i = 0; i < 8; i++)
             ofs << std::setw(16) << sha_512_.getContext(i) << "\n";
 
+        PUT_COMMENT_LINE("TMAC context: (state (5 lines), rate, byteIOIndex, squeezing)");
+        // State
+        for (int i = 0; i < 5; i++) {
+            std::stringstream ss;
+            for (int j = 0; j < 10; j++)
+                ss << std::setfill('0') << std::setw(2) << std::hex << (int)keccak_inst_.state[i*10+j];
+            ofs << std::setw(20) << ss.str().c_str() << "\n";
+        }
+        // Rate, byteIOIndex, squeezing
+        ofs << std::dec;
+        ofs << keccak_inst_.rate << "\n";
+        ofs << keccak_inst_.byteIOIndex << "\n";
+        ofs << keccak_inst_.squeezing << "\n";
+        ofs << std::hex;
+
         PUT_COMMENT_LINE("RAR stack:");
         for (int i = 0; i < SPECT_RAR_DEPTH; i++)
             ofs << std::setw(4) << GetRarAt(i) << "\n";
@@ -557,6 +572,38 @@ void spect::CpuModel::LoadContext(const std::string &path)
             DebugInfo(VERBOSITY_LOW, "Setting SHA512 context (", i, ") to 0x", line.c_str());
             sha_512_.setContext(i, num);
         }
+
+        // TMAC
+        SKIP_COMMENT_LINES
+        // State
+        for (int i = 0; i < 5; i++) {
+            std::getline(ifs, line);
+            std::istringstream state_iss(line);
+            std::string num = std::string("0x") + line;
+            std::stringstream idx_low;
+            std::stringstream idx_high;
+            idx_low << std::setw(2) << i*10;
+            idx_high << std::setw(2) << (i+1)*10-1;
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - state [", idx_low.str().c_str(), ":", idx_high.str().c_str(), "] to", (num.c_str()));
+            for (int j = 0; j < 10; j++) {
+                keccak_inst_.state[i*10+j] = (unsigned char)((uint256_t(num.c_str()) >> (72-j*8)) & uint256_t("0xFF"));
+            }
+        }
+        // Rate, byteIOIndex, squeezing
+        std::getline(ifs, line);
+        std::istringstream rate_iss(line);
+        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - rate to", line);
+        rate_iss >> keccak_inst_.rate;
+        // byteIOIndex
+        std::getline(ifs, line);
+        std::istringstream bioi_iss(line);
+        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - byteIOIndex to", line);
+        bioi_iss >> keccak_inst_.byteIOIndex;
+        // squeezing
+        std::getline(ifs, line);
+        std::istringstream squeezing_iss(line);
+        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - squeezing to", line);
+        squeezing_iss >> keccak_inst_.squeezing;
 
         // RAR stack
         SKIP_COMMENT_LINES
