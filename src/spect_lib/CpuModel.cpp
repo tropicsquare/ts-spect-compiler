@@ -506,9 +506,11 @@ void spect::CpuModel::DumpContext(const std::string &path)
             ofs << std::setw(20) << ss.str().c_str() << "\n";
         }
         // Rate, byteIOIndex, squeezing
-        ofs << std::dec << keccak_inst_.rate << "\n";
-        ofs << std::dec << keccak_inst_.byteIOIndex << "\n";
-        ofs << std::dec << keccak_inst_.squeezing << "\n";
+        ofs << std::dec;
+        ofs << keccak_inst_.rate << "\n";
+        ofs << keccak_inst_.byteIOIndex << "\n";
+        ofs << keccak_inst_.squeezing << "\n";
+        ofs << std::hex;
 
         PUT_COMMENT_LINE("RAR stack:");
         for (int i = 0; i < SPECT_RAR_DEPTH; i++)
