@@ -27,32 +27,44 @@ stages:
       junit: sim/sim_logs/ts_sim_junit_out.xml
 
 
-build_programmers_guide_v0.1:
+build_programmer_guide:
   stage: doc
   tags:
     - shell
   script:
     - source ./setup_env
-    - cd doc/programmer_guide/ISAv0.1
-    - ts_latex_build.py spect_programmer_guide_v0.1.tex
+    - cd doc/programmer_guide
+    - ts_latex_build.py spect_programmer_guide.tex
   artifacts:
     when: always
     paths:
-      - doc/programmer_guide/ISAv0.1/build/pdf/spect_programmer_guide_v0.1.pdf
+      - doc/programmer_guide/build/pdf/spect_programmer_guide.pdf
 
-build_programmers_guide_v0.2:
+build_isa_v0.1:
   stage: doc
   tags:
     - shell
   script:
     - source ./setup_env
-    - cd doc/programmer_guide/ISAv0.2
-    - ts_latex_build.py spect_programmer_guide_v0.2.tex
+    - cd doc/ISAv0.1
+    - ts_latex_build.py isav0.1.tex
   artifacts:
     when: always
     paths:
-      - doc/programmer_guide/ISAv0.2/build/pdf/spect_programmer_guide_v0.2.pdf
+      - doc/ISAv0.1/build/pdf/isav0.1.pdf
 
+build_isa_v0.2:
+  stage: doc
+  tags:
+    - shell
+  script:
+    - source ./setup_env
+    - cd doc/ISAv0.2
+    - ts_latex_build.py isav0.2.tex
+  artifacts:
+    when: always
+    paths:
+      - doc/ISAv0.2/build/pdf/isav0.2.pdf
 
 ###################################################################################################
 # Build compiler and test it
