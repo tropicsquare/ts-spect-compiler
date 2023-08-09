@@ -114,7 +114,9 @@ deploy_compiler:
     - cp src/cosim/spect_iss_dpi_pkg.sv $DEST_FOLDER/$VERSION
     - cp src/cosim/spect_instr_gen_coverage.svh $DEST_FOLDER/$VERSION
 
-    - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf $DEST_FOLDER/$VERSION
+    - cp doc/programmer_guide/build/pdf/spect_programmer_guide.pdf $DEST_FOLDER/$VERSION
+    - cp doc/ISAv0.1/build/pdf/isav0.1.pdf $DEST_FOLDER/$VERSION
+    - cp doc/ISAv0.2/build/pdf/isac0.2.pdf $DEST_FOLDER/$VERSION
 
 
 ###################################################################################################
