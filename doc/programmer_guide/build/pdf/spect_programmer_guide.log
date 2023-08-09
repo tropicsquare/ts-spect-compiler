@@ -1,0 +1,1819 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.5)  9 AUG 2023 10:28
+entering extended mode
+ \write18 enabled.
+ %&-line parsing enabled.
+**spect_programmer_guide.tex
+(./spect_programmer_guide.tex
+LaTeX2e <2022-11-01> patch level 1
+L3 programming layer <2022-11-02>
+(/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_design_spec.cls
+Document Class: tropic_design_spec 2021/07/05 Design specification class
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2022/07/02 v1.4n Standard LaTeX document class
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2022/07/02 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count185
+\c@section=\count186
+\c@subsection=\count187
+\c@subsubsection=\count188
+\c@paragraph=\count189
+\c@subparagraph=\count190
+\c@figure=\count191
+\c@table=\count192
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
+)
+(/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_includes.sty
+Package: tropic_includes 2021/13/07 Tropic Square includes package
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2022/06/12 v2.14 LaTeX color extensions (UK)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: pdftex.def on input line 227.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2022/09/22 v1.2b Graphics/color driver for pdftex
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1353.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1357.
+Package xcolor Info: Model `RGB' extended on input line 1369.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1371.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1374.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1375.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1376.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/geometry/geometry.sty
+Package: geometry 2020/01/02 v5.9 Page Geometry
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/iftex/ifvtex.sty
+Package: ifvtex 2019/10/25 v1.7 ifvtex legacy package. Use iftex instead.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/iftex/iftex.sty
+Package: iftex 2022/02/03 v1.0f TeX engine tests
+))
+\Gm@cnth=\count193
+\Gm@cntv=\count194
+\c@Gm@tempcnt=\count195
+\Gm@bindingoffset=\dimen141
+\Gm@wd@mp=\dimen142
+\Gm@odd@mp=\dimen143
+\Gm@even@mp=\dimen144
+\Gm@layoutwidth=\dimen145
+\Gm@layoutheight=\dimen146
+\Gm@layouthoffset=\dimen147
+\Gm@layoutvoffset=\dimen148
+\Gm@dimlist=\toks17
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pdflscape/pdflscape.sty
+Package: pdflscape 2022-10-27 v0.13 Display of landscape pages in PDF
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pdflscape/pdflscape-nomet
+adata.sty
+Package: pdflscape-nometadata 2022-10-28 v0.13 Display of landscape pages in PD
+F (HO)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics/lscape.sty
+Package: lscape 2020/05/28 v3.02 Landscape Pages (DPC)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 107.
+))
+Package pdflscape Info: Auto-detected driver: pdftex on input line 81.
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/enumitem/enumitem.sty
+Package: enumitem 2019/06/20 v3.9 Customized lists
+\labelindent=\skip50
+\enit@outerparindent=\dimen149
+\enit@toks=\toks18
+\enit@inbox=\box51
+\enit@count@id=\count196
+\enitdp@description=\count197
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+Package: fancyhdr 2022/11/09 v4.1 Extensive control of page headers and footers
+
+\f@nch@headwidth=\skip51
+\f@nch@O@elh=\skip52
+\f@nch@O@erh=\skip53
+\f@nch@O@olh=\skip54
+\f@nch@O@orh=\skip55
+\f@nch@O@elf=\skip56
+\f@nch@O@erf=\skip57
+\f@nch@O@olf=\skip58
+\f@nch@O@orf=\skip59
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2022-11-13 v7.00u Hypertext links for LaTeX
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.s
+ty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/kvdefinekeys/kvdefineke
+ys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/hycolor/hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/letltxmacro/letltxmacro.s
+ty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/auxhook/auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2022-05-17 v2.50 Cross-referencing by name of section
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/refcount/refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/gettitlestring/gettitle
+string.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+))
+\c@section@level=\count198
+)
+\@linkdim=\dimen150
+\Hy@linkcounter=\count199
+\Hy@pagecounter=\count266
+ (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2022-11-13 v7.00u Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/intcalc/intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/etexcmds/etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+\Hy@SavedSpaceFactor=\count267
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2022-11-13 v7.00u Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4162.
+Package hyperref Info: Link nesting OFF on input line 4167.
+Package hyperref Info: Hyper index ON on input line 4170.
+Package hyperref Info: Plain pages OFF on input line 4177.
+Package hyperref Info: Backreferencing OFF on input line 4182.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4410.
+\c@Hy@tempcnt=\count268
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip16
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 4748.
+\XeTeXLinkMargin=\dimen151
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/bitset/bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/bigintcalc/bigintcalc.s
+ty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count269
+\Field@Width=\dimen152
+\Fld@charsize=\dimen153
+Package hyperref Info: Hyper figures OFF on input line 6027.
+Package hyperref Info: Link nesting OFF on input line 6032.
+Package hyperref Info: Hyper index ON on input line 6035.
+Package hyperref Info: backreferencing OFF on input line 6042.
+Package hyperref Info: Link coloring OFF on input line 6047.
+Package hyperref Info: Link coloring with OCG OFF on input line 6052.
+Package hyperref Info: PDF/A mode OFF on input line 6057.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+\Hy@abspage=\count270
+\c@Item=\count271
+\c@Hfootnote=\count272
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2022-11-13 v7.00u Hyperref driver for pdfTeX
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
+with kernel methods
+)
+\Fld@listcount=\count273
+\c@bookmark@seq@number=\count274
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/rerunfilecheck/rerunfilec
+heck.sty
+Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/uniquecounter/uniquecou
+nter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+85.
+)
+\Hy@SectionHShift=\skip60
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/titlesec/titlesec.sty
+Package: titlesec 2021/07/05 v2.14 Sectioning titles
+\ttl@box=\box52
+\beforetitleunit=\skip61
+\aftertitleunit=\skip62
+\ttl@plus=\dimen154
+\ttl@minus=\dimen155
+\ttl@toksa=\toks19
+\titlewidth=\dimen156
+\titlewidthlast=\dimen157
+\titlewidthfirst=\dimen158
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2022/04/13 v1.1d Standard LaTeX ifthen package (DPC)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+\Gin@req@height=\dimen159
+\Gin@req@width=\dimen160
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/underscore/underscore.sty
+Package: underscore 2006/09/13
+LaTeX Info: Redefining \_ on input line 42.
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/opensans/opensans.sty
+Package: opensans 2019/06/20 Style file for Open Sans.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/fontaxes/fontaxes.sty
+Package: fontaxes 2020/07/21 v1.0e Font selection axes
+LaTeX Info: Redefining \upshape on input line 29.
+LaTeX Info: Redefining \itshape on input line 31.
+LaTeX Info: Redefining \slshape on input line 33.
+LaTeX Info: Redefining \swshape on input line 35.
+LaTeX Info: Redefining \scshape on input line 37.
+LaTeX Info: Redefining \sscshape on input line 39.
+LaTeX Info: Redefining \ulcshape on input line 41.
+LaTeX Info: Redefining \textsw on input line 47.
+LaTeX Info: Redefining \textssc on input line 48.
+LaTeX Info: Redefining \textulc on input line 49.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/iftex/ifluatex.sty
+Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/iftex/ifxetex.sty
+Package: ifxetex 2019/10/25 v0.7 ifxetex legacy package. Use iftex instead.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+Package: xkeyval 2022/06/16 v2.9 package option processing (HA)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/xkeyval/xkvutils.tex
+\XKV@toks=\toks20
+\XKV@tempa@toks=\toks21
+)
+\XKV@depth=\count275
+File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
+))) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+LaTeX Font Info:    Trying to load font information for T1+opensans-TLF on inpu
+t line 112.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/opensans/T1opensans-TLF.f
+d
+File: T1opensans-TLF.fd 2019/06/24 Font definitions for T1/opensans-TLF.
+)
+LaTeX Font Info:    Font shape `T1/opensans-TLF/m/n' will be
+(Font)              scaled to size 12.0pt on input line 112.
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/setspace/setspace.sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/xstring/xstring.sty
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/xstring/xstring.tex
+\integerpart=\count276
+\decimalpart=\count277
+)
+Package: xstring 2021/07/21 v1.84 String manipulations (CT)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/frontendlayer/tikz.st
+y (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-c
+ommon.tex
+\pgfutil@everybye=\toks22
+\pgfutil@tempdima=\dimen161
+\pgfutil@tempdimb=\dimen162
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-c
+ommon-lists.tex))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-l
+atex.def
+\pgfutil@abb=\box53
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfrcs.co
+de.tex
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2021/05/15 v3.1.9a (3.1.9a)
+))
+Package: pgf 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.st
+y
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.st
+y
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.
+code.tex
+Package: pgfsys 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfkeys.c
+ode.tex
+\pgfkeys@pathtoks=\toks23
+\pgfkeys@temptoks=\toks24
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfkeysfi
+ltered.code.tex
+\pgfkeys@tmptoks=\toks25
+))
+\pgf@x=\dimen163
+\pgf@y=\dimen164
+\pgf@xa=\dimen165
+\pgf@ya=\dimen166
+\pgf@xb=\dimen167
+\pgf@yb=\dimen168
+\pgf@xc=\dimen169
+\pgf@yc=\dimen170
+\pgf@xd=\dimen171
+\pgf@yd=\dimen172
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count278
+\c@pgf@countb=\count279
+\c@pgf@countc=\count280
+\c@pgf@countd=\count281
+\t@pgf@toka=\toks26
+\t@pgf@tokb=\toks27
+\t@pgf@tokc=\toks28
+\pgf@sys@id@count=\count282
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2021/05/15 v3.1.9a (3.1.9a)
+)
+Driver file for pgf: pgfsys-pdftex.def
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-
+pdftex.def
+File: pgfsys-pdftex.def 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-
+common-pdf.def
+File: pgfsys-common-pdf.def 2021/05/15 v3.1.9a (3.1.9a)
+)))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsyss
+oftpath.code.tex
+File: pgfsyssoftpath.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfsyssoftpath@smallbuffer@items=\count283
+\pgfsyssoftpath@bigbuffer@items=\count284
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsysp
+rotocol.code.tex
+File: pgfsysprotocol.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.
+code.tex
+Package: pgfcore 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmath.code.t
+ex
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathcalc.co
+de.tex
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathutil.co
+de.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathparser.
+code.tex
+\pgfmath@dimen=\dimen173
+\pgfmath@count=\count285
+\pgfmath@box=\box54
+\pgfmath@toks=\toks29
+\pgfmath@stack@operand=\toks30
+\pgfmath@stack@operation=\toks31
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.code.tex
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.basic.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.trigonometric.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.random.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.comparison.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.base.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.round.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.misc.code.tex)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctio
+ns.integerarithmetics.code.tex)))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmathfloat.c
+ode.tex
+\c@pgfmathroundto@lastzeros=\count286
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfint.code.te
+x)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorep
+oints.code.tex
+File: pgfcorepoints.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@picminx=\dimen174
+\pgf@picmaxx=\dimen175
+\pgf@picminy=\dimen176
+\pgf@picmaxy=\dimen177
+\pgf@pathminx=\dimen178
+\pgf@pathmaxx=\dimen179
+\pgf@pathminy=\dimen180
+\pgf@pathmaxy=\dimen181
+\pgf@xx=\dimen182
+\pgf@xy=\dimen183
+\pgf@yx=\dimen184
+\pgf@yy=\dimen185
+\pgf@zx=\dimen186
+\pgf@zy=\dimen187
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorep
+athconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@path@lastx=\dimen188
+\pgf@path@lasty=\dimen189
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorep
+athusage.code.tex
+File: pgfcorepathusage.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@shorten@end@additional=\dimen190
+\pgf@shorten@start@additional=\dimen191
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcores
+copes.code.tex
+File: pgfcorescopes.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfpic=\box55
+\pgf@hbox=\box56
+\pgf@layerbox@main=\box57
+\pgf@picture@serial@count=\count287
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreg
+raphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgflinewidth=\dimen192
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoret
+ransformations.code.tex
+File: pgfcoretransformations.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@pt@x=\dimen193
+\pgf@pt@y=\dimen194
+\pgf@pt@temp=\dimen195
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreq
+uick.code.tex
+File: pgfcorequick.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreo
+bjects.code.tex
+File: pgfcoreobjects.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorep
+athprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorea
+rrows.code.tex
+File: pgfcorearrows.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfarrowsep=\dimen196
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcores
+hade.code.tex
+File: pgfcoreshade.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@max=\dimen197
+\pgf@sys@shading@range@num=\count288
+\pgf@shadingcount=\count289
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorei
+mage.code.tex
+File: pgfcoreimage.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoree
+xternal.code.tex
+File: pgfcoreexternal.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfexternal@startupbox=\box58
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorel
+ayers.code.tex
+File: pgfcorelayers.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcoret
+ransparency.code.tex
+File: pgfcoretransparency.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorep
+atterns.code.tex
+File: pgfcorepatterns.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorer
+df.code.tex
+File: pgfcorerdf.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/modules/pgfmodulesh
+apes.code.tex
+File: pgfmoduleshapes.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfnodeparttextbox=\box59
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/modules/pgfmodulepl
+ot.code.tex
+File: pgfmoduleplot.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/compatibility/pgfcomp
+-version-0-65.sty
+Package: pgfcomp-version-0-65 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@nodesepstart=\dimen198
+\pgf@nodesepend=\dimen199
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/compatibility/pgfcomp
+-version-1-18.sty
+Package: pgfcomp-version-1-18 2021/05/15 v3.1.9a (3.1.9a)
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgfkeys.c
+ode.tex))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmath.code.t
+ex))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/utilities/pgffor.co
+de.tex
+Package: pgffor 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/math/pgfmath.code.t
+ex)
+\pgffor@iter=\dimen256
+\pgffor@skip=\dimen257
+\pgffor@stack=\toks32
+\pgffor@toks=\toks33
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/
+tikz.code.tex
+Package: tikz 2021/05/15 v3.1.9a (3.1.9a)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/libraries/pgflibrar
+yplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@plot@mark@count=\count290
+\pgfplotmarksize=\dimen258
+)
+\tikz@lastx=\dimen259
+\tikz@lasty=\dimen260
+\tikz@lastxsaved=\dimen261
+\tikz@lastysaved=\dimen262
+\tikz@lastmovetox=\dimen263
+\tikz@lastmovetoy=\dimen264
+\tikzleveldistance=\dimen265
+\tikzsiblingdistance=\dimen266
+\tikz@figbox=\box60
+\tikz@figbox@bg=\box61
+\tikz@tempbox=\box62
+\tikz@tempbox@bg=\box63
+\tikztreelevel=\count291
+\tikznumberofchildren=\count292
+\tikznumberofcurrentchild=\count293
+\tikz@fig@count=\count294
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/modules/pgfmodulema
+trix.code.tex
+File: pgfmodulematrix.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfmatrixcurrentrow=\count295
+\pgfmatrixcurrentcolumn=\count296
+\pgf@matrix@numberofcolumns=\count297
+)
+\tikz@expandcount=\count298
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/
+libraries/tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/tools/array.sty
+Package: array 2022/09/04 v2.5g Tabular extension package (FMi)
+\col@sep=\dimen267
+\ar@mcellbox=\box64
+\extrarowheight=\dimen268
+\NC@list=\toks34
+\extratabsurround=\skip63
+\backup@length=\skip64
+\ar@cellbox=\box65
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/tools/tabularx.sty
+Package: tabularx 2020/01/15 v2.11c `tabularx' package (DPC)
+\TX@col@width=\dimen269
+\TX@old@table=\dimen270
+\TX@old@col=\dimen271
+\TX@target=\dimen272
+\TX@delta=\dimen273
+\TX@cols=\count299
+\TX@ftn=\toks35
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/colortbl/colortbl.sty
+Package: colortbl 2022/06/20 v1.0f Color table columns (DPC)
+\everycr=\toks36
+\minrowclearance=\skip65
+\rownum=\count300
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/multirow/multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip66
+\multirow@cntb=\count301
+\multirow@dima=\skip67
+\bigstrutjot=\dimen274
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/xltabular/xltabular.sty
+Package: xltabular 2020/11/04 v0.2e `xltabular' package (hv,RN)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/ltablex/ltablex.sty
+Package: ltablex 2014/08/13 v1.1 Modified tabularx
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
+\LTleft=\skip68
+\LTright=\skip69
+\LTpre=\skip70
+\LTpost=\skip71
+\LTchunksize=\count302
+\LTcapwidth=\dimen275
+\LT@head=\box66
+\LT@firsthead=\box67
+\LT@foot=\box68
+\LT@lastfoot=\box69
+\LT@gbox=\box70
+\LT@cols=\count303
+\LT@rows=\count304
+\c@LT@tables=\count305
+\c@LT@chunks=\count306
+\LT@p@ftn=\toks37
+)))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count307
+\float@exts=\toks38
+\float@box=\box71
+\@float@everytoks=\toks39
+\@floatcapt=\box72
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count308
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2022/03/01 v3.6b Customizing captions (AR)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2022/03/17 v2.3b caption3 kernel (AR)
+\caption@tempdima=\dimen276
+\captionmargin=\dimen277
+\caption@leftmargin=\dimen278
+\caption@rightmargin=\dimen279
+\caption@width=\dimen280
+\caption@indent=\dimen281
+\caption@parindent=\dimen282
+\caption@hangindent=\dimen283
+Package caption Info: Standard document class detected.
+)
+\c@caption@flags=\count309
+\c@continuedfloat=\count310
+Package caption Info: float package is loaded.
+Package caption Info: hyperref package is loaded.
+Package caption Info: longtable package is loaded.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/ulem/ulem.sty
+\UL@box=\box73
+\UL@hyphenbox=\box74
+\UL@skip=\skip72
+\UL@hook=\toks40
+\UL@height=\dimen284
+\UL@pe=\count311
+\UL@pixel=\dimen285
+\ULC@box=\box75
+Package: ulem 2019/11/18
+\ULdepth=\dimen286
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/iexec/iexec.sty
+Package: iexec 2022-11-01 0.11.4 Inputable Shell Executions
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/tools/shellesc.sty
+Package: shellesc 2019/11/08 v1.0c unified shell escape interface for LaTeX
+Package shellesc Info: Unrestricted shell escape enabled on input line 75.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/l3kernel/expl3.sty
+Package: expl3 2022-11-02 L3 programming layer (loader) 
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/l3backend/l3backend-pdfte
+x.def
+File: l3backend-pdftex.def 2022-10-26 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count312
+\l__pdf_internal_box=\box76
+))
+\iexec@exitfile=\read3
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/tools/hhline.sty
+Package: hhline 2020/01/04 v2.04 Table rule package (DPC)
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/changepage/changepage.sty
+Package: changepage 2009/10/20 v1.0c check page and change page layout
+\c@cp@cntr=\count313
+\cp@tempcnt=\count314
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2022/11/30 3.83 The Babel package
+\babel@savecnt=\count315
+\U@D=\dimen287
+\l@unhyphenated=\language87
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read4
+\bbl@dirlevel=\count316
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/babel-english/english.l
+df
+Language: english 2017/06/06 v3.3r English support from the babel system
+Package babel Info: Hyphen rules for 'canadian' set to \l@english
+(babel)             (\language0). Reported on input line 102.
+Package babel Info: Hyphen rules for 'australian' set to \l@ukenglish
+(babel)             (\language21). Reported on input line 105.
+Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
+(babel)             (\language21). Reported on input line 108.
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/generic/babel/locale/en/babel-e
+nglish.tex
+Package babel Info: Importing font and identification data for english
+(babel)             from babel-en.ini. Reported on input line 11.
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/tabto-ltx/tabto.sty
+Package: tabto 2018/12/28  v 1.4  Another tabbing mechanism
+\CurrentLineWidth=\dimen288
+\TabPrevPos=\dimen289
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count317
+\lst@gtempboxa=\box77
+\lst@token=\toks41
+\lst@length=\count318
+\lst@currlwidth=\dimen290
+\lst@column=\count319
+\lst@pos=\count320
+\lst@lostspace=\dimen291
+\lst@width=\dimen292
+\lst@newlines=\count321
+\lst@lineno=\count322
+\lst@maxwidth=\dimen293
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+\c@lstnumber=\count323
+\lst@skipnumbers=\count324
+\lst@framebox=\box78
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2020/03/24 1.8d listings configuration
+))
+Package: listings 2020/03/24 1.8d (Carsten Heinz)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/koma-script/scrextend.sty
+Package: scrextend 2022/10/12 v3.38 KOMA-Script package (extend other classes w
+ith features of KOMA-Script classes)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/koma-script/scrkbase.sty
+Package: scrkbase 2022/10/12 v3.38 KOMA-Script package (KOMA-Script-dependent b
+asics and keyval usage)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/koma-script/scrbase.sty
+Package: scrbase 2022/10/12 v3.38 KOMA-Script package (KOMA-Script-independent 
+basics and keyval usage)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/koma-script/scrlfile.sty
+Package: scrlfile 2022/10/12 v3.38 KOMA-Script package (file load hooks)
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/koma-script/scrlfile-hook
+.sty
+Package: scrlfile-hook 2022/10/12 v3.38 KOMA-Script package (using LaTeX hooks)
+
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/koma-script/scrlogo.sty
+Package: scrlogo 2022/10/12 v3.38 KOMA-Script package (logo)
+)))
+Applying: [2021/05/01] Usage of raw or classic option list on input line 252.
+Already applied: [0000/00/00] Usage of raw or classic option list on input line
+ 368.
+))
+
+LaTeX Warning: Command \@footnotemark  has changed.
+               Check if current package is valid.
+
+) (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/psnfss/pifont.sty
+Package: pifont 2020/03/25 PSNFSS-v9.3 Pi font support (SPQR) 
+LaTeX Font Info:    Trying to load font information for U+pzd on input line 63.
+
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/psnfss/upzd.fd
+File: upzd.fd 2001/06/04 font definitions for U/pzd.
+)
+LaTeX Font Info:    Trying to load font information for U+psy on input line 64.
+
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/psnfss/upsy.fd
+File: upsy.fd 2001/06/04 font definitions for U/psy.
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/latexsym.sty
+Package: latexsym 1998/08/17 v2.2e Standard LaTeX package (lasy symbols)
+\symlasy=\mathgroup4
+LaTeX Font Info:    Overwriting symbol font `lasy' in version `bold'
+(Font)                  U/lasy/m/n --> U/lasy/b/n on input line 52.
+))
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/relsize/relsize.sty
+Package: relsize 2013/03/29 ver 4.1
+)
+(/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_styles.sty
+Package: tropic_styles 2021/06/07 Tropic Square styles package
+
+(/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_colors.sty
+Package: tropic_colors 2021/06/07 Tropic Square colors package
+)
+\c@reqcount=\count325
+\c@subreqcount=\count326
+\c@openissuecounter=\count327
+)
+(/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_tables.sty
+\@float@every@table=\toks42
+)
+(/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_fonts.sty))
+(build/pdf/spect_programmer_guide.aux
+
+LaTeX Warning: Label `SPECTBK' multiply defined.
+
+
+LaTeX Warning: Label `SPECTBK' multiply defined.
+
+)
+\openout1 = `spect_programmer_guide.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 31.
+LaTeX Font Info:    ... okay on input line 31.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count328
+\scratchdimen=\dimen294
+\scratchbox=\box79
+\nofMPsegments=\count329
+\nofMParguments=\count330
+\everyMPshowfont=\toks43
+\MPscratchCnt=\count331
+\MPscratchDim=\dimen295
+\MPnumerator=\count332
+\makeMPintoPDFobject=\count333
+\everyMPtoPDFconversion=\toks44
+)
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-bas
+e.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.
+cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+*geometry* verbose mode - [ preamble ] result:
+* driver: pdftex
+* paper: a4paper
+* layout: <same size as paper>
+* layoutoffset:(h,v)=(0.0pt,0.0pt)
+* modes: includehead includefoot 
+* h-part:(L,W,R)=(56.9055pt, 483.69684pt, 56.90553pt)
+* v-part:(T,H,B)=(56.9055pt, 735.63976pt, 52.50159pt)
+* \paperwidth=597.50787pt
+* \paperheight=845.04684pt
+* \textwidth=483.69684pt
+* \textheight=668.63976pt
+* \oddsidemargin=-15.36449pt
+* \evensidemargin=-15.36449pt
+* \topmargin=-15.36449pt
+* \headheight=12.0pt
+* \headsep=25.0pt
+* \topskip=12.0pt
+* \footskip=30.0pt
+* \marginparwidth=0.0pt
+* \marginparsep=0.0pt
+* \columnsep=10.0pt
+* \skip\footins=10.8pt plus 4.0pt minus 2.0pt
+* \hoffset=0.0pt
+* \voffset=0.0pt
+* \mag=1000
+* \@twocolumnfalse
+* \@twosidefalse
+* \@mparswitchfalse
+* \@reversemarginfalse
+* (1in=72.27pt=25.4mm, 1cm=28.453pt)
+
+Package hyperref Info: Link coloring OFF on input line 31.
+(build/pdf/spect_programmer_guide.out) (build/pdf/spect_programmer_guide.out)
+\@outlinefile=\write4
+\openout4 = `spect_programmer_guide.out'.
+
+\c@mv@tabular=\count334
+\c@mv@boldtabular=\count335
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: changepage package is loaded.
+\caption@adjustwidth@hsize=\dimen296
+\caption@adjustwidth@linewidth=\dimen297
+Package caption Info: listings package is loaded.
+Package caption Info: End \AtBeginDocument code.
+\c@lstlisting=\count336
+LaTeX Font Info:    Font shape `T1/opensans-TLF/m/n' will be
+(Font)              scaled to size 24.88pt on input line 40.
+LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
+(Font)              scaled to size 24.88pt on input line 40.
+LaTeX Font Info:    Font shape `T1/opensans-TLF/m/n' will be
+(Font)              scaled to size 14.4pt on input line 40.
+LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
+(Font)              scaled to size 14.4pt on input line 40.
+LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
+(Font)              scaled to size 12.0pt on input line 40.
+runsystem((git describe --tags --abbrev=0 HEAD 2>/dev/null) > iexec.tmp 2>&1; /
+bin/echo -n $?% >iexec.ret)...executed.
+
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+<img//TS_logo_blue.pdf, id=127, 667.5626pt x 103.61813pt>
+File: img//TS_logo_blue.pdf Graphic file (type pdf)
+<use img//TS_logo_blue.pdf>
+Package pdftex.def Info: img//TS_logo_blue.pdf  used on input line 40.
+(pdftex.def)             Requested size: 193.47577pt x 30.03108pt.
+[1
+
+{/tools/tropic/texlive/2022/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map} 
+</tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/img//TS_logo_blue.pdf>]
+LaTeX Font Info:    Font shape `T1/opensans-TLF/m/n' will be
+(Font)              scaled to size 17.28pt on input line 59.
+LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
+(Font)              scaled to size 17.28pt on input line 59.
+\NetTableWidth=\dimen298
+\coldima=\dimen299
+\coldimb=\dimen300
+\coldimc=\dimen301
+\coldimd=\dimen302
+\coldime=\dimen303
+\coldimf=\dimen304
+\coldimg=\dimen305
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/ulasy.fd)
+Overfull \hbox (2.13522pt too wide) in paragraph at lines 71--71
+[]|[]\T1/opensans-TLF/b/n/12 Version
+ []
+
+
+Underfull \hbox (badness 1248) in paragraph at lines 71--71
+[]|\T1/opensans-TLF/m/n/12 Fix se-man-tics of LSR in-struc-
+ []
+
+
+Underfull \hbox (badness 3861) in paragraph at lines 71--71
+\T1/opensans-TLF/m/n/12 (op1 in-stead of op2). Add
+ []
+
+
+Underfull \hbox (badness 3179) in paragraph at lines 71--71
+\T1/opensans-TLF/m/n/12 note about mod-u-lar in-struc-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 71--71
+[]|\T1/opensans-TLF/m/n/12 Add de-scrip-tion of SW
+ []
+
+<img//TS_logo_blue_symbol.pdf, id=140, 112.53343pt x 94.85023pt>
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 77.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+
+pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
+been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.77 \newpage
+              [1 </tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/img//TS_logo_
+blue_symbol.pdf>]
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 8
+6.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2022/07/10 v2.5l Standard LaTeX font definitions
+)
+Underfull \hbox (badness 10000) in paragraph at lines 96--97
+[][]$\T1/cmtt/m/n/12 https : / / tropic-[]gitlab . corp . sldev . cz / internal
+ / development-[]environment /
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 117.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[2] (build/pdf/spect_programmer_guide.toc)
+\tf@toc=\write5
+\openout5 = `spect_programmer_guide.toc'.
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 128.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[3]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 141.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[4
+
+]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 149.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[5
+
+]
+
+pdfTeX warning: pdflatex (file ./img/spect_pm_block_diagram.pdf): PDF inclusion
+: found PDF version <1.7>, but at most version <1.5> allowed
+<img/spect_pm_block_diagram.pdf, id=214, 485.89528pt x 302.0886pt>
+File: img/spect_pm_block_diagram.pdf Graphic file (type pdf)
+<use img/spect_pm_block_diagram.pdf>
+Package pdftex.def Info: img/spect_pm_block_diagram.pdf  used on input line 164
+.
+(pdftex.def)             Requested size: 483.71432pt x 300.73265pt.
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 169.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[6
+
+ <./img/spect_pm_block_diagram.pdf>]
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 190.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 190.
+
+
+
+pdfTeX warning: pdflatex (file ./img/spect_pm_gprs.pdf): PDF inclusion: found P
+DF version <1.7>, but at most version <1.5> allowed
+<img/spect_pm_gprs.pdf, id=238, 603.21356pt x 234.8775pt>
+File: img/spect_pm_gprs.pdf Graphic file (type pdf)
+<use img/spect_pm_gprs.pdf>
+Package pdftex.def Info: img/spect_pm_gprs.pdf  used on input line 196.
+(pdftex.def)             Requested size: 435.32419pt x 169.50948pt.
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 208.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[7
+
+ <./img/spect_pm_gprs.pdf>]
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 211.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 211.
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 252.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[8]
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 267.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 267.
+
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 280.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 280.
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 291.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[9]
+
+pdfTeX warning: pdflatex (file ./img/spect_pm_invocation.pdf): PDF inclusion: f
+ound PDF version <1.7>, but at most version <1.5> allowed
+<img/spect_pm_invocation.pdf, id=297, 283.0575pt x 356.29109pt>
+File: img/spect_pm_invocation.pdf Graphic file (type pdf)
+<use img/spect_pm_invocation.pdf>
+Package pdftex.def Info: img/spect_pm_invocation.pdf  used on input line 314.
+(pdftex.def)             Requested size: 338.5863pt x 426.22063pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 323.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 323.
+
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 334.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 334.
+
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 344.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 344.
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 346.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[10]
+Overfull \hbox (17.43507pt too wide) in paragraph at lines 351--353
+[]\T1/opensans-TLF/m/n/12 Done -- En-abled when [] = 1. Gen-er-ated when SPECT 
+firmware
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 355.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[11 <./img/spect_pm_invocation.pdf>] (./spect_mem_map.tex
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 13.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[12]
+\NetTableWidth=\dimen306
+\coldima=\dimen307
+\coldimb=\dimen308
+\coldimc=\dimen309
+\coldimd=\dimen310
+\coldime=\dimen311
+\coldimf=\dimen312
+\coldimg=\dimen313
+
+Overfull \hbox (9.36502pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+
+Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+
+LaTeX Warning: Hyper reference `subsec:Constants ROM' on page 13 undefined on i
+nput line 45.
+
+
+LaTeX Warning: Hyper reference `subsec:External Memory In' on page 13 undefined
+ on input line 45.
+
+
+Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+
+LaTeX Warning: Hyper reference `subsec:External Memory Out' on page 13 undefine
+d on input line 45.
+
+
+Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 51.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[13
+
+]
+\NetTableWidth=\dimen314
+\coldima=\dimen315
+\coldimb=\dimen316
+\coldimc=\dimen317
+\coldimd=\dimen318
+\coldime=\dimen319
+\coldimf=\dimen320
+\coldimg=\dimen321
+
+Underfull \hbox (badness 10000) in paragraph at lines 71--71
+[]|\T1/opensans-TLF/b/n/12 Address
+ []
+
+
+Underfull \hbox (badness 10000) in alignment at lines 71--71
+[][][][][][][]
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 74.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[14]
+Underfull \hbox (badness 10000) in paragraph at lines 84--84
+[]|[]\T1/opensans-TLF/b/n/12 Reset
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--94
+[]|[]\T1/opensans-TLF/b/n/12 Reset
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 94--94
+[]|\T1/opensans-TLF/m/n/12 WO
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+[]|[]\T1/opensans-TLF/b/n/12 Reset
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+[]|\T1/opensans-TLF/m/n/12 RW
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 105--105
+[]|\T1/opensans-TLF/m/n/12 RW
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 115--115
+[]|[]\T1/opensans-TLF/b/n/12 Reset
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 115.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[15
+
+]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 118.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[16])
+Overfull \hbox (2.0068pt too wide) in paragraph at lines 378--380
+\T1/opensans-TLF/m/n/12 Constant ROM con-tains a ROM im-age with con-stants use
+d by SPECT firmware (e.g. $\OML/cmm/m/it/12 P[]$\T1/opensans-TLF/m/n/12 ).
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 399.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[17
+
+]
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 454.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 454.
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 461.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[18
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 482--484
+[]\T1/opensans-TLF/m/n/12 By us-ing "\T1/cmtt/m/n/12 --isa-version=X\T1/opensan
+s-TLF/m/n/12 " switch of SPECT com-piler or ISS, sym-bol
+ []
+
+
+Overfull \hbox (2.01656pt too wide) in paragraph at lines 482--484
+\T1/opensans-TLF/m/n/12 "\T1/cmtt/m/n/12 SPECT_-ISA_-VERSION_-<X>\T1/opensans-T
+LF/m/n/12 " is de-fined au-to-mat-i-cally. The de-fault value is the al-ways ne
+west
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 488.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[19]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 508.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[20
+
+]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 512.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[21
+
+] (build/pdf/spect_programmer_guide.aux)
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
+Package rerunfilecheck Info: File `spect_programmer_guide.out' has not changed.
+
+(rerunfilecheck)             Checksum: A67C1266E7315C9C12E057FF1A034AE3;3886.
+ ) 
+Here is how much of TeX's memory you used:
+ 27761 strings out of 474968
+ 520585 string characters out of 5776089
+ 908492 words of memory out of 5000000
+ 48579 multiletter control sequences out of 15000+600000
+ 479277 words of font info for 58 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 138i,24n,145p,405b,1047s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{/tools/tropic/texlive/2022/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super
+-t1.enc}{/tools/tropic/texlive/2022/2022/texmf-dist/fonts/enc/dvips/opensans/a_
+jg4h6q.enc}</tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1/ascender/ope
+nsans/OpenSans-Bold.pfb></tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1
+/ascender/opensans/OpenSans-Regular.pfb></tools/tropic/texlive/2022/2022/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></tools/tropic/texlive/2022/2022
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></tools/tropic/texlive/202
+2/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></tools/tropic/texliv
+e/2022/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></tools/tropic
+/texlive/2022/2022/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb></tools/
+tropic/texlive/2022/2022/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb>
+Output written on build/pdf/spect_programmer_guide.pdf (22 pages, 236698 bytes)
+.
+PDF statistics:
+ 484 PDF objects out of 1000 (max. 8388607)
+ 413 compressed objects within 5 object streams
+ 95 named destinations out of 1000 (max. 500000)
+ 278 words of extra memory for PDF output out of 10000 (max. 10000000)
+

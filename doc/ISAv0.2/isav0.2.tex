@@ -1,0 +1,301 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% Copyright © 2022 Tropic Square s.r.o. (https://tropicsquare.com/)
+%%
+%% This work is subject to the license terms of the LICENSE.txt file in the
+%% root directory of this source tree.
+%%
+%% If a copy of the LICENSE file was not distributed with this work, you can
+%% obtain one at (https://tropicsquare.com/license).
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is SPECT ISA v0.2 description
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Specify Tropic Square document class
+\documentclass{tropic_design_spec}
+
+\usepackage{listings}
+\lstset{backgroundcolor=\color{lightgray}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document properties and title page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{SPECT -- ISA v0.2}
+\author{Vit Masek, Tropic Square}
+\date{August 2023}
+
+% Start of document
+\begin{document}
+
+% Parameters Needed by Design spec class (must be inside document)
+% Set these parameters according to your project.
+\def \projectname {SPECT}
+\def \documentname {ISA v0.2}
+\def \versionnumber {0.1}
+
+% Title page
+\maketitle
+
+\newcommand{\tspar}{\par\vspace{0.5cm}}
+\newcommand{\tsspc}{\vspace{0.5cm}}
+\newcommand{\tsblank}{\hspace*{0.5cm}}
+\newcommand{\bi}[1]{\textbf{\textit{#1}}}
+
+\newcommand{\tsnlind}{\newline\tsblank}
+
+\newcommand{\tsif}{\textbf{\textit{if }}}
+\newcommand{\tsthen}{\textbf{\textit{then: }}}
+\newcommand{\tselse}{\newline\textbf{\textit{else: }}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Glossary
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\TsSection{Glossary}
+
+\begin{itemize}
+    \item{$P_{25519} = 2^{255} - 19$}
+    \item{$P_{256} = 2^{256} - 2^{224} + 2^{192} + 2^{96} - 1$}
+    \item{|| -- concatenation}
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instruction set
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\TsSection{Instruction set}
+
+SPECT provides 4 types of instructions:
+\begin{itemize}
+    \item{\textbf{R} - Register}
+    \item{\textbf{I} - Immediate}
+    \item{\textbf{M} - Memory}
+    \item{\textbf{J} - Jump}
+\end{itemize}
+
+\TsSubSection{Operand interpretation}
+
+All operands are considered as 256 bits unsigned integers. Arithmetic instructions that work only with 32 bit
+operands ignores the 224 MSBs of input and clears them in the result. Immediate logic instructions work only
+with 12 LSBs, ignore the 244 MSBs of input, and pass the 244 MSBs of op2 to the result.
+
+\TsSubSection{Instruction Format}
+
+\input{isav0.2_spect_instruction_encoding.tex}
+
+\TsSubSection{Symbols}
+
+Following symbols are used in description of instructions:
+\begin{itemize}
+    \item{F -- Flags set by the instruction}
+    \item{\#C -- Number of cycles the instruction takes to execute}
+\end{itemize}
+
+\begin{landscape}
+\pagebreak
+\TsSubSection{R instructions}
+\begin{TropicRatioLongTable5Col}
+    {0.25}                   {0.285}                              {0.4}                                         {0.03} {0.035}
+    {Mnemonic               & Name                              & Semantics                                     & F     & \#C              }
+      \TropicTableBreak{Arithmetic Instructions (32 bit)}                                                                       \Ttlb
+      ADD op1,op2,op3       & 32 bit addition                   & op1 = op2 + op3                               & Z     & 11    \Ttlb
+      SUB op1,op2,op3       & 32 bit subtraction                & op1 = op2 - op3                               & Z     & 11    \Ttlb
+      CMP op2,op3           & 32 bit comparison                 & op2 - op3                                     & Z     & 9     \Ttlb
+
+      \TropicTableBreak{Logic Instructions}                                                                                     \Ttlb
+      AND op1,op2,op3       & Bitwise AND                       & op1 = op2 \& op3                              & Z     & 11    \Ttlb
+      OR op1,op2,op3        & Bitwise OR                        & op1 = op2 | op3                               & Z     & 11    \Ttlb
+      XOR op1,op2,op3       & Bitwise Exclusive OR              & op1 = op2 \textasciicircum\space op3          & Z     & 11    \Ttlb
+      NOT op1,op2           & Bitwise NOT                       & op1 = \textasciitilde op2                     & Z     & 10    \Ttlb
+      SBIT op1,op2,op3      & Set bit                           & op1 = op2 $\vee$ (0x1 $\ll$ op3[7:0])         &       & 11    \Ttlb
+      CBIT op1,op2,op3      & Clear bit                         & op1 = op2 $\wedge$ $\sim$(0x1 $\ll$ op3[7:0]) &       & 11    \Ttlb
+
+
+      \TropicTableBreak{Shift Instructions}                                                                                         \Ttlb
+      LSL op1,op2           & Logic shift left                  & op1 = op2[254:0] || 0                 & C      & 10               \Ttlb
+      LSR op1,op2           & Logic shift right                 & op1 = 0 || op2[255:1]                 & C      & 10               \Ttlb
+      ROL op1,op2           & Rotating shift left               & op1 = op2[254:0] || op2[255]          & C      & 10               \Ttlb
+      ROR op1,op2           & Rotating shift right              & op1 = op2[0] || op2[255:1]            & C      & 10               \Ttlb
+      ROL8 op1,op2          & Rotating byte shift left          & op1 = op2[247:0] || op2[255:248]      &        & 10               \Ttlb
+      ROR8 op1,op2          & Rotating byte shift right         & op1 = op2[7:0] || op2[255:8]          &        & 10               \Ttlb
+      ROLIN op1,op2,op3     & Rotating byte shift left\newline
+                              with shift in from op3            & op1 = op2[247:0] || op3[255:248]      &        & 11               \Ttlb
+      RORIN op1,op2,op3     & Rotating byte shift right\newline
+                              with shift in from op3            & op1 = op3[7:0] || op2[255:8]          &        & 11               \Ttlb
+
+      SWE op1,op2           & Swap endianity                    & op1[255:248] = op2[7:0]  \newline
+                                                                  op1[247:240] = op2[15:8] \newline
+                                                                  ... \newline
+                                                                  op1[7:0] = op2[255:248]               &        & 10               \Ttlb
+
+      \TropicTableBreak{Modular arithmetic instructions}                                                                            \Ttlb
+      MUL25519 op1,op2,op3  & Multiplication in $GF(P_{25519})$ & op1 = (op2 * op3) \% $P_{25519}$      &        & 91               \Ttlb
+      MUL256 op1,op2,op3    & Multiplication in $GF(P_{256})$   & op1 = (op2 * op3) \% $P_{256}$        &        & 139              \Ttlb
+      ADDP op1,op2,op3      & Generic Modular Addition          & op1 = (op2 + op3) \% R31              &        & 16               \Ttlb
+      SUBP op1,op2,op3      & Generic Modular Subtraction       & op1 = (op2 - op3) \% R31              &        & 16               \Ttlb
+      MULP op1,op2,op3      & Generic Modular Multiplication    & op1 = (op2 * op3) \% R31              &        & 597              \Ttlb
+      REDP op1,op2,op3      & Generic Modular Reduction         & op1 = (op2 || op3) \% R31             &        & 528              \Ttlb
+
+      \TropicTableBreak{Load Instructions}                                                                                          \Ttlb
+      LDR op1,op2           & Load register                     & op1[31:0] = Mem[op2]\newline
+                                                                  op1[63:32] = Mem[op2+0x4]\newline
+                                                                  \dots\newline
+                                                                  op1[255:224] = Mem[op2+0x1C]          &        & --               \Ttlb
+      STR op1,op2           & Store register                    & Mem[op2] = op1[31:0]\newline
+                                                                  Mem[op2+0x4] = op1[63:32]\newline
+                                                                  \dots\newline
+                                                                  Mem[op2+0x1C] = op1[255:224]          &        & --               \Ttlb
+
+
+      \TropicTableBreak{Other Instructions}                                                                                         \Ttlb
+      MOV op1,op2           & Move register                     & op1 = op2                             &        & 7                \Ttlb
+      CSWAP op1,op2         & Conditional swap -- C flag        & \tsif \textbf{C} == 1 \tsthen \tsnlind
+                                                                    op1 = op2 \tsnlind
+                                                                    op2 = op1                           &        & 11               \Ttlb
+      ZSWAP op1,op2         & Conditional swap -- Z flag        & \tsif \textbf{Z} == 1 \tsthen \tsnlind
+                                                                    op1 = op2 \tsnlind
+                                                                    op2 = op1                           &        & 11               \Ttlb
+      HASH op1,op2          & Hash (SHA512)                     & Updates SHA core with (op2+3||op2+2||op2+1||op2)\newline
+                                                                  op1 = SHA state[255:0]\newline
+                                                                  op1+1 = SHA state[511:256]            &        & 347              \Ttlb
+      TMAC_IT op2           & TMAC initialize                   & Resets TMAC and underlying KECCAK core
+                                                                  mask = (op2+3||op2+2||op2+1||op2)\newline
+                                                                  Share A = mask[399:0]\newline
+                                                                  Share B = mask[799:0]\newline
+                                                                  Guard = [803:800]                     &        & 94               \Ttlb
+      TMAC_UP op2           & TMAC update                       & Updates TMAC with op2[143:0]          &        & 44               \Ttlb                                                         
+      TMAC_RD op1           & TMAC update                       & op1 = TMAC result                     &        & 84               \Ttlb                                                         
+
+      GRV op1               & Get Random Value                  & op1 = Random number                   &        & --               \Ttlb
+      SCB op1,op2,op3       & Blind scalar                      & B = \textit{Blind}(op2, op3, R31)\newline
+                                                                  op1 = B[255:0]\newline
+                                                                  op1+1 = B[511:256]                    &        & 88               \Ttlb
+\end{TropicRatioLongTable5Col}
+
+
+\TsSubSection{I instructions}
+\begin{TropicRatioLongTable5Col}
+    {0.25}                      {0.285}                              {0.4}                                          {0.03} {0.035}
+    {Mnemonic                   & Name                              & Semantics                                     & F      & \#C          }
+      \TropicTableBreak{Arithmetic Instructions (32 bit)}                                                                                   \Ttlb
+      ADDI op1,op2,Immediate    & 32 bit addition                   & op1 = op2 + Immediate                         & Z     & 11            \Ttlb
+      SUBI op1,op2,Immediate    & 32 bit subtraction                & op1 = op2 - Immediate                         & Z     & 11            \Ttlb
+      CMPI op2,Immediate        & 32 bit comparison                 & op2 - Immediate                               & Z     & 9             \Ttlb
+
+      \TropicTableBreak{Logic Instructions (12 bit)}                                                                                        \Ttlb
+      ANDI op1,op2,Immediate    & 12 bit bitwise logic AND          & op1[11:0] = op2[11:0] \& Immediate\newline
+                                                                      op1[255:12] = op2[255:12]                     & Z     & 11            \Ttlb
+      ORI op1,op2,Immediate     & 12 bit bitwise logic OR           & op1[11:0] = op2[11:0] | Immediate\newline
+                                                                      op1[255:12] = op2[255:12]                     & Z     & 11            \Ttlb
+      XORI op1,op2,Immediate    & 12 bit bitwise exclusive OR       & op1[11:0] = op2[11:0] \textasciicircum\space Immediate\newline
+                                                                      op1[255:12] = op2[255:12]                     & Z     & 11            \Ttlb
+
+      \TropicTableBreak{KBUS Instructions}                                                                                                  \Ttlb
+      LDK op1,op2,Immediate     & Load key                          & op1 = KBUS_READ[type,slot,offset] where\newline
+                                                                      type = Immediate[11:8]\newline
+                                                                      slot = op2[7:0]\newline
+                                                                      offset = Immediate[4:0] * 8                   & E     & --            \Ttlb
+      STK op1,op2,Immediate     & Load key                          & KBUS_WRITE[key,type,slot,offset] where\newline
+                                                                      key = op1\newline
+                                                                      type = Immediate[11:8]\newline
+                                                                      slot = op2[7:0]\newline
+                                                                      offset = Immediate[4:0] * 8                   & E     & --            \Ttlb
+      KBO op2,Immediate         & KBUS OP                           & KBUS_OP[type,slot,op] where\newline
+                                                                      type = Immediate[11:8]\newline
+                                                                      slot = op2[7:0]\newline
+                                                                      op = Immediate[3:0]                           & E     & --            \Ttlb
+
+      \TropicTableBreak{Other Instructions}                                                                                                 \Ttlb
+      MOVI op1,Immediate        & Move immediate                    & op1[11:0] = Immediate,\newline
+                                                                      op1[255:12] = 0                               &       & 6             \Ttlb
+      HASH_IT                   & Hash init                         & Reset hash calculation.                       &       & 9             \Ttlb
+      TMAC_IS op2, Immediate    & TMAC initstring                   & Initialize TMAC with initstring\newline
+                                                                      K = op2, N = Imd[7:0]                         &       & 78            \Ttlb
+\end{TropicRatioLongTable5Col}
+
+Due to not enough space in the 32 bit instruction format, the immediate operand is just 12 bit. Because of that,
+the logic instructions works only with the 12 LSBs of op2. E.g. 0xFF12 \& 0xF0F = 0xFF02.
+
+\TsSubSection{M instructions}
+
+\begin{TropicRatioLongTable5Col}
+    {0.25}                      {0.285}                            {0.4}                                           {0.03}  {0.035}
+    {Mnemonic                   & Name                              & Semantics                                     & F     & \#C                   }
+      LD op1,Addr               & Load                              & op1[31:0] = Mem[Addr]\newline
+                                                                      op1[63:32] = Mem[Addr+0x4]\newline
+                                                                      ...\newline
+                                                                      op1[255:224] = Mem[Addr+0x1C]                 &       & --            \Ttlb
+      ST op1,Addr               & Store                             & Mem[Addr] = op1[31:0]\newline
+                                                                      Mem[Addr+0x4] = op1[63:32] = \newline
+                                                                      ...\newline
+                                                                      Mem[Addr+0x1C] = op1[255:224]                 &       & --            \Ttlb
+\end{TropicRatioLongTable5Col}
+
+\pagebreak
+\TsSubSection{J instructions}
+
+\begin{TropicRatioLongTable5Col}
+    {0.25}                      {0.285}                             {0.4}                                           {0.03}  {0.035}
+    {Mnemonic                   & Name                              & Semantics                                     & F      & \#C           }
+     CALL NewPC                 & Subroutine call                   & push(RAR, PC+0x4), PC = NewPC                 &        & 5            \Ttlb
+     RET                        & Return from subroutine            & PC = pop(RAR)                                 &        & 5            \Ttlb
+     BRZ NewPC                  & Branch on Zero                    & \tsif Z == 1 \tsthen \tsnlind
+                                                                        PC = NewPC                                  &        & 5            \Ttlb
+     BRNZ NewPC                 & Branch on not Zero                & \tsif Z == 0 \tsthen \tsnlind
+                                                                        PC = NewPC                                  &        & 5            \Ttlb
+     BRC NewPC                  & Branch on Carry                   & \tsif C == 1 \tsthen \tsnlind
+                                                                        PC = NewPC                                  &        & 5            \Ttlb
+     BRNC NewPC                 & Branch on not Carry               & \tsif C == 0 \tsthen \tsnlind
+                                                                        PC = NewPC                                  &        & 5            \Ttlb
+     BRE NewPC                  & Branch on Error                   & \tsif E == 1 \tsthen \tsnlind
+                                                                        PC = NewPC                                  &        & 5            \Ttlb
+     BRNE NewPC                 & Branch on not Error               & \tsif E == 0 \tsthen \tsnlind
+                                                                        PC = NewPC                                  &        & 5            \Ttlb
+     JMP NewPC                  & Unconditional jump                & PC = NewPC                                    &        & 5            \Ttlb
+     END                        & End of program, stops FW execution
+                                  and sets \Register{STATUS[DONE]}. & --                                            &        & 4            \Ttlb
+     NOP                        & Does nothing.                     & --                                            &        & 3            \Ttlb
+\end{TropicRatioLongTable5Col}
+
+\end{landscape}
+
+\TsSection{Flags}
+
+\TsSubSection{Zero Flag -- Z}
+
+Zero flag is set to 1, if instruction changing the flag is executed and:
+\begin{itemize}
+    \item all 256 bits of op1 are 0
+    \item op2 - op3 = 0 in case of CMP and CMPI instructions
+\end{itemize}
+and cleared otherwise.
+
+Zero flag keeps its value if instruction that does not modify it is executed.
+
+\TsSubSection{Cary Flag -- C}
+
+Carry flag is set to 1, if instruction changing the flag is executed and:
+\begin{itemize}
+    \item op2[255] = 1 in case of LSL and ROL instructions
+    \item op2[0] = 1 in case of LSR and ROR instructions
+\end{itemize}
+and cleared otherwise.
+
+Carry flag keeps its value if instruction that does not modify it is executed.
+
+\TsSubSection{Error Flag -- E}
+
+Error flag is set to 1 in \Signal{spect_kbus_error} is set during KBUS request
+when LDK, STK and KBO instructions are executed.
+
+Error flag keeps its value if instruction that does not modify it is executed.
+
+\end{document}
