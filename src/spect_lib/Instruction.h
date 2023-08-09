@@ -30,9 +30,10 @@ class spect::Instruction
         /// @param op_mask Instruction operand mask (operands required in the '.s' file).
         /// @param r31_dep True - Instruction depends on content of register 31, False otherwise.
         /// @param c_time True - Instruction shall execute in constant time, False otherwise.
+        /// @param cycles - Instruction execution duration
         ///////////////////////////////////////////////////////////////////////////////////////////
         Instruction(std::string mnemonic, InstructionType itype, uint32_t opcode,
-                    uint32_t func, int op_mask, bool r31_dep, bool c_time);
+                    uint32_t func, int op_mask, bool r31_dep, bool c_time, int cycles);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Instruction destructor
@@ -150,8 +151,12 @@ class spect::Instruction
         ///////////////////////////////////////////////////////////////////////////////////////////
         int op_mask_;
 
-        // Number of clock cycles instruction took to execute on RTL
-        int cycles_ = 0;
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// Number of clock cycles instruction take to execute on RTL
+        ///  When in timing accurate mode, this value is used to insert delay.
+        ///  When running on RTL, this variable is used to store observed execution duration.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        int cycles_;
 
         // Number of times instruction was executed
         uint64_t exec_cnt_ = 0;

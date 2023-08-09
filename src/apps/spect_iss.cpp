@@ -38,7 +38,9 @@ enum  optionIndex {
     DUMP_CONTEXT,
     LOAD_CONTEXT,
     DUMP_KEYMEM,
-    LOAD_KEYMEM
+    LOAD_KEYMEM,
+    TIMING_ACCURATE,
+    EXEC_TIME_STEP
 };
 
 const option::Descriptor usage[] =
@@ -71,6 +73,8 @@ const option::Descriptor usage[] =
     {LOAD_CONTEXT,          0,  ""  ,    "load-context"         ,option::Arg::Optional,     "  --load-context=<file>        Load context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) before execution from file. \n"},
     {DUMP_KEYMEM,           0,  ""  ,    "dump-keymem"          ,option::Arg::Optional,     "  --dump-keymem=<file>         Dump Key memory after execution to file. \n"},
     {LOAD_KEYMEM,           0,  ""  ,    "load-keymem"          ,option::Arg::Optional,     "  --load-keymem=<file>         Load Key memory before execution from file. \n"},
+    {TIMING_ACCURATE,       0,  ""  ,    "timing-accurate"      ,option::Arg::Optional,     "  --timing-accurate            Launch simulator in the timing accurate mode.\n"},
+    {EXEC_TIME_STEP,        0,  ""  ,    "execution-time-step"  ,option::Arg::Optional,     "  --execution-time-step=<n>    Instruction execution time step (in us) for timing accurate simulation (default = 10).\n"},
 
     {0,0,0,0,0,0}
 };
@@ -241,6 +245,19 @@ int main(int argc, char** argv)
         std::stringstream ss;
         ss << options[MAX_INSTR_CNT].arg;
         ss >> simulator->model_->max_instr_cnt_;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Configure timing accurate simulation
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    if (options[TIMING_ACCURATE]) {
+        simulator->model_->timing_accurate_sim_ = true;
+    }
+
+    if (options[EXEC_TIME_STEP]) {
+        std::stringstream ss;
+        ss << options[EXEC_TIME_STEP].arg;
+        ss >> simulator->model_->execution_time_step_;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

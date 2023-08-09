@@ -31,12 +31,12 @@
 // Macros for definitions of instructions
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define DEFINE_R_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
+#define DEFINE_R_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time, cycles)    \
     class name : public spect::InstructionR {                                                   \
         public:                                                                                 \
             name(CpuGpr op1, CpuGpr op2, CpuGpr op3) :                                          \
                 InstructionR(std::string(mnemonic), opcode, func, op_mask,                      \
-                             op1, op2, op3, r31_dep, c_time)                                    \
+                             op1, op2, op3, r31_dep, c_time, cycles)                            \
                 {};                                                                             \
             spect::Instruction* Clone() {                                                       \
                 return new name(op1_, op2_, op3_);                                              \
@@ -44,12 +44,12 @@
             bool Execute();                                                                     \
     };
 
-#define DEFINE_I_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
+#define DEFINE_I_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time, cycles)    \
     class name : public spect::InstructionI {                                                   \
         public:                                                                                 \
             name(CpuGpr op1, CpuGpr op2, uint16_t immediate) :                                  \
                 InstructionI(std::string(mnemonic), opcode, func, op_mask,                      \
-                             op1, op2, immediate, r31_dep, c_time)                              \
+                             op1, op2, immediate, r31_dep, c_time, cycles)                      \
                 {};                                                                             \
             spect::Instruction* Clone() {                                                       \
                 return new name(op1_, op2_, immediate_);                                        \
@@ -57,12 +57,12 @@
             bool Execute();                                                                     \
     };                                                                                          \
 
-#define DEFINE_M_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
+#define DEFINE_M_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time, cycles)    \
     class name : public spect::InstructionM {                                                   \
         public:                                                                                 \
             name(CpuGpr op1, uint16_t addr) :                                                   \
                 InstructionM(std::string(mnemonic), opcode, func, op_mask,                      \
-                            op1, addr, r31_dep, c_time)                                         \
+                            op1, addr, r31_dep, c_time, cycles)                                 \
                 {};                                                                             \
             spect::Instruction* Clone() {                                                       \
                 return new name(op1_, addr_);                                                   \
@@ -70,12 +70,12 @@
             bool Execute();                                                                     \
     };                                                                                          \
 
-#define DEFINE_J_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time)            \
+#define DEFINE_J_INSTRUCTION(name, mnemonic, opcode, func, op_mask, r31_dep, c_time, cycles)    \
     class name : public spect::InstructionJ {                                                   \
         public:                                                                                 \
             name(uint16_t new_pc) :                                                             \
                 InstructionJ(std::string(mnemonic), opcode, func, op_mask, new_pc, r31_dep,     \
-                             c_time)                                                            \
+                             c_time, cycles)                                                    \
                 {};                                                                             \
             spect::Instruction* Clone() {                                                       \
                 return new name(new_pc_);                                                       \

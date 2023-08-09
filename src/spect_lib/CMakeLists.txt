@@ -74,11 +74,12 @@ foreach (ISA_TEMPLATE ${ISA_LIST})
           list(GET LINE_LIST 5 R31_DEP)
           list(GET LINE_LIST 6 C_TIME)
           list(GET LINE_LIST 7 CROSS_COVER)
+          list(GET LINE_LIST 8 CYCLES)
 
           message("   ${InstructionColor}${MNEMONIC}${ColourReset}")
 
           # Instruction definitions (header + implicit constructor)
-          set(DEF_STR "${DEF_STR} DEFINE_${ITYPE}_INSTRUCTION(V${ISA_VERSION}Instruction${MNEMONIC},\"${MNEMONIC}\",${OPCODE},${FUNC},${OPMASK},${R31_DEP},${C_TIME}) ")
+          set(DEF_STR "${DEF_STR} DEFINE_${ITYPE}_INSTRUCTION(V${ISA_VERSION}Instruction${MNEMONIC},\"${MNEMONIC}\",${OPCODE},${FUNC},${OPMASK},${R31_DEP},${C_TIME},${CYCLES}) ")
 
           # Instruction registration within instruction factory
           set(REG_STR "${REG_STR} REGISTER_${ITYPE}_INSTRUCTION(${ISA_VERSION},spect::V${ISA_VERSION}Instruction${MNEMONIC}) ")

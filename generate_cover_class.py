@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 continue
 
             # Parse out Instruction attribtues
-            [i_type_str, mnemonic, opcode, func, op_mask, r31_dep, c_time, op2_op3_cross] = line.split()
+            [i_type_str, mnemonic, opcode, func, op_mask, r31_dep, c_time, op2_op3_cross, cycles] = line.split()
 
             i_type_int = 0
             for i_type in i_types:

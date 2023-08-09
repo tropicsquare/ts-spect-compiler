@@ -21,12 +21,13 @@
 
 
 spect::Instruction::Instruction(std::string mnemonic, InstructionType itype, uint32_t opcode,
-                                uint32_t func, int op_mask, bool r31_dep, bool c_time) :
+                                uint32_t func, int op_mask, bool r31_dep, bool c_time, int cycles) :
     itype_(itype),
     opcode_(opcode),
     func_(func),
     mnemonic_(mnemonic),
     op_mask_(op_mask),
+    cycles_(cycles),
     r31_dep_(r31_dep),
     c_time_(c_time)
 {}
