@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.5)  7 AUG 2023 10:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.12.5)  9 AUG 2023 10:28
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
-**spect_programmer_guide_v0.2.tex
-(./spect_programmer_guide_v0.2.tex
+**spect_programmer_guide.tex
+(./spect_programmer_guide.tex
 LaTeX2e <2022-11-01> patch level 1
 L3 programming layer <2022-11-02>
 (/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_design_spec.cls
@@ -893,7 +893,7 @@ Package: tropic_colors 2021/06/07 Tropic Square colors package
 \@float@every@table=\toks42
 )
 (/tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/tropic_fonts.sty))
-(build/pdf/spect_programmer_guide_v0.2.aux
+(build/pdf/spect_programmer_guide.aux
 
 LaTeX Warning: Label `SPECTBK' multiply defined.
 
@@ -901,7 +901,7 @@ LaTeX Warning: Label `SPECTBK' multiply defined.
 LaTeX Warning: Label `SPECTBK' multiply defined.
 
 )
-\openout1 = `spect_programmer_guide_v0.2.aux'.
+\openout1 = `spect_programmer_guide.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 31.
 LaTeX Font Info:    ... okay on input line 31.
@@ -982,10 +982,9 @@ e
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 Package hyperref Info: Link coloring OFF on input line 31.
-(build/pdf/spect_programmer_guide_v0.2.out)
-(build/pdf/spect_programmer_guide_v0.2.out)
+(build/pdf/spect_programmer_guide.out) (build/pdf/spect_programmer_guide.out)
 \@outlinefile=\write4
-\openout4 = `spect_programmer_guide_v0.2.out'.
+\openout4 = `spect_programmer_guide.out'.
 
 \c@mv@tabular=\count334
 \c@mv@boldtabular=\count335
@@ -1009,13 +1008,14 @@ LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
 runsystem((git describe --tags --abbrev=0 HEAD 2>/dev/null) > iexec.tmp 2>&1; /
 bin/echo -n $?% >iexec.ret)...executed.
 
- (./iexec.tmp)
+
+(./iexec.tmp)
 iexec: The content of 'iexec.tmp' was included into the document
 runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-<img//TS_logo_blue.pdf, id=151, 667.5626pt x 103.61813pt>
+<img//TS_logo_blue.pdf, id=127, 667.5626pt x 103.61813pt>
 File: img//TS_logo_blue.pdf Graphic file (type pdf)
 <use img//TS_logo_blue.pdf>
 Package pdftex.def Info: img//TS_logo_blue.pdf  used on input line 40.
@@ -1038,14 +1038,34 @@ LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
 \coldimg=\dimen305
 
 (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/ulasy.fd)
-Overfull \hbox (2.13522pt too wide) in paragraph at lines 65--65
+Overfull \hbox (2.13522pt too wide) in paragraph at lines 71--71
 []|[]\T1/opensans-TLF/b/n/12 Version
  []
 
-<img//TS_logo_blue_symbol.pdf, id=164, 112.53343pt x 94.85023pt>
+
+Underfull \hbox (badness 1248) in paragraph at lines 71--71
+[]|\T1/opensans-TLF/m/n/12 Fix se-man-tics of LSR in-struc-
+ []
+
+
+Underfull \hbox (badness 3861) in paragraph at lines 71--71
+\T1/opensans-TLF/m/n/12 (op1 in-stead of op2). Add
+ []
+
+
+Underfull \hbox (badness 3179) in paragraph at lines 71--71
+\T1/opensans-TLF/m/n/12 note about mod-u-lar in-struc-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 71--71
+[]|\T1/opensans-TLF/m/n/12 Add de-scrip-tion of SW
+ []
+
+<img//TS_logo_blue_symbol.pdf, id=140, 112.53343pt x 94.85023pt>
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 72.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 77.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1069,14 +1089,24 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.72 \tableofcontents
-                      [1 </tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/img//
-TS_logo_blue_symbol.pdf>] (build/pdf/spect_programmer_guide_v0.2.toc
+l.77 \newpage
+              [1 </tools/tropic/ts-latex-lib/v0.18/tropic_tex_lib/img//TS_logo_
+blue_symbol.pdf>]
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 8
+6.
+
+(/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2022/07/10 v2.5l Standard LaTeX font definitions
+)
+Underfull \hbox (badness 10000) in paragraph at lines 96--97
+[][]$\T1/cmtt/m/n/12 https : / / tropic-[]gitlab . corp . sldev . cz / internal
+ / development-[]environment /
+ []
+
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 37.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 117.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
 (fancyhdr)                Make it at least 26.0pt, for example:
@@ -1094,13 +1124,13 @@ runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-[2])
+[2] (build/pdf/spect_programmer_guide.toc)
 \tf@toc=\write5
-\openout5 = `spect_programmer_guide_v0.2.toc'.
+\openout5 = `spect_programmer_guide.toc'.
 
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 83.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 128.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 
@@ -1123,7 +1153,7 @@ runsystem(rm iexec.ret)...executed.
 [3]
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 94.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 141.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 
@@ -1148,7 +1178,7 @@ runsystem(rm iexec.ret)...executed.
 ]
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 102.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 149.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 
@@ -1174,15 +1204,15 @@ runsystem(rm iexec.ret)...executed.
 
 pdfTeX warning: pdflatex (file ./img/spect_pm_block_diagram.pdf): PDF inclusion
 : found PDF version <1.7>, but at most version <1.5> allowed
-<img/spect_pm_block_diagram.pdf, id=229, 485.89528pt x 302.0886pt>
+<img/spect_pm_block_diagram.pdf, id=214, 485.89528pt x 302.0886pt>
 File: img/spect_pm_block_diagram.pdf Graphic file (type pdf)
 <use img/spect_pm_block_diagram.pdf>
-Package pdftex.def Info: img/spect_pm_block_diagram.pdf  used on input line 117
+Package pdftex.def Info: img/spect_pm_block_diagram.pdf  used on input line 164
 .
 (pdftex.def)             Requested size: 483.71432pt x 300.73265pt.
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 122.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 169.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1206,24 +1236,24 @@ runsystem(rm iexec.ret)...executed.
  <./img/spect_pm_block_diagram.pdf>]
 
 Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 142.
+(hhline)                 on input line 190.
 
 
 Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 142.
+(hhline)                 on input line 190.
 
 
 
 pdfTeX warning: pdflatex (file ./img/spect_pm_gprs.pdf): PDF inclusion: found P
 DF version <1.7>, but at most version <1.5> allowed
-<img/spect_pm_gprs.pdf, id=253, 603.21356pt x 234.8775pt>
+<img/spect_pm_gprs.pdf, id=238, 603.21356pt x 234.8775pt>
 File: img/spect_pm_gprs.pdf Graphic file (type pdf)
 <use img/spect_pm_gprs.pdf>
-Package pdftex.def Info: img/spect_pm_gprs.pdf  used on input line 148.
+Package pdftex.def Info: img/spect_pm_gprs.pdf  used on input line 196.
 (pdftex.def)             Requested size: 435.32419pt x 169.50948pt.
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 160.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 208.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1247,23 +1277,15 @@ runsystem(rm iexec.ret)...executed.
  <./img/spect_pm_gprs.pdf>]
 
 Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 163.
+(hhline)                 on input line 211.
 
 
 Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 163.
-
-
-Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 204.
-
-
-Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 204.
+(hhline)                 on input line 211.
 
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 206.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 252.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1285,35 +1307,23 @@ runsystem(rm iexec.ret)...executed.
 [8]
 
 Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 218.
+(hhline)                 on input line 267.
 
 
 Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 218.
-
-
-
-pdfTeX warning: pdflatex (file ./img/spect_pm_invocation.pdf): PDF inclusion: f
-ound PDF version <1.7>, but at most version <1.5> allowed
-<img/spect_pm_invocation.pdf, id=306, 283.0575pt x 356.29109pt>
-File: img/spect_pm_invocation.pdf Graphic file (type pdf)
-<use img/spect_pm_invocation.pdf>
-Package pdftex.def Info: img/spect_pm_invocation.pdf  used on input line 248.
-(pdftex.def)             Requested size: 338.5863pt x 426.22063pt.
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
+(hhline)                 on input line 267.
 
 
 Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 255.
+(hhline)                 on input line 280.
 
 
 Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 255.
+(hhline)                 on input line 280.
 
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 257.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 291.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1334,16 +1344,43 @@ runsystem(rm iexec.ret)...executed.
 
 [9]
 
+pdfTeX warning: pdflatex (file ./img/spect_pm_invocation.pdf): PDF inclusion: f
+ound PDF version <1.7>, but at most version <1.5> allowed
+<img/spect_pm_invocation.pdf, id=297, 283.0575pt x 356.29109pt>
+File: img/spect_pm_invocation.pdf Graphic file (type pdf)
+<use img/spect_pm_invocation.pdf>
+Package pdftex.def Info: img/spect_pm_invocation.pdf  used on input line 314.
+(pdftex.def)             Requested size: 338.5863pt x 426.22063pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
 Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 266.
+(hhline)                 on input line 323.
 
 
 Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 266.
+(hhline)                 on input line 323.
+
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 334.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 334.
+
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 344.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 344.
 
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 273.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 346.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1362,10 +1399,37 @@ runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-[10 <./img/spect_pm_invocation.pdf>]
+[10]
+Overfull \hbox (17.43507pt too wide) in paragraph at lines 351--353
+[]\T1/opensans-TLF/m/n/12 Done -- En-abled when [] = 1. Gen-er-ated when SPECT 
+firmware
+ []
+
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 290.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 355.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[11 <./img/spect_pm_invocation.pdf>] (./spect_mem_map.tex
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 13.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 
@@ -1385,39 +1449,7 @@ runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-[11] (./spect_instruction_encoding.tex
-LaTeX Font Info:    Font shape `T1/opensans-TLF/m/n' will be
-(Font)              scaled to size 10.95pt on input line 5.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <10.95> on input line 6.
-LaTeX Font Info:    Font shape `T1/opensans-TLF/b/n' will be
-(Font)              scaled to size 10.95pt on input line 24.
-)
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 323.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[12
-
-]
+[12]
 \NetTableWidth=\dimen306
 \coldima=\dimen307
 \coldimb=\dimen308
@@ -1427,14 +1459,40 @@ runsystem(rm iexec.ret)...executed.
 \coldimf=\dimen312
 \coldimg=\dimen313
 
-Overfull \hbox (6.80194pt too wide) in paragraph at lines 372--372
-[]|\T1/opensans-TLF/m/n/12 tmp = \T1/opensans-TLF/m/it/12 SHA512\T1/opensans-TL
-F/m/n/12 (op2+3||op2+2||op2+1||op2) 
+Overfull \hbox (9.36502pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+
+Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+
+LaTeX Warning: Hyper reference `subsec:Constants ROM' on page 13 undefined on i
+nput line 45.
+
+
+LaTeX Warning: Hyper reference `subsec:External Memory In' on page 13 undefined
+ on input line 45.
+
+
+Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
+[]|[]| 
+ []
+
+
+LaTeX Warning: Hyper reference `subsec:External Memory Out' on page 13 undefine
+d on input line 45.
+
+
+Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
+[]|[]| 
  []
 
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 372.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 51.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 Package fancyhdr Warning: \headheight is too small (12.0pt): 
@@ -1464,164 +1522,6 @@ runsystem(rm iexec.ret)...executed.
 \coldime=\dimen319
 \coldimf=\dimen320
 \coldimg=\dimen321
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 398.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[14]
-\NetTableWidth=\dimen322
-\coldima=\dimen323
-\coldimb=\dimen324
-\coldimc=\dimen325
-\coldimd=\dimen326
-\coldime=\dimen327
-\coldimf=\dimen328
-\coldimg=\dimen329
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 419.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[15]
-\NetTableWidth=\dimen330
-\coldima=\dimen331
-\coldimb=\dimen332
-\coldimc=\dimen333
-\coldimd=\dimen334
-\coldime=\dimen335
-\coldimf=\dimen336
-\coldimg=\dimen337
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 437.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[16] (./spect_mem_map.tex
-\NetTableWidth=\dimen338
-\coldima=\dimen339
-\coldimb=\dimen340
-\coldimc=\dimen341
-\coldimd=\dimen342
-\coldime=\dimen343
-\coldimf=\dimen344
-\coldimg=\dimen345
-
-Overfull \hbox (9.36502pt too wide) in paragraph at lines 45--45
-[]|[]| 
- []
-
-
-Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
-[]|[]| 
- []
-
-
-LaTeX Warning: Hyper reference `subsec:Constants ROM' on page 17 undefined on i
-nput line 45.
-
-
-LaTeX Warning: Hyper reference `subsec:External Memory In' on page 17 undefined
- on input line 45.
-
-
-Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
-[]|[]| 
- []
-
-
-LaTeX Warning: Hyper reference `subsec:External Memory Out' on page 17 undefine
-d on input line 45.
-
-
-Overfull \hbox (2.50342pt too wide) in paragraph at lines 45--45
-[]|[]| 
- []
-
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 51.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[17
-
-
-]
-\NetTableWidth=\dimen346
-\coldima=\dimen347
-\coldimb=\dimen348
-\coldimc=\dimen349
-\coldimd=\dimen350
-\coldime=\dimen351
-\coldimf=\dimen352
-\coldimg=\dimen353
 
 Underfull \hbox (badness 10000) in paragraph at lines 71--71
 []|\T1/opensans-TLF/b/n/12 Address
@@ -1653,7 +1553,7 @@ runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-[18]
+[14]
 Underfull \hbox (badness 10000) in paragraph at lines 84--84
 []|[]\T1/opensans-TLF/b/n/12 Reset
  []
@@ -1709,7 +1609,7 @@ runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-[19
+[15
 
 ]
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
@@ -1734,10 +1634,130 @@ runsystem(rm iexec.tmp)...executed.
 
 runsystem(rm iexec.ret)...executed.
 
-[20])
+[16])
+Overfull \hbox (2.0068pt too wide) in paragraph at lines 378--380
+\T1/opensans-TLF/m/n/12 Constant ROM con-tains a ROM im-age with con-stants use
+d by SPECT firmware (e.g. $\OML/cmm/m/it/12 P[]$\T1/opensans-TLF/m/n/12 ).
+ []
+
 File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
 <use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 471.
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 399.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[17
+
+]
+
+Package hhline Warning: the character 1 ignored in \hhline argument
+(hhline)                 on input line 454.
+
+
+Package hhline Warning: the character 2 ignored in \hhline argument
+(hhline)                 on input line 454.
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 461.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[18
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 482--484
+[]\T1/opensans-TLF/m/n/12 By us-ing "\T1/cmtt/m/n/12 --isa-version=X\T1/opensan
+s-TLF/m/n/12 " switch of SPECT com-piler or ISS, sym-bol
+ []
+
+
+Overfull \hbox (2.01656pt too wide) in paragraph at lines 482--484
+\T1/opensans-TLF/m/n/12 "\T1/cmtt/m/n/12 SPECT_-ISA_-VERSION_-<X>\T1/opensans-T
+LF/m/n/12 " is de-fined au-to-mat-i-cally. The de-fault value is the al-ways ne
+west
+ []
+
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 488.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[19]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 508.
+(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
+
+
+Package fancyhdr Warning: \headheight is too small (12.0pt): 
+(fancyhdr)                Make it at least 26.0pt, for example:
+(fancyhdr)                \setlength{\headheight}{26.0pt}.
+(fancyhdr)                You might also make \topmargin smaller to compensate:
+
+(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
+
+runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
+c.ret)...executed.
+
+(./iexec.tmp)
+iexec: The content of 'iexec.tmp' was included into the document
+runsystem(rm iexec.tmp)...executed.
+
+runsystem(rm iexec.ret)...executed.
+
+[20
+
+]
+File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
+<use img//TS_logo_blue_symbol.pdf>
+Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 512.
 (pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
 
 
@@ -1759,130 +1779,41 @@ runsystem(rm iexec.ret)...executed.
 
 [21
 
-]
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 5
-09.
- (/tools/tropic/texlive/2022/2022/texmf-dist/tex/latex/base/t1cmtt.fd
-File: t1cmtt.fd 2022/07/10 v2.5l Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `T1/opensans-TLF/m/n' will be
-(Font)              scaled to size 8.0pt on input line 528.
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 528.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[22
-
-]
-
-Package hhline Warning: the character 1 ignored in \hhline argument
-(hhline)                 on input line 542.
-
-
-Package hhline Warning: the character 2 ignored in \hhline argument
-(hhline)                 on input line 542.
-
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 573.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[23]
-File: img//TS_logo_blue_symbol.pdf Graphic file (type pdf)
-<use img//TS_logo_blue_symbol.pdf>
-Package pdftex.def Info: img//TS_logo_blue_symbol.pdf  used on input line 577.
-(pdftex.def)             Requested size: 22.76228pt x 19.18535pt.
-
-
-Package fancyhdr Warning: \headheight is too small (12.0pt): 
-(fancyhdr)                Make it at least 26.0pt, for example:
-(fancyhdr)                \setlength{\headheight}{26.0pt}.
-(fancyhdr)                You might also make \topmargin smaller to compensate:
-
-(fancyhdr)                \addtolength{\topmargin}{-14.0pt}.
-
-runsystem((git rev-parse --short HEAD) > iexec.tmp 2>&1; /bin/echo -n $?% >iexe
-c.ret)...executed.
-
-(./iexec.tmp)
-iexec: The content of 'iexec.tmp' was included into the document
-runsystem(rm iexec.tmp)...executed.
-
-runsystem(rm iexec.ret)...executed.
-
-[24
-
-] (build/pdf/spect_programmer_guide_v0.2.aux)
+] (build/pdf/spect_programmer_guide.aux)
 
 LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package rerunfilecheck Info: File `spect_programmer_guide_v0.2.out' has not cha
-nged.
-(rerunfilecheck)             Checksum: AB60AA56FAC3D288372E4715A8737E64;4890.
+Package rerunfilecheck Info: File `spect_programmer_guide.out' has not changed.
+
+(rerunfilecheck)             Checksum: A67C1266E7315C9C12E057FF1A034AE3;3886.
  ) 
 Here is how much of TeX's memory you used:
- 27801 strings out of 474968
- 521528 string characters out of 5776089
- 944129 words of memory out of 5000000
- 48606 multiletter control sequences out of 15000+600000
- 484110 words of font info for 71 fonts, out of 8000000 for 9000
+ 27761 strings out of 474968
+ 520585 string characters out of 5776089
+ 908492 words of memory out of 5000000
+ 48579 multiletter control sequences out of 15000+600000
+ 479277 words of font info for 58 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 138i,25n,145p,410b,1958s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 138i,24n,145p,405b,1047s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/tools/tropic/texlive/2022/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super
 -t1.enc}{/tools/tropic/texlive/2022/2022/texmf-dist/fonts/enc/dvips/opensans/a_
 jg4h6q.enc}</tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1/ascender/ope
 nsans/OpenSans-Bold.pfb></tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1
-/ascender/opensans/OpenSans-BoldItalic.pfb></tools/tropic/texlive/2022/2022/tex
-mf-dist/fonts/type1/ascender/opensans/OpenSans-Italic.pfb></tools/tropic/texliv
-e/2022/2022/texmf-dist/fonts/type1/ascender/opensans/OpenSans-Regular.pfb></too
-ls/tropic/texlive/2022/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pf
-b></tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cm
-r12.pfb></tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmr8.pfb></tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmsy10.pfb></tools/tropic/texlive/2022/2022/texmf-dist/fonts/type1/pub
-lic/cm-super/sftt0800.pfb>
-Output written on build/pdf/spect_programmer_guide_v0.2.pdf (25 pages, 227624 b
-ytes).
+/ascender/opensans/OpenSans-Regular.pfb></tools/tropic/texlive/2022/2022/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></tools/tropic/texlive/2022/2022
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></tools/tropic/texlive/202
+2/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></tools/tropic/texliv
+e/2022/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></tools/tropic
+/texlive/2022/2022/texmf-dist/fonts/type1/public/cm-super/sftt0800.pfb></tools/
+tropic/texlive/2022/2022/texmf-dist/fonts/type1/public/cm-super/sftt1200.pfb>
+Output written on build/pdf/spect_programmer_guide.pdf (22 pages, 236698 bytes)
+.
 PDF statistics:
- 511 PDF objects out of 1000 (max. 8388607)
- 435 compressed objects within 5 object streams
- 93 named destinations out of 1000 (max. 500000)
- 326 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 484 PDF objects out of 1000 (max. 8388607)
+ 413 compressed objects within 5 object streams
+ 95 named destinations out of 1000 (max. 500000)
+ 278 words of extra memory for PDF output out of 10000 (max. 10000000)
 

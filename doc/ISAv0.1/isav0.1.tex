@@ -10,7 +10,7 @@
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This is SPECT programmers manual
+% This is SPECT ISA v0.1 description
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -23,9 +23,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document properties and title page
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{SPECT -- Programmer Guide}
-\author{Ondrej Ille, Tropic Square}
-\date{October 2022}
+\title{SPECT -- ISA v0.1}
+\author{Vit Masek, Tropic Square}
+\date{August 2023}
 
 % Start of document
 \begin{document}
@@ -33,8 +33,8 @@
 % Parameters Needed by Design spec class (must be inside document)
 % Set these parameters according to your project.
 \def \projectname {SPECT}
-\def \documentname {Programmer Guide ISAv0.1}
-\def \versionnumber {0.5}
+\def \documentname {ISA v0.1}
+\def \versionnumber {0.1}
 
 % Title page
 \maketitle
@@ -50,31 +50,6 @@
 \newcommand{\tsthen}{\textbf{\textit{then: }}}
 \newcommand{\tselse}{\newline\textbf{\textit{else: }}}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Document revisions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Version history}
-
-\begin{TropicRatioLongTable4Col}
-    {0.1}            {0.2}                  {0.3}            {0.4}
-    {Version Tag     & Date                 & Author          &    Description                    }
-     0.1             & 12.10.2022           & Ondrej Ille     &    Initial version                      \Ttlb
-     0.2             & 7.11.2022            & Ondrej Ille     &    Fix semantics of LSR instruction.    \Ttlb
-     0.3             & 8.11.2022            & Ondrej Ille     &    Fix SCB semantics.                   \Ttlb
-     0.4             & 14.11.2022           & Ondrej Ille     &    Fix semantics of ST instruction (op1 instead of op2).
-                                                                   Add note about modular instruction operands. \Ttlb
-     0.5             & 23.11.2022           & Ondrej Ille     &    Add description of SW toolchain. \Ttlb
-\end{TropicRatioLongTable4Col}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Table of contents
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagebreak
-\tableofcontents
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Document
@@ -87,203 +62,10 @@
 \TsSection{Glossary}
 
 \begin{itemize}
-    \item{\textbf{CPU} - Central Processing Unit}
-    \item{\textbf{ECC} - Elliptic Curve Cryptography}
-    \item{\textbf{SPECT} - Secure Processor of Elliptic Curves for Tropic}
+    \item{$P_{25519} = 2^{255} - 19$}
+    \item{$P_{256} = 2^{256} - 2^{224} + 2^{192} + 2^{96} - 1$}
+    \item{|| -- concatenation}
 \end{itemize}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Register field types
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\TsSection{Register field types}
-
-\TropicRegisterTypeList
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Introduction
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\TsSection{Introduction}
-
-This document provides a programmer's guide for SPECT. SPECT is a domain specific
-processing unit targeted for calculations of Elliptic Curve Cryptography (ECC).
-SPECT provides instructions for calculation with 256 bit numbers and modular
-arithmetics. SPECT is useful to implement operations/algorithms such as:
-\begin{itemize}
-    \item{ECDSA - Elliptic Curve Digital Signature Algorithm}
-    \item{ECDH  - Elliptic Curve Diffe-Hellman}
-\end{itemize}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{%
-        \detokenize{img/spect_pm_block_diagram.pdf}%
-    }
-    \caption{SPECT - Block diagram}%
-    \label{SPECTBK}%
-\end{figure}
-
-\TsSection{Programmer's model}
-
-SPECT programmer's model consists of:
-\begin{itemize}
-    \item 32 x 256 bit general purpose registers (\textbf{R0} - \textbf{R31}).
-    \item \textbf{PC} - Program counter.
-    \item Zero (\textbf{Z}) and Carry (\textbf{C}) flag.
-    \item HW \textbf{RAR} (Return Address Register) stack for nested procedure calls.
-    \item \textbf{SRR} (Secret Results Register) for handling secret results.
-    \item 2048 B read-write memory space in address range 0x0000 -- 0x07FC.
-    \item 512 B write-only memory space in address range 0x1000 -- 0x11FC.
-    \item 2048 B read-only memory space in address range 0x3000 -- 0x37FC.
-\end{itemize}
-
-\TropicNote{
-    SPECTs address space is 32 bit word organized. \textbf{LD} and \textbf{ST}
-    instructions works with 256 bit values and it always uses 8 consecutive words
-    in the memory. E.g. 0x0020 - 0x003C.
-}
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=.9\textwidth]{%
-        \detokenize{img/spect_pm_gprs.pdf}%
-    }
-    \caption{SPECT - Programmers model}%
-    \label{SPECTBK}%
-\end{figure}
-
-
-\TsSubSection{Subroutine calls}
-
-SPECT contains HW \textbf{RAR} stack, and it pushes return address from subroutine
-to RAR stack each time when it executes CALL instruction. When SPECT executes
-RET instruction, it pops value from RAR stack and updates \textbf{PC}. HW \textbf{RAR}
-stack supports up to 5 nested subroutine calls.
-
-\TropicNote{
-    Behavior of SPECT when number of nested subroutine calls is exceeded is undefined.
-}
-
-\TsSubSection{Using private keys}
-
-Private keys are typically sensitive information in cryptographic systems.
-Therefore, it is good to minimize the time for which they are present in such
-system. When SPECT Program needs to use private key which is stored elsewhere
-in the system, it executes GPK instruction which reads 256 bit
-private key from outside of SPECT. GPK instruction supports key
-identification in case of multiple private keys are available in the system.
-
-\TsSubSection{Using random numbers}
-
-Proper random numbers with uniform distribution are critical for cryptographic
-calculations. Such random numbers can be typically generated by TRNG (True Random
-Number Generator). When SPECT Program needs a random number, it executes GRV
-instruction which obtains random number from outside of SPECT.
-
-\TsSubSection{Modular arithmetics}
-
-SPECT provides instructions for finite field arithmetic such as
-addition, subtraction and multiplication with 256 bit operands stored in general purpose
-registers. SPECT supports fast multiplication in Ed25519 and P-256 curves finite fields 
-via dedicated instructions -- MUL25519 and MUL256. Modular arithmetics with generic modulus
-specified by value in \textbf{R31} is supported by instructions ADDP, SUBP, MULP. SPECT
-also supports modular reduction of 512 bit number with REDP instruction.
-
-When programming with modular instructions, one needs to be careful about input
-operands of such instructions. Following conditions must be met:
-\begin{itemize}
-    \item op2 < $P_{25519}$ and op3 < $P_{25519}$ for MUL25519 instruction.
-    \item op2 < $P_{256}$ and op3 < $P_{256}$ for MUL256 instruction.
-    \item op2 < R31 and op3 < R31 for ADDP, SUBP instructions.
-    \item R31 != 0 and R31 != 1 for ADDP, SUBP, MULP, REDP instructions.
-\end{itemize}
-if these conditions are not met when invoking such modular instruction, result
-of instruction calculation is undefined (value in op1).
-
-\TropicNote{
-    Performance of MULP when \textbf{R31} = $P_{25519}$ / $P_{256}$ is lower
-    than performance of MUL25519 / MUL256.
-}
-
-\TsSubSection{Hash calculation}
-
-SPECT supports SHA512 Hash calculation as specified in FIPS 180-4. SPECT can
-calculate SHA512 hash from arbitrarily long data stream. When SPECT executes HASH_IT
-instruction, it resets context in its execution engine to initialization
-vector as specified in FIPS 180-4. Each execution of HASH instruction
-processes 1024 bit block, and executes next round of SHA512 calculation.
-
-\TropicNote{
-    SPECT does not perform padding of input data as specified in section 5.1
-    of FIPS 180-4. It is responsibility of SPECT program or external system
-    to perform such padding.
-}
-
-\TsSubSection{Handling secret results}
-
-Cryptographic calculations frequently result in a shared secret (e.g. in case
-of ECDH calculation), which shall only be visible to certain other objects in
-the system, but it shall not be globally accessible on system level memory bus.
-When SPECT program finishes its execution, it stores these results into
-\textbf{SRR} register. After the program execution has finished, external
-blocks within a system can read this secret result from the SPECT via dedicated
-handshake.
-
-\TsSubSection{Scalar blinding}
-
-SPECT supports scalar blinding by a random number as side-channel counter-measure
-by SCB instruction. It blinds the scalar $sc$ using group scalar randomization method
-as defined in \cite{SCB} with 256 bit random number. The random number $rng$ shall be obtained in
-advance by GRV instruction as described above. The group order $q$ shall be present in \textbf{R31}.
-
-SCB performs this exact function: $$Blind(sc, rng, q) = q \times (rng | (2^{255} + 2^{223})) + sc$$
-
-\TsSubSection{SPECT invocation}
-
-SPECT is invoked by external system which has access to its memory space via
-memory bus as shown in following figure:
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[width=.7\textwidth]{%
-        \detokenize{img/spect_pm_invocation.pdf}%
-    }
-    \caption{SPECT - Invocation}%
-    \label{SPECTBK}%
-\end{figure}
-
-\TropicNote{Address of first Program instruction executed by SPECT after
-            \Register{COMMAND[START]} = 1 is written, is fixed and defined
-            by a system which integrates SPECT.}
-
-\TsSubSection{Invalid instructions}
-
-When SPECT attempts to execute invalid instruction, it aborts program execution
-and sets \Register{STATUS[ERR]} = 1.
-
-\TropicNote{
-    Invalid instruction means invalid opcode or not matching parity bit in the instruction code. Unless
-    a fault, usual cause of this is e.g. missing RET instruction in subroutine or END instruction at the
-    end of program.
-}
-
-\TsSubSection{Soft Reset}
-
-SPECT can be reset by extenal system by writing \Register{COMMAND[RST]} = 1.
-When SPECT is reset, it aborts program execution and resets its internal state.
-
-\TsSubSection{Interrupts}
-
-SPECT program execution can't be interrupted by an external event (other than
-Soft reset). SPECT itself can generate following interrupts for external system:
-\begin{itemize}
-    \item{Program Done - Enabled when \Register{INT_ENA[INT_DONE_EN]} = 1. Generated
-                         when SPECT program executes END instruction, or it
-                         detects error.}
-    \item{Program Error interrupt - Enabled when \Register{INT_ENA[INT_DONE_EN]} = 1.
-                        Generated when SPECT attempts to execute invalid instruction.}
-\end{itemize}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Instruction set
@@ -308,19 +90,15 @@ to the result.
 
 \TsSubSection{Instruction Format}
 
-\input{spect_instruction_encoding.tex}
+\input{isav0.1_spect_instruction_encoding.tex}
 
 \TsSubSection{Symbols}
 
 Following symbols are used in description of instructions:
 \begin{itemize}
-    \item{|| -- Bitwise concatenation}
-    \item{$P_{25519} = 2^{255} - 19$}
-    \item{$P_{256} = 2^{256} - 2^{224} + 2^{192} + 2^{96} - 1$}
     \item{F -- Flags set by the instruction}
     \item{\#C -- Number of cycles the instruction takes to execute}
 \end{itemize}
-
 
 \begin{landscape}
 \pagebreak
@@ -434,146 +212,36 @@ the logic instructions works only with the 12 LSBs of op2. E.g. 0xFF12 \& 0xF0F 
      BRNC NewPC                 & Branch on not Carry               & \tsif C == 0 \tsthen \tsnlind
                                                                         PC = NewPC                                  &        & 5            \Ttlb
      JMP NewPC                  & Unconditional jump                & PC = NewPC                                    &        & 5            \Ttlb
-\end{TropicRatioLongTable5Col}
+     END                        & End of program, stops FW execution
+                                  and sets \Register{STATUS[DONE]}. & --                                            &        & 4            \Ttlb
+     NOP                        & Does nothing.                     & --                                            &        & 3            \Ttlb
+
+    \end{TropicRatioLongTable5Col}
 
 \end{landscape}
 
-\input{spect_mem_map.tex}
+\TsSection{Flags}
 
-\TsSubSection{Data RAM IN}
+\TsSubSection{Zero Flag -- Z}
 
-Data RAM IN is a memory where external system stores parameters for SPECT Program
-before it starts its execution. SPECT Program sees it as read-write memory.
-
-\TsSubSection{Data RAM OUT}
-
-Data RAM OUT is a memory where SPECT Program stores results of its calculation,
-and external system reads such results after SPECT Program execution ends. SPECT
-Program sees it as write-only memory.
-
-\TsSubSection{Instruction Memory}
-
-Instruction memory contains the Program executed by SPECT. Based on SPECT
-manufacturing configuration, this memory might be readable/writable by external
-system (Instruction Memory is RAM), or not accessible by external system at all
-(Instruction Memory is ROM with fixed program). SPECT Program do not have access
-to this memory with LD and ST instructions. 
-
-\TsSubSection{Constant ROM}
-
-Constant ROM contains a ROM image with important cryptographic constants
-used by SPECT Program during program execution. SPECT program sees it as
-read-only memory.
-
-\OpenIssue{Place SPECT Constant ROM content!}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SW supoort
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\TsSection{SW toolchain}
-
-SPECT contains SW toolchain intended for SW development and debugging. SPECT
-has following applications available:
-
+Zero flag is set to 1, if instruction changing the flag is executed and:
 \begin{itemize}
-    \item{spect_compiler} -- A compiler/assembler which creates .hex file from .s
-                            assembly file.
-    \item{spect_iss} -- Instruction level simulator with simple command line debugger.
-                       It can simulate .s file as well as .hex file.
+    \item bits 31:0 of op1 are 0 
+    \item op2[31:0] - op3[31:0] = 0 in case of CMP and CMPI instructions
 \end{itemize}
+and cleared otherwise.
 
-Options for each of the applications are described when using \textbf{- -help}
-command line option. Options available inside interactive shell of
-\textbf{spect_iss} are available with \textbf{- -help} command line oprion or \textbf{help}
-command.
+Zero flag keeps its value if instruction that does not modify it is executed.
 
-SPECT assembler has support for following assembly language features:
+\TsSubSection{Cary Flag -- C}
+
+Carry flag is set to 1, if instruction changing the flag is executed and:
 \begin{itemize}
-    \item{Function labels}
-    \item{Constant definitions}
-    \item{Include other assembly file}
+    \item op2[255] = 1 in case of LSL and ROL instructions
+    \item op2[0] = 1 in case of LSR and ROR instructions
 \end{itemize}
+and cleared otherwise.
 
-\TsSubSection{Tool requirements}
-
-SPECT SW toolchain requires following tools:
-\begin{itemize}
-    \item CMAKE 3.18.2 or higher
-\end{itemize}
-
-\OpenIssue{What else?}
-
-\TsSubSection{Function labels}
-
-SPECT compiler allows definition of function labels, and passing them
-as NewPc of J instructions, e.g like so:
-
-\begin{lstlisting}
-_start:
-    CALL my_func
-    END
-
-my_func:
-    ADD r0, r1, r2
-    RET
-\end{lstlisting}
-
-
-\TsSubSection{Constant definitions}
-SPECT compiler allows definition of constants, and passing them as
-Addr of M instructions or Immediate operand of I type instructions like so:
-
-\begin{lstlisting}
-threshold .eq 0x12
-
-_start:
-    ADDI r0, r0, threshold
-\end{lstlisting}
-
-\begin{lstlisting}
-p25519_addr .eq 0x3020
-
-_start:
-    LD r31, p25519_addr
-\end{lstlisting}
-
-\TropicNote{
-    Currently, SPECT compiler does not support expression parsing,
-    it only supports simple decimal, hexadecimal or binary value
-    when defining constants.
-}
-
-\TsSubSection{Include other assembly file}
-
-Multiple .s assembly files can be connected together in SPECT source code
-via "include" directive, e.g. like so:
-
-\begin{lstlisting}
-_start:
-    NOP
-
-.include <other_s_file>
-    END
-\end{lstlisting}
-
-\section{REFERENCES}\label{s:REFERENCES}
-
-\begin{thebibliography}{99}
-
-    \bibitem{SCB}{
-        Danger, Jean-Luc et al.
-        “A synthesis of side-channel attacks on elliptic curve cryptography in smart-cards.”
-        Journal of Cryptographic Engineering 3 (2013): 241 - 265.
-    }
-
-\end{thebibliography}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Open issues
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\TsSection{Open Issues}
-
-\PrintOpenIssueSummary
+Carry flag keeps its value if instruction that does not modify it is executed.
 
 \end{document}
