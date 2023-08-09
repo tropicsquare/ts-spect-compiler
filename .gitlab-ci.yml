@@ -128,7 +128,9 @@ pages:
     script:
       - echo "Publishing pages..."
       - mkdir -p public
-      - cp doc/programmer_guide/build/pdf/spect_programmers_guide.pdf public
+      - cp doc/programmer_guide/build/pdf/spect_programmer_guide.pdf public
+      - cp doc/ISAv0.1/build/pdf/isav0.1.pdf public
+      - cp doc/ISAv0.2/build/pdf/isav0.2.pdf public
 
     artifacts:
       paths:
