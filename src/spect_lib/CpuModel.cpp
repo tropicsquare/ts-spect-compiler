@@ -486,6 +486,7 @@ void spect::CpuModel::PrintHashContext(uint32_t verbosity_level)
 
 void spect::CpuModel::DumpContext(const std::string &path)
 {
+    uint32_t backup = verbosity_;
     std::ofstream ofs;
     ofs.open(path);
 
@@ -531,16 +532,27 @@ void spect::CpuModel::DumpContext(const std::string &path)
         ofs << flgs.carry << "\n";
         ofs << flgs.error << "\n";
 
-        PUT_COMMENT_LINE("Memory:");
-        uint32_t backup = verbosity_;
-        for (int i = 0; i < (SPECT_TOTAL_MEM_SIZE / 4) ; i++) {
+        PUT_COMMENT_LINE("Data RAM In:");
+        for (int i = 0; i < (SPECT_DATA_RAM_IN_SIZE / 4) ; i++) {
             if (i == 10) {
-                int num_accesses = (SPECT_TOTAL_MEM_SIZE / 4) - 10;
+                int num_accesses = (SPECT_DATA_RAM_IN_SIZE / 4) - 10;
                 DebugInfo(VERBOSITY_LOW, "Executed", std::to_string(num_accesses),
-                        "further acesses to memory that were not printed...");
+                        "further acesses to Data RAM In memory that were not printed...");
                 verbosity_ = 0;
             }
-            ofs << std::setw(8) << GetMemory(i * 4) << "\n";
+            ofs << std::setw(8) << GetMemory(SPECT_DATA_RAM_IN_BASE + i * 4) << "\n";
+        }
+        verbosity_ = backup;
+
+        PUT_COMMENT_LINE("Data RAM Out:");
+        for (int i = 0; i < (SPECT_DATA_RAM_OUT_SIZE / 4) ; i++) {
+            if (i == 10) {
+                int num_accesses = (SPECT_DATA_RAM_OUT_SIZE / 4) - 10;
+                DebugInfo(VERBOSITY_LOW, "Executed", std::to_string(num_accesses),
+                        "further acesses to Data RAM Out memory that were not printed...");
+                verbosity_ = 0;
+            }
+            ofs << std::setw(8) << GetMemory(SPECT_DATA_RAM_OUT_BASE + i * 4) << "\n";
         }
         verbosity_ = backup;
 
@@ -554,6 +566,7 @@ void spect::CpuModel::DumpContext(const std::string &path)
 
 void spect::CpuModel::LoadContext(const std::string &path)
 {
+    uint32_t backup = verbosity_;
     std::ifstream ifs(path);
     std::string line;
 
@@ -648,21 +661,37 @@ void spect::CpuModel::LoadContext(const std::string &path)
         iss4 >> val;
         SetCpuFlag(CpuFlagType::ERROR, val);
 
-        // Memory
+        // Data RAM In
         SKIP_COMMENT_LINES
-        uint32_t backup = verbosity_;
-        for (int i = 0; i < (SPECT_TOTAL_MEM_SIZE / 4) ; i++) {
+        for (int i = 0; i < (SPECT_DATA_RAM_IN_SIZE / 4) ; i++) {
             if (i == 10) {
-                int num_accesses = (SPECT_TOTAL_MEM_SIZE / 4) - 10;
+                int num_accesses = (SPECT_DATA_RAM_IN_SIZE / 4) - 10;
                 DebugInfo(VERBOSITY_LOW, "Executed", std::to_string(num_accesses),
-                        "further acesses to memory that were not printed...");
+                        "further acesses to Data RAM In memory that were not printed...");
                 verbosity_ = 0;
             }
             uint32_t mem_val;
             std::getline(ifs, line);
             std::istringstream iss5(line);
             iss5 >> std::hex >> mem_val;
-            SetMemory(i * 4, mem_val);
+            SetMemory(SPECT_DATA_RAM_IN_BASE + i * 4, mem_val);
+        }
+        verbosity_ = backup;
+
+        // Data RAM Out
+        SKIP_COMMENT_LINES
+        for (int i = 0; i < (SPECT_DATA_RAM_OUT_SIZE / 4) ; i++) {
+            if (i == 10) {
+                int num_accesses = (SPECT_DATA_RAM_OUT_SIZE / 4) - 10;
+                DebugInfo(VERBOSITY_LOW, "Executed", std::to_string(num_accesses),
+                        "further acesses to Data RAM Out memory that were not printed...");
+                verbosity_ = 0;
+            }
+            uint32_t mem_val;
+            std::getline(ifs, line);
+            std::istringstream iss6(line);
+            iss6 >> std::hex >> mem_val;
+            SetMemory(SPECT_DATA_RAM_OUT_BASE + i * 4, mem_val);
         }
         verbosity_ = backup;
 
