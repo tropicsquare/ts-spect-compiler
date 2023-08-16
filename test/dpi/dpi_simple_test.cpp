@@ -13,6 +13,7 @@
 #include <stdint.h>
 
 #include "spect_iss_dpi.h"
+#include "spect_defs.h"
 
 extern "C" {
     // Dummy replacement of simulator specific printf
@@ -37,7 +38,9 @@ int main()
     spect_dpi_reset();
 
     // TODO: Adjust paths to be raltive to some var
-    rv = spect_dpi_compile_program(DPI_TEST_FW, "tmp.hex", DPI_HEX_ISS_WORD, DPI_PARITY_NONE);
+    rv = spect_dpi_compile_program(DPI_TEST_FW, "tmp.hex",
+                                   DPI_HEX_ISS_WORD, DPI_PARITY_NONE,
+                                   SPECT_INSTR_MEM_BASE);
     assert(rv == 0);
 
     spect_dpi_exit();

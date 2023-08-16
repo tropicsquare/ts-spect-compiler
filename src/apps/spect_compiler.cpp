@@ -99,15 +99,18 @@ int main(int argc, char** argv)
     }
     std::cout << "Using ISA version: " << spect::InstructionFactory::GetActiveISAVersion() << std::endl;
 
-    comp = new spect::Compiler(SPECT_INSTR_MEM_BASE);
+    comp = new spect::Compiler();
+    uint32_t first_addr = SPECT_INSTR_MEM_BASE;
+
     if (options[FIRST_ADDR]) {
         std::stringstream ss;
         ss << std::hex << options[FIRST_ADDR].arg;
-        ss >> comp->first_addr_;
+        ss >> first_addr;
     } else {
         comp->Warning("'--first-address' undefined. First instruction will be placed at start of"
                       " instruction memory.");
     }
+    comp->CompileInit(first_addr);
 
     // All remaining arguments are input source files
     try {

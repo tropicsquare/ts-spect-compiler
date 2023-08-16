@@ -19,6 +19,12 @@ spect::CpuProgram::CpuProgram(size_t expected_size)
     code_.reserve(expected_size);
 }
 
+spect::CpuProgram::~CpuProgram()
+{
+    for (const auto &instr : code_)
+        delete instr;
+}
+
 void spect::CpuProgram::AppendInstruction(spect::Instruction *instr)
 {
     code_.push_back(instr);

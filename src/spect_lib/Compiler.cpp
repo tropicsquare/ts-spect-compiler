@@ -22,24 +22,9 @@
 #include "InstructionR.h"
 
 
-spect::Compiler::Compiler(uint32_t first_addr) :
-    first_addr_(first_addr),
-    curr_addr_(first_addr)
+spect::Compiler::Compiler(void)
 {
-    if (first_addr < SPECT_INSTR_MEM_BASE ||
-       (first_addr_ > (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE)) ) {
-        char buf[256];
-        std::sprintf(buf, "First instruction placed at address 0x%04x which is not in Instruction "
-                          "Memory of SPECT. Place first instruction between: 0x%04x - 0x%04x",
-                          first_addr, SPECT_INSTR_MEM_BASE,
-                          SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - 4);
-        Error(buf);
-    }
-
     symbols_ = new spect::SymbolTable();
-    program_ = new spect::CpuProgram(2048);
-    program_->first_addr_ = first_addr;
-    program_->compiler_ = this;
     print_fnc = &(printf);
 
     CondDefAdd(std::string("SPECT_ISA_VERSION_") + std::to_string(InstructionFactory::GetActiveISAVersion()));
@@ -51,6 +36,29 @@ spect::Compiler::~Compiler()
         delete f.second;
     delete symbols_;
     delete program_;
+}
+
+void spect::Compiler::CompileInit(uint32_t first_addr)
+{
+    if (first_addr < SPECT_INSTR_MEM_BASE ||
+       (first_addr > (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE)) ) {
+        char buf[256];
+        std::sprintf(buf, "First instruction placed at address 0x%04x which is not in Instruction "
+                          "Memory of SPECT. Place first instruction between: 0x%04x - 0x%04x",
+                          first_addr, SPECT_INSTR_MEM_BASE,
+                          SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - 4);
+        Error(buf);
+    }
+
+    first_addr_ = first_addr;
+    curr_addr_ = first_addr;
+
+    if (program_ != nullptr)
+        delete program_;
+
+    program_ = new spect::CpuProgram(2048);
+    program_->compiler_ = this;
+    program_->first_addr_ = first_addr;
 }
 
 uint32_t spect::Compiler::ParseValue(spect::SourceFile *sf, int line_nr, const std::string &val,

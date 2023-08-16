@@ -158,15 +158,17 @@ int main(int argc, char** argv)
     ///////////////////////////////////////////////////////////////////////////////////////////////
     uint32_t *m_mem = simulator->model_->GetMemoryPtr();
 
+    uint32_t first_addr = SPECT_INSTR_MEM_BASE;
     if (options[PROGRAM] && options[FIRST_ADDR]) {
         std::stringstream ss;
         ss << std::hex << options[FIRST_ADDR].arg;
-        ss >> simulator->compiler_->first_addr_ ;
+        ss >> first_addr;
     } else {
         simulator->compiler_->Warning(
             "'--first-address' undefined, and program loaded via '--program'."
             "First instruction will be placed at start of Instruction memory.");
     }
+    simulator->compiler_->CompileInit(first_addr);
 
     if (options[INSTRUCTION_MEM_HEX]) {
         if (options[PROGRAM]) {

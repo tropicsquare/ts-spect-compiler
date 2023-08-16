@@ -23,16 +23,21 @@ class spect::Compiler
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief New Compiler constructor
-        /// @param first_addr Address where compiler shall place first instruction of first
-        ///                   processed assembly file.
         /// @returns New model object
         ///////////////////////////////////////////////////////////////////////////////////////////
-        Compiler(uint32_t first_addr);
+        Compiler(void);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Compiler destructor
         ///////////////////////////////////////////////////////////////////////////////////////////
         ~Compiler();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Compiler destructor
+        /// @param first_addr Address where compiler shall place first instruction of first
+        ///                   processed assembly file.
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void CompileInit(uint32_t first_addr);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Compile program
@@ -93,7 +98,7 @@ class spect::Compiler
         spect::SymbolTable *symbols_;
 
         // Pointer to compiled program
-        spect::CpuProgram *program_;
+        spect::CpuProgram *program_ = nullptr;
 
         // Pointer to source files (.s) used for compilation
         std::map<std::string, spect::SourceFile*> files_;
