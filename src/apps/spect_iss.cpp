@@ -20,6 +20,7 @@
 enum  optionIndex {
     UNKNOWN,
     HELP,
+    VERSION,
     PROGRAM,
     FIRST_ADDR,
     ISA_VERSION,
@@ -47,6 +48,7 @@ const option::Descriptor usage[] =
 {
     {UNKNOWN,               0,  ""  ,    ""                     ,option::Arg::None,         "USAGE: spect_compiler [options]\n\n" "Options:" },
     {HELP,                  0,  "h" ,    "help"                 ,option::Arg::None,         "  --help                       Print usage and exit." },
+    {VERSION,               0,  "v" ,    "version"              ,option::Arg::None,         "  --version                    Display program version and exit." },
     {PROGRAM,               0,  ""  ,    "program"              ,option::Arg::Optional,     "  --program=<s-file>           Program (unassembled) to be compiled and loaded to Instruction memory.\n"},
     {FIRST_ADDR,            0,  ""  ,    "first-address"        ,option::Arg::Optional,     "  --first-address=<addr>       Address to place first instruction from first compiled file. Use this "
                                                                                                                            "option only when loading program via '--program' switch. Option is ignored"
@@ -121,6 +123,13 @@ int main(int argc, char** argv)
 
     if (options[HELP] || argc == 0) {
         option::printUsage(std::cout, usage);
+        return 0;
+    }
+
+    if (options[VERSION]) {
+        std::cout << "SPECT Instruction Set Simulator\n";
+        std::cout << "Version:  " TOOL_VERSION_TAG "\n";
+        std::cout << "GIT Hash: " TOOL_VERSION_HASH "\n";
         return 0;
     }
 

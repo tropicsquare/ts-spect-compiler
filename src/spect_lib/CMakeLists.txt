@@ -100,7 +100,6 @@ foreach (ISA_TEMPLATE ${ISA_LIST})
 
 endforeach()
 
-
 # Waivers
 set_source_files_properties(InstructionDefs.cpp PROPERTIES COMPILE_FLAGS -Wno-unused-parameter)
 set_source_files_properties(ordt_pio_common.cpp PROPERTIES COMPILE_FLAGS -Wno-type-limits)
