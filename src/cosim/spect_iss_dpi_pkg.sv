@@ -355,13 +355,15 @@ typedef enum {
    *              DPI_PARITY_ODD              - Odd parity
    *              DPI_PARITY_EVEN             - Even parity
    *              DPI_PARITY_NONE             - No parity calculated
+   *  @param first_addr Address where to place first compiled instruction.
    *  @returns 0 - Program compiled succesfully
    *           non-zero - Compilation failed.
    *  @note This function fails if the S file does not define '_start' symbol.
    */
   import "DPI-C" function int unsigned spect_dpi_compile_program(string program_path, string hex_path,
                                                                  dpi_hex_file_type_t hex_format,
-                                                                 dpi_parity_type_t parity_type);
+                                                                 dpi_parity_type_t parity_type,
+                                                                 int unsigned first_addr);
 
   /**
    *  @returns Start address from previously compiled program (value of `_start` symbol.)

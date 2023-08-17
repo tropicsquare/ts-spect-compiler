@@ -237,13 +237,15 @@ extern "C" {
      *              DPI_PARITY_ODD              - Odd parity
      *              DPI_PARITY_EVEN             - Even parity
      *              DPI_PARITY_NONE             - No parity calculated
+     *  @param first_addr Address where to place first compiled instruction.
      *  @returns 0 - Program compiled succesfully
      *           non-zero - Compilation failed.
      *  @note This function fails if the S file does not define '_start' symbol.
      */
     uint32_t spect_dpi_compile_program(const char *program_path, const char* hex_path,
                                        const dpi_hex_file_type_t hex_format,
-                                       const dpi_parity_type_t parity_type);
+                                       const dpi_parity_type_t parity_type,
+                                       uint32_t first_addr);
 
     /**
      *  @returns Start address from previously compiled program (value of `_start` symbol.)

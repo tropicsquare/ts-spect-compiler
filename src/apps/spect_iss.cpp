@@ -8,6 +8,7 @@
 
 #include "OptionParser.h"
 
+#include "spect.h"
 #include "CpuSimulator.h"
 #include "Compiler.h"
 #include "CpuModel.h"
@@ -20,6 +21,7 @@
 enum  optionIndex {
     UNKNOWN,
     HELP,
+    VERSION,
     PROGRAM,
     FIRST_ADDR,
     ISA_VERSION,
@@ -47,6 +49,7 @@ const option::Descriptor usage[] =
 {
     {UNKNOWN,               0,  ""  ,    ""                     ,option::Arg::None,         "USAGE: spect_compiler [options]\n\n" "Options:" },
     {HELP,                  0,  "h" ,    "help"                 ,option::Arg::None,         "  --help                       Print usage and exit." },
+    {VERSION,               0,  "v" ,    "version"              ,option::Arg::None,         "  --version                    Display program version and exit." },
     {PROGRAM,               0,  ""  ,    "program"              ,option::Arg::Optional,     "  --program=<s-file>           Program (unassembled) to be compiled and loaded to Instruction memory.\n"},
     {FIRST_ADDR,            0,  ""  ,    "first-address"        ,option::Arg::Optional,     "  --first-address=<addr>       Address to place first instruction from first compiled file. Use this "
                                                                                                                            "option only when loading program via '--program' switch. Option is ignored"
@@ -79,21 +82,7 @@ const option::Descriptor usage[] =
     {0,0,0,0,0,0}
 };
 
-#define EXEC_WITH_ERR_HANDLER(code)                                                                 \
-    try {                                                                                           \
-            code                                                                                    \
-        } catch(std::runtime_error &err) {                                                          \
-            std::cout << err.what() << std::endl;                                                   \
-            program_exit(1);                                                                        \
-        }                                                                                           \
-
 spect::CpuSimulator *simulator;
-
-void program_exit(int ret_code)
-{
-    delete simulator;
-    exit(ret_code);
-}
 
 
 int main(int argc, char** argv)
@@ -121,6 +110,13 @@ int main(int argc, char** argv)
 
     if (options[HELP] || argc == 0) {
         option::printUsage(std::cout, usage);
+        return 0;
+    }
+
+    if (options[VERSION]) {
+        std::cout << "SPECT Instruction Set Simulator\n";
+        std::cout << "Version:  " TOOL_VERSION_TAG "\n";
+        std::cout << "GIT Hash: " TOOL_VERSION_HASH "\n";
         return 0;
     }
 
@@ -158,31 +154,35 @@ int main(int argc, char** argv)
     ///////////////////////////////////////////////////////////////////////////////////////////////
     uint32_t *m_mem = simulator->model_->GetMemoryPtr();
 
+    uint32_t first_addr = SPECT_INSTR_MEM_BASE;
     if (options[PROGRAM] && options[FIRST_ADDR]) {
         std::stringstream ss;
         ss << std::hex << options[FIRST_ADDR].arg;
-        ss >> simulator->compiler_->first_addr_ ;
+        ss >> first_addr;
     } else {
         simulator->compiler_->Warning(
             "'--first-address' undefined, and program loaded via '--program'."
             "First instruction will be placed at start of Instruction memory.");
     }
+    simulator->compiler_->CompileInit(first_addr);
 
     if (options[INSTRUCTION_MEM_HEX]) {
         if (options[PROGRAM]) {
             simulator->compiler_->Error(
                 "Instruction model invoked with both '--program' and '--instruction-mem'."
-                "Use only one source of program (either HEX or .s file)");
+                "Use only one source of program (either HEX or .s file)", spect::ErrCode::GENERIC);
         }
+
         EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[INSTRUCTION_MEM_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_INSTR_MEM_BASE);
-        })
+        }, {delete simulator;})
     }
 
     if (options[PROGRAM]) {
         std::stringstream ss;
         ss << options[PROGRAM].arg;
+
         EXEC_WITH_ERR_HANDLER({
             std::string line = std::string(80, '*') + std::string("\n");
             simulator->compiler_->print_fnc(line.c_str());
@@ -192,28 +192,28 @@ int main(int argc, char** argv)
             simulator->compiler_->CompileFinish();
             uint32_t *p_start = m_mem + (simulator->compiler_->program_->first_addr_ >> 2);
             simulator->compiler_->program_->Assemble(p_start, parity_type);
-        })
+        }, {delete simulator;})
     }
 
     if (options[CONST_ROM_HEX]) {
         EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[CONST_ROM_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_CONST_ROM_BASE);
-        })
+        }, {delete simulator;})
     }
 
     if (options[DATA_RAM_IN_HEX]) {
         EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[DATA_RAM_IN_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_DATA_RAM_IN_BASE);
-        })
+        }, {delete simulator;})
     }
 
     if (options[EMEM_IN_HEX]) {
         EXEC_WITH_ERR_HANDLER({
             std::string path = std::string(options[EMEM_IN_HEX].arg);
             spect::HexHandler::LoadHexFile(path, m_mem, SPECT_EMEM_IN_BASE);
-        })
+        }, {delete simulator;})
     }
 
 
@@ -267,7 +267,7 @@ int main(int argc, char** argv)
         std::vector<uint32_t> mem;
         EXEC_WITH_ERR_HANDLER({
             spect::HexHandler::LoadHexFile(std::string(options[GRV_HEX].arg), mem);
-        })
+        }, {delete simulator;})
 
         for (const auto &wrd : mem)
             simulator->model_->GrvQueuePush(wrd);
@@ -297,7 +297,7 @@ int main(int argc, char** argv)
 
     EXEC_WITH_ERR_HANDLER({
         simulator->Start(batch_mode);
-    })
+    }, {delete simulator;})
 
     if (options[DATA_RAM_OUT_HEX]) {
         spect::HexHandler::DumpHexFile(std::string(options[DATA_RAM_OUT_HEX].arg),

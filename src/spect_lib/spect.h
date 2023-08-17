@@ -102,6 +102,13 @@ namespace spect {
         UNKNOWN
     };
 
+    enum class ErrCode {
+        GENERIC             = 1,
+        NOT_ENOUGH_SPACE    = 2,
+        SYNTAX              = 3,
+        SYMBOL              = 4,
+    };
+
     std::ostream& operator << ( std::ostream& os, const spect::SymbolType& symbol_type);
 
     enum class HexFileType {
@@ -192,6 +199,16 @@ namespace spect {
 
     #define KECCAK_CAPACITY 256
     #define KECCAK_RATE     144
+
+    #define EXEC_WITH_ERR_HANDLER(exec_code,cleanup_code)                                               \
+        try {                                                                                           \
+                exec_code                                                                               \
+            } catch(std::system_error &err) {                                                           \
+                std::cout << err.what() << std::endl;                                                   \
+                cleanup_code                                                                            \
+                exit(err.code().value());                                                               \
+            }                                                                                           \
+
 
 #if defined(__has_cpp_attribute)
     #if 	__has_cpp_attribute(maybe_unused)

@@ -76,7 +76,8 @@
 #endif
 
 #ifndef SPECT_EMEM_IN_SIZE
-#define SPECT_EMEM_IN_SIZE 0x40
+// 0x90 - 144 bytes - Size of TROPIC01 Mailbox Command Buffer
+#define SPECT_EMEM_IN_SIZE 0x90
 #endif
 
 
@@ -86,7 +87,8 @@
 #endif
 
 #ifndef SPECT_EMEM_OUT_SIZE
-#define SPECT_EMEM_OUT_SIZE 0x50
+// 0x80 - 128 bytes - Size of TROPIC01 Mailbox Result Buffer
+#define SPECT_EMEM_OUT_SIZE 0x80
 #endif
 
 
@@ -96,7 +98,8 @@
 #endif
 
 #ifndef SPECT_INSTR_MEM_SIZE
-#define SPECT_INSTR_MEM_SIZE 0x2000
+// 32X3072 - Size of Instruction RAM in TROPIC01
+#define SPECT_INSTR_MEM_SIZE 0x3000
 #endif
 
 // If true, SPECT instruction memory is readable via AHB

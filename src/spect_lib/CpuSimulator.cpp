@@ -22,7 +22,7 @@ spect::CpuSimulator::CpuSimulator()
     model_ = new spect::CpuModel(SPECT_INSTR_MEM_AHB_W, SPECT_INSTR_MEM_AHB_R);
     model_->verbosity_ = VERBOSITY_HIGH;
     model_->simulator_ = this;
-    compiler_ = new spect::Compiler(SPECT_INSTR_MEM_BASE);
+    compiler_ = new spect::Compiler();
     key_memory_ = new spect::KeyMemory();
     key_memory_->verbosity_ = VERBOSITY_HIGH;
 

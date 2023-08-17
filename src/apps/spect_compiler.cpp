@@ -25,6 +25,7 @@
 enum  optionIndex {
     UNKNOWN,
     HELP,
+    VERSION,
     FIRST_ADDR,
     HEX_FORMAT,
     HEX_FILE,
@@ -38,6 +39,7 @@ const option::Descriptor usage[] =
 {
     {UNKNOWN,          0,  "" ,    ""               ,option::Arg::None,     "USAGE: spect_compiler [options] [source_file_1 [source_file_2] ...]\n\n" "Options:" },
     {HELP,             0,  "h" ,    "help"          ,option::Arg::None,     "  --help                  Print usage and exit." },
+    {VERSION,          0,  "v" ,    "version"       ,option::Arg::None,     "  --version               Display program version and exit." },
     {FIRST_ADDR,       0,  ""  ,    "first-address" ,option::Arg::Optional, "  --first-address=<addr>  Address to place first instruction from first compiled file." },
     {HEX_FORMAT,       0,  ""  ,    "hex-format"    ,option::Arg::Optional, "  --hex-format=<type>     Format of hex file:\n"
                                                                             "                           0 - Hex file for Instruction simulator or SPECT DPI model (default).\n"
@@ -67,8 +69,6 @@ int main(int argc, char** argv)
     option::Option options[stats.options_max], buffer[stats.buffer_max];
     option::Parser parse(usage, argc, argv, options, buffer);
 
-    int ret_code = 0;
-
     if (parse.error()) {
         option::printUsage(std::cout, usage);
         return 1;
@@ -90,6 +90,13 @@ int main(int argc, char** argv)
         return 0;
     }
 
+    if (options[VERSION]) {
+        std::cout << "SPECT Compiler\n";
+        std::cout << "Version:  " TOOL_VERSION_TAG "\n";
+        std::cout << "GIT Hash: " TOOL_VERSION_HASH "\n";
+        return 0;
+    }
+
     if (options[ISA_VERSION]) {
         std::stringstream ss;
         int isa_version;
@@ -99,31 +106,31 @@ int main(int argc, char** argv)
     }
     std::cout << "Using ISA version: " << spect::InstructionFactory::GetActiveISAVersion() << std::endl;
 
-    comp = new spect::Compiler(SPECT_INSTR_MEM_BASE);
+    comp = new spect::Compiler();
+    uint32_t first_addr = SPECT_INSTR_MEM_BASE;
+
     if (options[FIRST_ADDR]) {
         std::stringstream ss;
         ss << std::hex << options[FIRST_ADDR].arg;
-        ss >> comp->first_addr_;
+        ss >> first_addr;
     } else {
         comp->Warning("'--first-address' undefined. First instruction will be placed at start of"
                       " instruction memory.");
     }
+    comp->CompileInit(first_addr);
 
     // All remaining arguments are input source files
-    try {
+    EXEC_WITH_ERR_HANDLER({
         for (int i = 0; i < parse.nonOptionsCount(); ++i) {
             std::string path = parse.nonOption(i);
-                comp->Compile(path);
+            comp->Compile(path);
         }
-    } catch(std::runtime_error &err) {
-        std::cout << err.what() << std::endl;
-        ret_code = 1;
-        goto cleanup;
-    }
+    }, {delete comp;})
+
 
     if (options[HEX_FILE]) {
         std::cout << "Assembling program to: " << options[HEX_FILE].arg << std::endl;
-        try {
+        EXEC_WITH_ERR_HANDLER({
             spect::HexFileType hex_type = spect::HexFileType::ISS_WORD;
             if (options[HEX_FORMAT]) {
                 if (*options[HEX_FORMAT].arg == '1')
@@ -141,11 +148,7 @@ int main(int argc, char** argv)
             }
 
             comp->program_->Assemble(std::string(options[HEX_FILE].arg), hex_type, parity_type);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
-        }
+        }, {delete comp;})
     }
 
     comp->CompileFinish();
@@ -164,7 +167,5 @@ int main(int argc, char** argv)
         ofs.close();
     }
 
-cleanup:
-    delete comp;
-    exit(ret_code);
+    return 0;
 }
