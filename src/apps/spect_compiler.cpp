@@ -167,4 +167,5 @@ int main(int argc, char** argv)
         ofs.close();
     }
 
+    return 0;
 }
