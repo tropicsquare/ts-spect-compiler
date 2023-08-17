@@ -336,10 +336,10 @@ extern "C" {
                     (spect::HexFileType) internal_hex_type,
                     internal_parity_type);
 
-        } catch(std::runtime_error &exception) {
-            vpi_printf("%s Failed to compile program: %s\n",
-                        MODEL_LABEL, exception.what());
-            err = 1;
+        } catch(std::system_error &exception) {
+            vpi_printf("%s Failed to compile program with exit code: %d\n",
+                        MODEL_LABEL, exception.code().value());
+            err = exception.code().value();
         }
 
         DPI_CALL_LOG_EXIT

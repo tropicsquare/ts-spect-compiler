@@ -67,18 +67,20 @@ class spect::Compiler
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Throw compiler error
         /// @param err Error message to print
+        /// @param err_code Error code to throw
         /// @throw std::runtime_error
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void Error(std::string err);
+        void Error(std::string err, ErrCode err_code);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Throw compiler error with reference to source file location
         /// @param err Error message to print
         /// @param sf Pointer to source file where error occured.
         /// @param line_nr Line number where error occured.
+        /// @param err_code Error code to throw
         /// @throw std::runtime_error
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void ErrorAt(std::string err, const SourceFile *sf, int line_nr);
+        void ErrorAt(std::string err, const SourceFile *sf, int line_nr, ErrCode err_code);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Throw compiler warning

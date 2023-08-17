@@ -14,6 +14,7 @@
 
 #include "Compiler.h"
 #include "InstructionFactory.h"
+#include "spect.h"
 
 #include "Instruction.h"
 #include "InstructionI.h"
@@ -47,7 +48,7 @@ void spect::Compiler::CompileInit(uint32_t first_addr)
                           "Memory of SPECT. Place first instruction between: 0x%04x - 0x%04x",
                           first_addr, SPECT_INSTR_MEM_BASE,
                           SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - 4);
-        Error(buf);
+        Error(buf, spect::ErrCode::NOT_ENOUGH_SPACE);
     }
 
     first_addr_ = first_addr;
@@ -70,7 +71,7 @@ uint32_t spect::Compiler::ParseValue(spect::SourceFile *sf, int line_nr, const s
     if (std::regex_match(val, std::regex("^" OP_REGEX))) {
         char buf[128];
         std::sprintf(buf, "Found operand: '%s' when expecting value or symbol.", val.c_str());
-        ErrorAt(std::string(buf), sf, line_nr);
+        ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYNTAX);
     }
 
     // Number
@@ -114,7 +115,7 @@ spect::CpuGpr spect::Compiler::ParseOp(spect::SourceFile *sf, int line_nr, std::
     } else {
         char buf[128];
         std::sprintf(buf, "Invalid operand: '%s'. Valid operands: R0, R1 ... R31", arg.c_str());
-        ErrorAt(std::string(buf), sf, line_nr);
+        ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYNTAX);
     }
     return CpuGpr::R0;
 }
@@ -221,7 +222,7 @@ bool spect::Compiler::ParseCondCompile(spect::SourceFile *sf, std::string &line_
 
     if (std::regex_match(line_buf, std::regex("^" ELSE_KEYWORD))) {
         if (cond_stack_.empty())
-            ErrorAt("No previous 'ifdef' defined!", sf, line_nr);
+            ErrorAt("No previous 'ifdef' defined!", sf, line_nr, spect::ErrCode::SYNTAX);
         bool top = cond_stack_.front();
         cond_stack_.pop_front();
         cond_stack_.push_front(!top);
@@ -230,7 +231,7 @@ bool spect::Compiler::ParseCondCompile(spect::SourceFile *sf, std::string &line_
 
     if (std::regex_match(line_buf, std::regex("^" ENDIF_KEYWORD))) {
         if (cond_stack_.empty())
-            ErrorAt("No previous 'ifdef' defined!", sf, line_nr);
+            ErrorAt("No previous 'ifdef' defined!", sf, line_nr, spect::ErrCode::SYNTAX);
         cond_stack_.pop_front();
         return true;
     }
@@ -252,7 +253,7 @@ spect::Symbol* spect::Compiler::ParseLabel(spect::SourceFile *sf, std::string &l
                 char buf[128];
                 std::sprintf(buf, "Symbol: '%s' previously defined at: %s:%d",
                                 ident.c_str(), s->f_->path_.c_str(), s->line_nr_);
-                ErrorAt(std::string(buf), sf, line_nr);
+                ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYMBOL);
             } else {
                 symbols_->ResolveSymbol(s, SymbolType::LABEL, curr_addr_);
                 return s;
@@ -278,7 +279,7 @@ bool spect::Compiler::ParseConstant(spect::SourceFile *sf, std::string &line_buf
                 char buf[128];
                 std::sprintf(buf, "Symbol: '%s' previously defined at: %s:%d",
                                 ident.c_str(), s->f_->path_.c_str(), s->line_nr_);
-                ErrorAt(std::string(buf), sf, line_nr);
+                ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYMBOL);
             } else {
                 symbols_->ResolveSymbol(s, SymbolType::CONSTANT,
                                         ParseValue(sf, line_nr, val, s_dummy));
@@ -328,7 +329,7 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
     if (gold_instr == nullptr) {
         char buf[128];
         std::sprintf(buf, "Unknown instruction: %s", mnemonic.c_str());
-        ErrorAt(std::string(buf), sf, line_nr);
+        ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYNTAX);
     }
 
     spect::Instruction *new_instr = gold_instr->Clone();
@@ -351,7 +352,7 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
             char buf[128];
             std::sprintf(buf, "Too many arguments to instruction: %s. Expected only %d arguments.",
                             mnemonic.c_str(), exp_argc);
-            ErrorAt(std::string(buf), sf, line_nr);
+            ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYNTAX);
         }
 
         // Skip un-implemented arguments for given unstruction
@@ -381,7 +382,7 @@ spect::Instruction* spect::Compiler::ParseInstruction(spect::SourceFile *sf, std
         std::sprintf(buf, "Missing arguments to instruction: %s. "
                           "Expected %d arguments found only %d!",
                           mnemonic.c_str(), exp_argc, arg_index - 1);
-        ErrorAt(std::string(buf), sf, line_nr);
+        ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::SYNTAX);
     }
 
     num_instr_++;
@@ -438,14 +439,13 @@ void spect::Compiler::Compile(std::string path)
 
         if (curr_addr_ >= SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE) {
             char buf[256];
-            // TODO: Check this calculation!!!
             std::sprintf(buf, "Program does not fit into Instruction memory. "
                               "Address of first instruction: 0x%08x, "
                               "Maximal program size till end of Instruction Memory: "
                               "%d instructions",
                             first_addr_,
                             (SPECT_INSTR_MEM_BASE + SPECT_INSTR_MEM_SIZE - first_addr_) / 4);
-            ErrorAt(std::string(buf), sf, line_nr);
+            ErrorAt(std::string(buf), sf, line_nr, spect::ErrCode::NOT_ENOUGH_SPACE);
         }
 
         program_->AppendInstruction(new_instr);
@@ -488,7 +488,8 @@ void spect::Compiler::TrimSpaces(std::string &input)
     input = std::regex_replace(input, std::regex(" +$"), "");
 }
 
-void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr)
+void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr,
+                              spect::ErrCode err_code)
 {
     print_fnc("\033[1m");
     print_fnc("%s:%d:", sf->path_.c_str(), line_nr);
@@ -504,18 +505,20 @@ void spect::Compiler::ErrorAt(std::string err, const SourceFile *sf, int line_nr
     if ((size_t)line_nr < sf->lines_.size())
         print_fnc("%4d:%s\n", (line_nr + 1), sf->lines_[line_nr].c_str());
 
-    std::string msg = std::string(80, '*') +
-                      std::string("\nCompilation failed\n") +
-                      std::string(80, '*');
-    throw std::runtime_error(msg.c_str());
+    print_fnc(std::string(80, '*').c_str());
+    print_fnc("\nCompilation failed\n");
+    print_fnc(std::string(80, '*').c_str());
+
+    throw std::system_error(std::error_code(static_cast<int>(err_code), std::system_category()));
 }
 
-void spect::Compiler::Error(std::string err)
+void spect::Compiler::Error(std::string err, spect::ErrCode err_code)
 {
     print_fnc("\033[1m \033[31m Error: \033[0m");
     print_fnc("%s\n", err);
+    print_fnc("Compilation failed");
 
-    throw std::runtime_error("Compilation failed");
+    throw std::system_error(std::error_code(static_cast<int>(err_code), std::system_category()));
 }
 
 void spect::Compiler::WarningAt(std::string warn, const SourceFile *sf, int line_nr)

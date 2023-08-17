@@ -40,7 +40,7 @@ void spect::CpuProgram::Assemble(uint32_t *mem, spect::ParityType parity_type)
             char buf[128];
             std::sprintf(buf, "Unable to find definition of symbol: '%s'.",
                               s_unknown->identifier_.c_str());
-            compiler_->ErrorAt(buf, s_unknown->f_, s_unknown->line_nr_);
+            compiler_->ErrorAt(buf, s_unknown->f_, s_unknown->line_nr_, ErrCode::SYMBOL);
         }
         *mem = instr->Assemble(parity_type);
         mem++;

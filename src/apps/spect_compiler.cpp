@@ -69,8 +69,6 @@ int main(int argc, char** argv)
     option::Option options[stats.options_max], buffer[stats.buffer_max];
     option::Parser parse(usage, argc, argv, options, buffer);
 
-    int ret_code = 0;
-
     if (parse.error()) {
         option::printUsage(std::cout, usage);
         return 1;
@@ -122,20 +120,17 @@ int main(int argc, char** argv)
     comp->CompileInit(first_addr);
 
     // All remaining arguments are input source files
-    try {
+    EXEC_WITH_ERR_HANDLER({
         for (int i = 0; i < parse.nonOptionsCount(); ++i) {
             std::string path = parse.nonOption(i);
-                comp->Compile(path);
+            comp->Compile(path);
         }
-    } catch(std::runtime_error &err) {
-        std::cout << err.what() << std::endl;
-        ret_code = 1;
-        goto cleanup;
-    }
+    }, {delete comp;})
+
 
     if (options[HEX_FILE]) {
         std::cout << "Assembling program to: " << options[HEX_FILE].arg << std::endl;
-        try {
+        EXEC_WITH_ERR_HANDLER({
             spect::HexFileType hex_type = spect::HexFileType::ISS_WORD;
             if (options[HEX_FORMAT]) {
                 if (*options[HEX_FORMAT].arg == '1')
@@ -153,11 +148,7 @@ int main(int argc, char** argv)
             }
 
             comp->program_->Assemble(std::string(options[HEX_FILE].arg), hex_type, parity_type);
-        } catch(std::runtime_error &err) {
-            std::cout << err.what() << std::endl;
-            ret_code = 1;
-            goto cleanup;
-        }
+        }, {delete comp;})
     }
 
     comp->CompileFinish();
@@ -176,7 +167,4 @@ int main(int argc, char** argv)
         ofs.close();
     }
 
-cleanup:
-    delete comp;
-    exit(ret_code);
 }
