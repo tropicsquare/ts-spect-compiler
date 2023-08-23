@@ -11,8 +11,8 @@ R               AND            0b0001        0b010          0b111           fals
 R                OR            0b0010        0b010          0b111           false               true                0                  11
 R               XOR            0b0100        0b010          0b111           false               true                0                  11
 R               NOT            0b1000        0b010          0b110           false               true                0                  10
-R              SBIT            0b0001        0b011          0b111           false               true                0                  11
-R              CBIT            0b0010        0b011          0b111           false               true                0                  11
+R              SBIT            0b0001        0b011          0b111           false               true                0                  12
+R              CBIT            0b0010        0b011          0b111           false               true                0                  12
 R               LSL            0b0001        0b100          0b110           false               true                0                  10
 R               LSR            0b0010        0b100          0b110           false               true                0                  10
 R               ROL            0b0101        0b100          0b110           false               true                0                  10
@@ -59,14 +59,14 @@ M                LD            0b0010        0b101          0b110           fals
 M                ST            0b0100        0b101          0b110           false               false               0                  14
 
 
-J              CALL            0b0001        0b000          0b100           false               true                0                  5
-J               RET            0b0010        0b000          0b000           false               true                0                  5
-J               BRZ            0b0100        0b000          0b100           false               true                0                  5
-J              BRNZ            0b0101        0b000          0b100           false               true                0                  5
-J               BRC            0b0110        0b000          0b100           false               true                0                  5
-J              BRNC            0b0111        0b000          0b100           false               true                0                  5
-J               BRE            0b1110        0b000          0b100           false               true                0                  5
-J              BRNE            0b1111        0b000          0b100           false               true                0                  5
-J               JMP            0b1100        0b000          0b100           false               true                0                  5
+J              CALL            0b0001        0b000          0b100           false               true                0                  4
+J               RET            0b0010        0b000          0b000           false               true                0                  4
+J               BRZ            0b0100        0b000          0b100           false               true                0                  4
+J              BRNZ            0b0101        0b000          0b100           false               true                0                  4
+J               BRC            0b0110        0b000          0b100           false               true                0                  4
+J              BRNC            0b0111        0b000          0b100           false               true                0                  4
+J               BRE            0b1110        0b000          0b100           false               true                0                  4
+J              BRNE            0b1111        0b000          0b100           false               true                0                  4
+J               JMP            0b1100        0b000          0b100           false               true                0                  4
 J               END            0b1001        0b111          0b000           false               true                0                  4
 J               NOP            0b1010        0b111          0b000           false               true                0                  3
