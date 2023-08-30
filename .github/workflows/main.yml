@@ -1,0 +1,18 @@
+# Calls shared workflow to correct submodule URLs
+
+# Github pushes are triggered by mirror operations from Gitlab.
+# This workflow will only affect Github, not Gitlab.
+
+name: call-submodule-corrector
+on:
+  push:
+    branches:
+      - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  call-submodule-corrector:
+      uses: tropicsquare/workflow-templates/.github/workflows/shared-correct-submodule-urls.yml@master
+
