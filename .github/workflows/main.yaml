@@ -3,16 +3,14 @@
 # Github pushes are triggered by mirror operations from Gitlab.
 # This workflow will only affect Github, not Gitlab.
 
-name: call-submodule-corrector
+name: Main Actions workflow
+
 on:
   push:
-    branches:
-      - master
+    branches: [master]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   call-submodule-corrector:
-      uses: tropicsquare/workflow-templates/.github/workflows/shared-correct-submodule-urls.yml@master
-
+    uses: tropicsquare/workflow-templates/.github/workflows/shared-correct-submodule-urls.yml@master

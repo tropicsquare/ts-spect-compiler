@@ -1,0 +1,57 @@
+name: Build and Push Base Container Image 
+
+on:
+  push:
+    branches: [master]
+    
+    # Ignore pushes to master that only affect these paths
+    paths-ignore:
+      - 'doc/**'
+      - 'test/**'
+      - 'setup_env'
+      - 'ts_sw_setup.yml'
+      - 'README.md'
+      - '.gitignore'
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-22.04
+
+    env: 
+      DOCKER_REGISTRY_URL: https://ghcr.io
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Get current date
+        id: current_date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+
+      - name: Log in to GitHub container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.DOCKER_REGISTRY_URL }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: /Dockerfiles/Dockerfile
+          platforms: linux/amd64, linux/arm64
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}:${{ github.sha }}
+            ${{ env.DOCKER_REGISTRY_URL }}/${{ github.repository }}:latest
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v
+
+        with:
+          tag_name: release-${{ steps.current_date.outputs.date }}-${{ github.sha }}
+          release_name: Release ${{ steps.current_date.outputs.date }}-${{ github.sha }}
+          body: |
+            This release contains the latest container image built by this repository and hosted at [tropicsquare/ts-spect-compiler:latest](https://ghcr.io/tropicsquare/ts-spect-compiler:latest).
