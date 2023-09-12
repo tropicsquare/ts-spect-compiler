@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - master
-    # All GitLab mirror operations will overwrite => every commit will trigger
+    # TODO: will all mirror operations trigger this?
     paths: 
       - '.gitmodules'
 
