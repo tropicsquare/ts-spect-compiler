@@ -1,0 +1,92 @@
+name: build-docs
+
+on:
+  push:
+    branches: ['master']
+    paths:
+        - 'doc/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/xu-cheng/texlive-full:latest
+
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+
+      - name: Checkout ts-latex-lib
+        uses: actions/checkout@v3
+        with:
+          repository: 'tropicsquare/ts-latex-lib'
+          ref: 'refs/heads/master'
+          path: 'ts-latex-lib'
+          # TODO: replace personal token (go public)
+          token: ${{ secrets.PAT_SECRET }}
+
+      - name: Compile docs
+        id: compile-docs
+        run: |
+          cp -r ts-latex-lib /ts-latex-lib
+          cp -r doc /doc
+
+          export TEXINPUTS=.:/ts-latex-lib//:
+
+          chmod +x /ts-latex-lib/scripts/ts_latex_build.py
+          export PATH=$PATH:/ts-latex-lib/scripts/
+
+          cd /doc/programmer_guide
+          ts_latex_build.py spect_programmer_guide.tex
+
+          cd /doc/ISAv0.1
+          ts_latex_build.py isav0.1.tex
+
+          cd /doc/ISAv0.2
+          ts_latex_build.py isav0.2.tex
+
+      - name: Upload PDF artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: SPECT_documentation
+          path: |
+            /doc/programmer_guide/build/pdf/spect_programmer_guide.pdf
+            /doc/ISAv0.1/build/pdf/isav0.1.pdf
+            /doc/ISAv0.2/build/pdf/isav0.2.pdf
+          retention-days: 2
+
+  push-docs:
+    runs-on: ubuntu-22.04
+    needs: build-docs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download documentation artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: SPECT_documentation
+          path: ${{ github.workspace }}/artifacts
+
+      - name: Commit and push
+        run: |
+          mkdir -p doc/programmer_guide/pdf
+          mv ${{ github.workspace }}/artifacts/programmer_guide/build/pdf/spect_programmer_guide.pdf doc/programmer_guide/pdf/
+
+          mkdir -p doc/ISAv0.1/pdf
+          mv ${{ github.workspace }}/artifacts/ISAv0.1/build/pdf/isav0.1.pdf doc/ISAv0.1/pdf/
+
+          mkdir -p doc/ISAv0.2/pdf
+          mv ${{ github.workspace }}/artifacts/ISAv0.2/build/pdf/isav0.2.pdf doc/ISAv0.2/pdf/
+
+          git config --global user.name "[bot]upload-docs"
+          git config --global user.email "[bot]upload-docs@users.noreply.github.com"
+          git status
+          git add doc/programmer_guide/pdf/spect_programmer_guide.pdf
+          git add doc/ISAv0.1/pdf/isav0.1.pdf
+          git add doc/ISAv0.2/pdf/isav0.2.pdf
+          git commit -m "Autogenerate PDFs"
+          git push origin master
