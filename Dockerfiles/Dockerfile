@@ -1,7 +1,6 @@
-ARG AARCH=amd64
-FROM ${AARCH}/ubuntu:22.04 as base
+FROM ubuntu:22.04 AS base
 
-SHELL [ "/bin/bash", "-c" ]
+# SHELL [ "/bin/bash", "-c" ]
 
 RUN apt-get update -qq && \
     DEBIAN_FRONTEND=noninteractive TZ="Europe/Prague" \
@@ -21,6 +20,3 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 LABEL org.opencontainers.image.source https://github.com/tropicsquare/ts-spect-compiler
 LABEL org.opencontainers.image.description Tropic Square SPECT compiler environment
-
-# docker build -t spect . -f Dockerfiles/Dockerfile
-# docker run --rm -v $(pwd):/app -w /app spect ./build.sh --clean

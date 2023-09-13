@@ -15,8 +15,22 @@ Diffie-Hellman).
 
 ## Build Compiler and Instruction Set Simulator
 
-### Prerequisites
+### Download pre-built binaries [![build-binaries](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-release-binaries.yaml/badge.svg)](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-release-binaries.yaml)
+Pre-built binaries are available on the [releases](github.com/tropicsquare/ts-spect-compiler/releases) page.
 
+### Build from source with Docker
+1. Assuming docker is installed and configured on your system, build the image
+from the root of the repository. 
+    ```bash
+    docker build -t spect-env . -f Dockerfiles/Dockerfile
+    ```
+2. Build the binaries inside the image.
+    ```bash
+    docker run --rm -v $(pwd):/app -w /app spect-env ./build.sh --clean
+    ```
+The built binaries are stored in `<repo_root>/build/src/apps`.
+
+### Build from source with CMake
 Before you begin, ensure you have the following prerequisites installed on your
 system:
 
@@ -52,10 +66,15 @@ system:
     ```
 </details>
 
-### Build with CMake
-Run [`./build.sh --clean`](build.sh) from the repository root. This will
-generate binaries for the compiler `spect_compiler` and the instruction set
-simulator `spect_iss` in the default build directory `build/src/apps`.
+Now, run the [`build.sh`](build.sh) script.
+
+```bash
+./build.sh --clean
+```
+
+This will generate binaries for the compiler `spect_compiler` and the
+instruction set simulator `spect_iss` in the default build directory
+`build/src/apps`.
 
 ### Add binaries to $PATH
 ```bash
