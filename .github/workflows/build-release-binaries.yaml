@@ -1,16 +1,19 @@
 name: Build and release SPECT binaries
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
-  workflow_dispatch:
+  workflow_run:
+    workflows: ['call-submodule-corrector']
+    branches: ['master']
+    types:
+      - completed
+  
 
 env:
   IMAGE_NAME: spect-env
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build and release binaries
     runs-on: ubuntu-22.04
 
