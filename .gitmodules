@@ -1,6 +1,6 @@
 [submodule "modules/cli"]
 	path = modules/cli
-	url = ../cli.git
+	url = ../../third-party/cli.git
 [submodule "modules/xkcp"]
 	path = modules/xkcp
-	url = ../xkcp.git
+	url = ../../third-party/xkcp.git
