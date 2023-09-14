@@ -1,16 +1,18 @@
 name: build-docs
 
 on:
-  push:
+  workflow_run:
+    workflows: ['call-submodule-corrector']
     branches: ['master']
-    paths:
-        - 'doc/**'
+    types:
+      - completed
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   build-docs:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-22.04
     container:
       image: ghcr.io/xu-cheng/texlive-full:latest
