@@ -57,6 +57,7 @@ jobs:
         with:
           body: |
             SPECT compiler and ISS binaries built from commit ${{ github.sha }}.
+          tag_name: spect-apps-${{ env.RELEASE_TAG }}
           files: |
             ${{ github.workspace }}/releases/spect_compiler_linux_${{matrix.architecture}}_${{ env.RELEASE_TAG }}
             ${{ github.workspace }}/releases/spect_iss_linux_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
