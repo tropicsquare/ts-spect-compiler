@@ -1,9 +1,13 @@
 name: Build and release SPECT binaries
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  workflow_run:
+    workflows: ['call-submodule-corrector']
+    branches: ['master']
+    types:
+      - completed
+
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 env:
@@ -11,6 +15,7 @@ env:
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Build and release binaries
     runs-on: ubuntu-22.04
 
@@ -37,21 +42,21 @@ jobs:
         env:
           RELEASE_TAG: ${{ steps.get-tag.outputs.tag }}
         run: |
-          echo $RELEASE_TAG
-          echo ${{ steps.get-tag.outputs.tag }}
-
           docker build -t ${{ env.IMAGE_NAME }}-linux-${{ matrix.architecture }}:latest -f Dockerfiles/Dockerfile .
           docker run --rm -v $(pwd):/app -w /app ${{ env.IMAGE_NAME }}-linux-${{ matrix.architecture }}:latest ./build.sh --clean
+
           mkdir ${{ github.workspace }}/releases
-          cp build/src/apps/spect_compiler ${{ github.workspace }}/releases/spect_compiler_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
-          cp build/src/apps/spect_iss ${{ github.workspace }}/releases/spect_iss_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
+
+          cp build/src/apps/spect_compiler ${{ github.workspace }}/releases/spect_compiler_linux_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
+          cp build/src/apps/spect_iss ${{ github.workspace }}/releases/spect_iss_linux_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
 
       - name: Create release
         env:
           RELEASE_TAG: ${{ steps.get-tag.outputs.tag }}
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: spect-apps-${{ env.RELEASE_TAG }}
+          body: |
+            SPECT compiler and ISS binaries built from commit ${{ github.sha }}.
           files: |
-            ${{ github.workspace }}/releases/spect_compiler_${{matrix.architecture}}_${{ env.RELEASE_TAG }}
-            ${{ github.workspace }}/releases/spect_iss_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
+            ${{ github.workspace }}/releases/spect_compiler_linux_${{matrix.architecture}}_${{ env.RELEASE_TAG }}
+            ${{ github.workspace }}/releases/spect_iss_linux_${{ matrix.architecture }}_${{ env.RELEASE_TAG }}
