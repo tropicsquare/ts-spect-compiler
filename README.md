@@ -16,7 +16,7 @@ Diffie-Hellman).
 ## Build Compiler and Instruction Set Simulator
 
 ### Download pre-built binaries [![build-binaries](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-release-binaries.yaml/badge.svg)](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-release-binaries.yaml)
-Pre-built binaries are available on the [releases](github.com/tropicsquare/ts-spect-compiler/releases) page.
+Pre-built binaries are available on the [releases](https://github.com/tropicsquare/ts-spect-compiler/releases) page.
 
 ### Build from source with Docker
 1. Assuming docker is installed and configured on your system, build the image
