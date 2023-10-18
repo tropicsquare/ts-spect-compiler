@@ -171,6 +171,15 @@ Before you begin, ensure you have the following prerequisites installed on your 
     ```
 </details>
 
+- <details>
+    <summary>XsltProc</summary>
+
+    ```bash
+    apt-get install xsltproc
+    ```
+</details>
+
+
 Now, follow these steps to build SPECT from source with CMake:
 
 1. **Clone the Repository:**
