@@ -159,6 +159,7 @@ Before you begin, ensure you have the following prerequisites installed on your 
     <summary>Python (version 3.8 or higher)</summary>
 
     ```bash
+    sudo apt-get update
     sudo apt-get install python3-pip
     ```
 </details>
@@ -175,7 +176,7 @@ Before you begin, ensure you have the following prerequisites installed on your 
     <summary>XsltProc</summary>
 
     ```bash
-    apt-get install xsltproc
+    sudo apt-get install xsltproc
     ```
 </details>
 
