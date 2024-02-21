@@ -196,7 +196,7 @@ void spect::KeyMemory::PrintArgs(Arg arg)
 {
     std::stringstream ss;
     ss << std::hex << arg << std::endl;
-    printf(ss.str().c_str());
+    printf("%s", ss.str().c_str());
 }
 
 template<typename First, typename... Args>
@@ -204,7 +204,7 @@ void spect::KeyMemory::PrintArgs(First first, Args... args)
 {
     std::stringstream ss;
     ss << std::hex << first << " ";
-    printf(ss.str().c_str());
+    printf("%s", ss.str().c_str());
     PrintArgs(args...);
 }
 
