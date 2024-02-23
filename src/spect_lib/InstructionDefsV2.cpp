@@ -811,7 +811,7 @@ bool spect::V2InstructionLDK::Execute()
     // Read
     uint256_t tmp = 0;
     for (int i = 0; i < 8; i++) {
-        DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_LDK_READ, type, slot, (offset*8+i)));
+        DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_LDK_READ, type, slot, (offset*8+i)<<2));
 
         // If running with CPU Simulator, preload key from simulator Key Memory to queue
         if (model_->simulator_ != NULL) {
@@ -857,7 +857,7 @@ bool spect::V2InstructionSTK::Execute()
     // Write
     uint256_t tmp = model_->GetGpr(TO_INT(op1_));
     for (int i = 0; i < 8; i++) {
-        DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_STK_WRITE, type, slot, (offset*8+i)));
+        DEFINE_CHANGE(ch_kbus, DPI_CHANGE_KBUS, KBUS_OBJ_ENCODE(DPI_KBUS_STK_WRITE, type, slot, (offset*8+i)<<2));
         ch_kbus.new_val[0] = uint32_t(tmp >> (32 * i));
         model_->ReportChange(ch_kbus);
 
