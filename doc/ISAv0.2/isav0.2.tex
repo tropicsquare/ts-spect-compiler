@@ -202,12 +202,12 @@ Following symbols are used in description of instructions:
       LDK op1,op2,Immediate     & Load key                          & op1 = KBUS_READ[type,slot,offset] where\newline
                                                                       type = Immediate[11:8]\newline
                                                                       slot = op2[7:0]\newline
-                                                                      offset = Immediate[4:0] * 8                   & E     & --            \Ttlb
+                                                                      offset = Immediate[2:0] * 32                  & E     & --            \Ttlb
       STK op1,op2,Immediate     & Load key                          & KBUS_WRITE[key,type,slot,offset] where\newline
                                                                       key = op1\newline
                                                                       type = Immediate[11:8]\newline
                                                                       slot = op2[7:0]\newline
-                                                                      offset = Immediate[4:0] * 8                   & E     & --            \Ttlb
+                                                                      offset = Immediate[2:0] * 32                  & E     & --            \Ttlb
       KBO op2,Immediate         & KBUS OP                           & KBUS_OP[type,slot,op] where\newline
                                                                       type = Immediate[11:8]\newline
                                                                       slot = op2[7:0]\newline
