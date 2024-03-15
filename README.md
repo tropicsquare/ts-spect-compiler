@@ -68,6 +68,8 @@ Diffie-Hellman).
 
    Restart your terminal or run `source ~/.bashrc`, and you can use `spect_compiler` and `spect_iss` from anywhere on your Linux system.
 
+   When compiling a firmware from [`ts-spect-fw`](https://github.com/tropicsquare/ts-spect-fw) repository using `make`, the SPECT compiler and instruction set simulator don't have to be visible in a new shell started by `make`. To ensure so, add the binary's directory using absolute path (don't use `~`) to the `$PATH` variable in your `/etc/environment` and restart system. The other way to build the SPECT firmware using `make` is to specify the absolute path to the binaries in Makefile.   
+
 ### Build from Source with Docker
 
 If you prefer to build the SPECT compiler and instruction set simulator from
