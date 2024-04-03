@@ -407,11 +407,7 @@ bool spect::V2InstructionSTR::Execute()
         PUT_GPR_TO_CHANGE(ch_gpr_1, new_val, model_->GetGpr(TO_INT(op1_)));                     \
         PUT_GPR_TO_CHANGE(ch_gpr_2, new_val, model_->GetGpr(TO_INT(op2_)));                     \
         model_->ReportChange(ch_gpr_1);                                                         \
-                                                                                                \
-        /* Match DUT behavior, report only single change if swapping between*/                  \
-        /* the same registers.*/                                                                \
-        if (op1_ != op2_)                                                                       \
-            model_->ReportChange(ch_gpr_2);                                                     \
+        model_->ReportChange(ch_gpr_2);                                                         \
                                                                                                 \
         return true;                                                                            \
     }
