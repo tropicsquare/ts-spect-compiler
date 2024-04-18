@@ -152,6 +152,11 @@ void spect_iss_cmd_load(std::ostream &out, std::string arg1, int offset)
     simulator->CmdLoad(out, arg1, offset);
 }
 
+void spect_iss_cmd_step(std::ostream &out, int n)
+{
+    simulator->CmdStep(out, n);
+}
+
 void spect_iss_cmd_dump(std::ostream &out, std::string arg1, uint32_t address, uint32_t size)
 {
     simulator->CmdDump(out, arg1, address, size);
@@ -162,6 +167,18 @@ void spect_iss_dump_data_ram_out_hex(std::string data_ram_out_hex_file)
     spect::HexHandler::DumpHexFile(data_ram_out_hex_file,
             spect::HexFileType::ISS_WORD, simulator->model_->GetMemoryPtr(),
             SPECT_DATA_RAM_OUT_BASE, SPECT_DATA_RAM_OUT_SIZE);
+}
+
+void spect_iss_dump_emem_out_hex(std::string emem_out_hex_file)
+{
+    spect::HexHandler::DumpHexFile(emem_out_hex_file,
+            spect::HexFileType::ISS_WORD, simulator->model_->GetMemoryPtr(), SPECT_EMEM_OUT_BASE,
+            SPECT_EMEM_OUT_SIZE);
+}
+
+void spect_iss_dump_key_mem_out_hex(std::string kmem_hex_file)
+{
+    simulator->key_memory_->Dump(kmem_hex_file);
 }
 
 void spect_iss_exit(void)
