@@ -61,7 +61,6 @@ class spect::InstructionFactory
         static bool IteratorIsLast(std::map<std::string, spect::Instruction*>::iterator &it);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        /// @returns True if iterator is at the last instruction
         /// @param isa_version Version of ISA under which to register an Instruction
         ///////////////////////////////////////////////////////////////////////////////////////////
         static void SetActiveISAVersion(int isa_version);
