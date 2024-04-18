@@ -145,7 +145,8 @@ class spect::CpuSimulator
         // Path to command file for simulator
         std::string cmd_file_;
 
-    private:
+        // Execute command file
+        void ExecCmdFile(cli::CliLocalTerminalSession &session);
 
         // Functions to execute individual commands
         void CmdInfo(std::ostream &out, std::string arg1);
@@ -160,6 +161,8 @@ class spect::CpuSimulator
         void CmdLoad(std::ostream &out, std::string arg1, uint32_t offset);
         void CmdDump(A_UNUSED std::ostream &out, std::string arg1, uint32_t address, uint32_t size);
 
+    private:
+
         // Array of breakpoints break-points
         std::vector<uint32_t> breakpoints_;
 
@@ -168,9 +171,6 @@ class spect::CpuSimulator
 
         // Create commands fo interactive CLI
         void BuildCliCommands(std::unique_ptr<cli::Menu> &menu);
-
-        // Execute command file
-        void ExecCmdFile(cli::CliLocalTerminalSession &session);
 
 };
 
