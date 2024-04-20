@@ -17,13 +17,16 @@
 #include "CpuProgram.h"
 #include "HexHandler.h"
 
-#include "vpi_user.h"
+#ifdef USING_VCS
+    #include "vpi_user.h"
+#endif
 
 #include "spect_iss_dpi.h"
 
 spect::Compiler *compiler = nullptr;
 spect::CpuModel *model    = nullptr;
 
+#ifdef USING_VCS
 #define DPI_CALL_LOG_ENTER                                                                          \
     assert (model != nullptr &&                                                         \
             MODEL_LABEL " Model not initalized. Did you forget to call 'spect_dpi_init'?");         \
@@ -34,11 +37,28 @@ spect::CpuModel *model    = nullptr;
     if (model->verbosity_ >= VERBOSITY_HIGH)                                            \
         vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);                       \
 
+#else
+#define DPI_CALL_LOG_ENTER                                                                          \
+    assert (model != nullptr &&                                                         \
+            MODEL_LABEL " Model not initalized. Did you forget to call 'spect_dpi_init'?");         \
+    if (model->verbosity_ >= VERBOSITY_HIGH)                                            \
+        printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);                       \
+
+#define DPI_CALL_LOG_EXIT                                                                           \
+    if (model->verbosity_ >= VERBOSITY_HIGH)                                            \
+        printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);                       \
+
+#endif
+
 extern "C" {
 
     uint32_t spect_dpi_init()
     {
+#ifdef USING_VCS
         vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
+#else
+        printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
+#endif
 
         uint32_t rv = 0;
         try {
@@ -47,25 +67,46 @@ extern "C" {
 
             // According to C standard, typecasting function pointer is undefined behavior,
             // but we only get rid of "const", so we hope its fine :)
+#ifdef USING_VCS
             model->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
             compiler->print_fnc = (int (*)(const char *format, ...))(&(vpi_printf));
+#else
+            model->print_fnc = (int (*)(const char *format, ...))(&(printf));
+            compiler->print_fnc = (int (*)(const char *format, ...))(&(printf));
+#endif
         } catch (const std::bad_alloc& e) {
+#ifdef USING_VCS
             vpi_printf("%s Failed to initialize SPECT DPI model: %s\n", MODEL_LABEL, e.what());
+#else
+            printf("%s Failed to initialize SPECT DPI model: %s\n", MODEL_LABEL, e.what());
+#endif
             rv = 1;
         }
 
+#ifdef USING_VCS
         vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
+#else
+        printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
+#endif
         return rv;
     }
 
     void spect_dpi_exit()
     {
+#ifdef USING_VCS
         vpi_printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
+#else
+        printf("%s DPI function '%s' entered.\n", MODEL_LABEL, __func__);
+#endif
 
         delete model;
         delete compiler;
 
+#ifdef USING_VCS
         vpi_printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
+#else
+        printf("%s DPI function '%s' exiting.\n", MODEL_LABEL, __func__);
+#endif
     }
 
     void spect_dpi_reset()
@@ -337,8 +378,13 @@ extern "C" {
                     internal_parity_type);
 
         } catch(std::system_error &exception) {
+#ifdef USING_VCS
             vpi_printf("%s Failed to compile program with exit code: %d\n",
                         MODEL_LABEL, exception.code().value());
+#else
+            printf("%s Failed to compile program with exit code: %d\n",
+                        MODEL_LABEL, exception.code().value());
+#endif
             err = exception.code().value();
         }
 
@@ -354,7 +400,12 @@ extern "C" {
         if (s_start_addr)
             rv = s_start_addr->val_;
         else
+#ifdef USING_VCS
             vpi_printf("%s: '%s' symbol not defined! Returning 0.\n", MODEL_LABEL, START_SYMBOL);
+#else
+            printf("%s: '%s' symbol not defined! Returning 0.\n", MODEL_LABEL, START_SYMBOL);
+#endif
+
         DPI_CALL_LOG_EXIT
         return rv;
     }
