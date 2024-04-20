@@ -1,3 +1,7 @@
+if(DEFINED ENV{VCS_HOME})
+    add_definitions(-DUSING_VCS)
+endif()
+
 add_library(spect_iss_dpi SHARED
     spect_iss_dpi.cpp
 )
