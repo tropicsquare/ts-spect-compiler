@@ -32,7 +32,7 @@ spect::CpuModel::CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r) :
 
 spect::CpuModel::~CpuModel()
 {
-    delete memory_;
+    delete[] memory_;
     delete regs_;
 }
 
