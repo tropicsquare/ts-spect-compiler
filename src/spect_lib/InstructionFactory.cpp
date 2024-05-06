@@ -33,9 +33,11 @@ void spect::InstructionFactory::Register(int isa_version, spect::Instruction *in
 {
     assert(isa_version > 0 && isa_version <= NUM_ISA_VERSIONS);
 
-    mnemonic_maps_[isa_version - 1][instr->mnemonic_] = instr;
+    std::shared_ptr<Instruction> sinstr(instr);
+
+    mnemonic_maps_[isa_version - 1][instr->mnemonic_] = sinstr;
     uint32_t enc = INSTR_ENCODE(instr->func_, instr->opcode_, instr->itype_);
-    encoding_maps_[isa_version - 1][enc] = instr;
+    encoding_maps_[isa_version - 1][enc] = sinstr;
 }
 
 
@@ -61,8 +63,7 @@ bool spect::InstructionFactory::Initialize()
 
 spect::InstructionFactory::~InstructionFactory()
 {
-    for (auto &instr : mnemonic_maps_[active_isa_map_index])
-        delete instr.second;
+
 }
 
 spect::Instruction* spect::InstructionFactory::GetInstruction(uint32_t enc)
@@ -71,7 +72,7 @@ spect::Instruction* spect::InstructionFactory::GetInstruction(uint32_t enc)
     if (it == encoding_maps_[active_isa_map_index].end())
         return nullptr;
 
-    return encoding_maps_[active_isa_map_index][enc];
+    return encoding_maps_[active_isa_map_index][enc].get();
 }
 
 spect::Instruction* spect::InstructionFactory::GetInstruction(std::string mnemonic)
@@ -79,16 +80,16 @@ spect::Instruction* spect::InstructionFactory::GetInstruction(std::string mnemon
     auto it = mnemonic_maps_[active_isa_map_index].find(mnemonic);
     if (it == mnemonic_maps_[active_isa_map_index].end())
         return nullptr;
-    return mnemonic_maps_[active_isa_map_index][mnemonic];
+    return mnemonic_maps_[active_isa_map_index][mnemonic].get();
 }
 
-std::map<std::string, spect::Instruction*>::iterator spect::InstructionFactory::GetInstructionIterator()
+std::map<std::string, std::shared_ptr<spect::Instruction>>::iterator spect::InstructionFactory::GetInstructionIterator()
 {
     return mnemonic_maps_[active_isa_map_index].begin();
 }
 
 bool spect::InstructionFactory::IteratorIsLast(
-    std::map<std::string, spect::Instruction*>::iterator &it)
+    std::map<std::string, std::shared_ptr<spect::Instruction>>::iterator &it)
 {
     return (it == mnemonic_maps_[active_isa_map_index].end());
 }
@@ -106,9 +107,9 @@ int spect::InstructionFactory::GetActiveISAVersion(void)
     return active_isa_map_index + 1;
 }
 
-std::map<std::string, spect::Instruction*> spect::InstructionFactory::mnemonic_maps_[NUM_ISA_VERSIONS];;
+thread_local std::map<std::string, std::shared_ptr<spect::Instruction>> spect::InstructionFactory::mnemonic_maps_[NUM_ISA_VERSIONS];;
 
-std::map<uint32_t, spect::Instruction*> spect::InstructionFactory::encoding_maps_[NUM_ISA_VERSIONS];;
+thread_local std::map<uint32_t, std::shared_ptr<spect::Instruction>> spect::InstructionFactory::encoding_maps_[NUM_ISA_VERSIONS];;
 
 bool spect::InstructionFactory::initialized_ = spect::InstructionFactory::Initialize();
 

@@ -59,7 +59,7 @@ void spect::CpuModel::Start()
     // Erase track of execution count
     auto it = spect::InstructionFactory::GetInstructionIterator();
     for (; !spect::InstructionFactory::IteratorIsLast(it); it++) {
-        Instruction *instr = it->second;
+        Instruction *instr = it->second.get();
         instr->exec_cnt_ = 0;
     }
 
@@ -89,7 +89,7 @@ void spect::CpuModel::Finish(int status_err)
     DebugInfo(VERBOSITY_HIGH, "     Instruction         No. of Executions       Cycles per instruction");
     auto it = spect::InstructionFactory::GetInstructionIterator();
     for (; !spect::InstructionFactory::IteratorIsLast(it); it++) {
-        Instruction *instr = it->second;
+        Instruction *instr = it->second.get();
         if (instr->exec_cnt_ > 0) {
             char buf[128];
             sprintf(buf, "   %10s                   %4lu                        %4d", instr->mnemonic_.c_str(),
