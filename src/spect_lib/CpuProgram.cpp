@@ -73,7 +73,7 @@ void spect::CpuProgram::Assemble(std::string path, spect::HexFileType hex_type, 
     }
     ofs.close();
 
-    delete mem;
+    delete[] mem;
 }
 
 

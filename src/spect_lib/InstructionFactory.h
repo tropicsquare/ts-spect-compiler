@@ -53,12 +53,12 @@ class spect::InstructionFactory
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @return Instruction iterator over all registered instructions.
         ///////////////////////////////////////////////////////////////////////////////////////////
-        static std::map<std::string, spect::Instruction*>::iterator GetInstructionIterator();
+        static std::map<std::string, std::shared_ptr<spect::Instruction>>::iterator GetInstructionIterator();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @returns True if iterator is at the last instruction
         ///////////////////////////////////////////////////////////////////////////////////////////
-        static bool IteratorIsLast(std::map<std::string, spect::Instruction*>::iterator &it);
+        static bool IteratorIsLast(std::map<std::string, std::shared_ptr<spect::Instruction>>::iterator &it);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @param isa_version Version of ISA under which to register an Instruction
@@ -90,11 +90,11 @@ class spect::InstructionFactory
 
         // Hash maps with instructions: mnemonic -> *Instruction
         // Single map for each ISA version
-        static std::map<std::string, spect::Instruction*> mnemonic_maps_[NUM_ISA_VERSIONS];
+        static thread_local std::map<std::string, std::shared_ptr<spect::Instruction>> mnemonic_maps_[NUM_ISA_VERSIONS];
 
         // Hash maps with instructions: encoding -> *Instruction
         // Single map for each ISA version
-        static std::map<uint32_t, spect::Instruction*> encoding_maps_[NUM_ISA_VERSIONS];
+        static thread_local std::map<uint32_t, std::shared_ptr<spect::Instruction>> encoding_maps_[NUM_ISA_VERSIONS];
 };
 
 #endif
