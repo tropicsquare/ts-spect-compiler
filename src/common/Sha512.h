@@ -39,6 +39,7 @@
 #define SHA512_H
 
 #include <string>
+#include <cstdint>
 
 class Sha512
 {
