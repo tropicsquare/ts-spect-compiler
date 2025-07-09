@@ -155,7 +155,7 @@ github_mirror:
       - source ./setup_env
 
       - git checkout public
-      - git config --global user.email "gitlab-runner@tropicsquare.com"
+      - git config --global user.email "tropic-gitlab@tropicsquare.com"
       - git config --global user.name "gitlab-runner"
 
       - whoami
