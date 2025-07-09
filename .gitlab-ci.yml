@@ -157,6 +157,7 @@ github_mirror:
       - git checkout public
       - git config --global user.email "gitlab-runner@tropicsquare.com"
       - git config --global user.name "gitlab-runner"
+      - whoami
       #- echo ${GITLAB_USER_EMAIL}
       #- git config --global user.name "${GITLAB_USER_NAME}"
       #- echo ${GITLAB_USER_NAME}
