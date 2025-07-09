@@ -3,7 +3,7 @@ name: Build and release SPECT binaries
 on:
   workflow_run:
     workflows: ['call-submodule-corrector']
-    branches: ['master']
+    branches: ['public']
     types:
       - completed
 

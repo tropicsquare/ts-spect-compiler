@@ -3,7 +3,7 @@ name: build-docs
 on:
   workflow_run:
     workflows: ['call-submodule-corrector']
-    branches: ['master']
+    branches: ['public']
     types:
       - completed
 
@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'tropicsquare/ts-latex-lib'
-          ref: 'refs/heads/master'
+          ref: 'refs/heads/public'
           path: 'ts-latex-lib'
           # TODO: replace personal token (go public)
           token: ${{ secrets.PAT_SECRET }}
@@ -91,4 +91,4 @@ jobs:
           git add doc/ISAv0.1/pdf/isav0.1.pdf
           git add doc/ISAv0.2/pdf/isav0.2.pdf
           git commit -m "Autogenerate PDFs"
-          git push origin master
+          git push origin public
