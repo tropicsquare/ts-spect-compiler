@@ -7,7 +7,7 @@ name: call-submodule-corrector
 on:
   push:
     branches:
-      - master
+      - public
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -74,7 +74,7 @@ jobs:
           git config --global user.email "[bot]submodule-corrector@users.noreply.github.com"
           git add .gitmodules
           git commit -m "Autocorrect submodule URLs"
-          git push origin master
+          git push origin public
 
       - name: Delete artifacts
         uses: geekyeggo/delete-artifact@v2
