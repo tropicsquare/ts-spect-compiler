@@ -19,10 +19,10 @@ jobs:
 
     steps:
       - name: Checkout current repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Checkout ts-latex-lib
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: 'tropicsquare/ts-latex-lib'
           ref: 'refs/heads/master'
@@ -65,10 +65,10 @@ jobs:
     needs: build-docs
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download documentation artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: SPECT_documentation
           path: ${{ github.workspace }}/artifacts
