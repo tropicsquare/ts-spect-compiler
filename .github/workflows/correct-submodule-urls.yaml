@@ -41,42 +41,10 @@ jobs:
           with open(".gitmodules", "w") as f:
               f.writelines(lines)
 
-      - name: Upload gitmodules artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitmodules
-          path: ${{ github.workspace }}/.gitmodules
-
-  commit-changes:
-    runs-on: ubuntu-22.04
-    needs: [modify-gitmodules]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download gitmodules artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: gitmodules
-          path: ${{ github.workspace }}/artifacts
-
-      - name: Check if nothing to commit
-        id: check-diff
-        run: |
-          mv artifacts/.gitmodules .gitmodules
-          git diff --quiet .gitmodules || echo "::set-output name=changes::true"
-
       - name: Commit and push
-        if: steps.check-diff.outputs.changes == 'true'
         run: |
           git config --global user.name "[bot]submodule-corrector"
           git config --global user.email "[bot]submodule-corrector@users.noreply.github.com"
           git add .gitmodules
           git commit -m "Autocorrect submodule URLs"
           git push origin public
-
-      - name: Delete artifacts
-        uses: geekyeggo/delete-artifact@v2
-        with:
-          name: gitmodules
