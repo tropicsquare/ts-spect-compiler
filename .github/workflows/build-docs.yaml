@@ -51,7 +51,7 @@ jobs:
           ts_latex_build.py isav0.2.tex
 
       - name: Upload PDF artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: SPECT_documentation
           path: |
