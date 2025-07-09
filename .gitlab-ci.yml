@@ -157,14 +157,20 @@ github_mirror:
       - git checkout public
       - git config --global user.email "gitlab-runner@tropicsquare.com"
       - git config --global user.name "gitlab-runner"
+
       - whoami
+
       #- echo ${GITLAB_USER_EMAIL}
       #- git config --global user.name "${GITLAB_USER_NAME}"
       #- echo ${GITLAB_USER_NAME}
+
       - git config --global --get user.email
       - git config --global --get user.name
+
       - cat ~/.ssh/id_rsa.pub
+
       - git remote remove github || true
       - git remote add github git@github.com:tropicsquare/ts-spect-compiler.git
-      - git push github
+
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" ~/.ssh/gitlab_mirror.id_rsa.pubgit push github
 
