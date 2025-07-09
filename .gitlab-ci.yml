@@ -172,5 +172,5 @@ github_mirror:
       - git remote remove github || true
       - git remote add github git@github.com:tropicsquare/ts-spect-compiler.git
 
-      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" ~/.ssh/gitlab_mirror.id_rsa.pubgit push github
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" git push github
 
