@@ -153,8 +153,10 @@ github_mirror:
     script:
       - source ./setup_env
 
+      - git checkout public
       - git config --global user.email "${GITLAB_USER_EMAIL}"
       - git config --global user.name "${GITLAB_USER_NAME}"
+
       - git remote add github git@github.com:tropicsquare/ts-spect-compiler.git
-      - git push github -u public
+      - git push github
 
