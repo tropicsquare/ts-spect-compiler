@@ -138,3 +138,23 @@ pages:
     artifacts:
       paths:
         - public
+
+
+###################################################################################################
+# Mirror the public branch to Github
+###################################################################################################
+github_mirror:
+    tags:
+        - shell
+    stage: publish
+    when: always
+    only:
+      - public
+    script:
+      - source ./setup_env
+
+      - git config --global user.email "${GITLAB_USER_EMAIL}"
+      - git config --global user.name "${GITLAB_USER_NAME}"
+      - git remote add github git@github.com:tropicsquare/ts-spect-compiler.git
+      - git push github -u public
+
