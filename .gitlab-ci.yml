@@ -156,7 +156,7 @@ github_mirror:
       - git checkout public
       - git config --global user.email "${GITLAB_USER_EMAIL}"
       - git config --global user.name "${GITLAB_USER_NAME}"
-
+      - git remote remove github || true
       - git remote add github git@github.com:tropicsquare/ts-spect-compiler.git
       - git push github
 
