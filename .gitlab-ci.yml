@@ -155,11 +155,12 @@ github_mirror:
       - source ./setup_env
 
       - git checkout public
-      #- git config --global user.email "${GITLAB_USER_EMAIL}"
+      - git config --global user.email "gitlab-runner@tropicsquare.com"
+      - git config --global user.name "gitlab-runner"
       #- echo ${GITLAB_USER_EMAIL}
       #- git config --global user.name "${GITLAB_USER_NAME}"
       #- echo ${GITLAB_USER_NAME}
-      - git config --global --get  user.email
+      - git config --global --get user.email
       - git config --global --get user.name
       - cat ~/.ssh/id_rsa.pub
       - git remote remove github || true
