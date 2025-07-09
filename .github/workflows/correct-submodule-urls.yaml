@@ -13,5 +13,70 @@ on:
   workflow_dispatch:
 
 jobs:
-  call-submodule-corrector:
-      uses: tropicsquare/workflow-templates/.github/workflows/shared-correct-submodule-urls.yml@master
+  modify-gitmodules:
+    runs-on: ubuntu-22.04
+
+    container:
+      image: python:alpine
+      volumes:
+        - ${{ github.workspace }}/.gitmodules:/.gitmodules
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Correct .gitmodules paths
+        shell: python
+        # Replaces '../foo/bar/repo.git' type urls with '../repo.git'
+        run: |
+          with open(".gitmodules", "r") as f:
+              lines = f.readlines()
+
+          for i, line in enumerate(lines):
+              if line.strip().startswith("url ="):
+                  url = line.strip()[6:]
+                  repo_name = url.rstrip('/').split('/')[-1]
+                  lines[i] = f"\turl = ../{repo_name}\n"
+
+          with open(".gitmodules", "w") as f:
+              f.writelines(lines)
+
+      - name: Upload gitmodules artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitmodules
+          path: ${{ github.workspace }}/.gitmodules
+
+  commit-changes:
+    runs-on: ubuntu-22.04
+    needs: [modify-gitmodules]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download gitmodules artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: gitmodules
+          path: ${{ github.workspace }}/artifacts
+
+      - name: Check if nothing to commit
+        id: check-diff
+        run: |
+          mv artifacts/.gitmodules .gitmodules
+          git diff --quiet .gitmodules || echo "::set-output name=changes::true"
+
+      - name: Commit and push
+        if: steps.check-diff.outputs.changes == 'true'
+        run: |
+          git config --global user.name "[bot]submodule-corrector"
+          git config --global user.email "[bot]submodule-corrector@users.noreply.github.com"
+          git add .gitmodules
+          git commit -m "Autocorrect submodule URLs"
+          git push origin master
+
+      - name: Delete artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+          name: gitmodules

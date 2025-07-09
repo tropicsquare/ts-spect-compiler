@@ -168,4 +168,5 @@ github_mirror:
 
       # Push - Use SSH key created for this purpose
       - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" git push github
+      - GIT_SSH_COMMAND="ssh -i ~/.ssh/gitlab_mirror.id_rsa" git push github --tags
 
