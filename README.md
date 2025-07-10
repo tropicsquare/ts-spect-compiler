@@ -17,7 +17,7 @@ and modular arithmetic, making it useful for implementing algorithms like:
 
 ## Dependencies
 
-The `ts-spect-compiler` dependencies:
+The `ts-spect-compiler` has following dependencies:
 
 - cmake
 - C++ compiler
