@@ -1,1 +1,6 @@
-**/build
+build/*
+test/unit/build/*
+*.aux
+*.log
+*.out
+*.toc

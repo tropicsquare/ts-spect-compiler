@@ -7,7 +7,7 @@ and modular arithmetic, making it useful for implementing algorithms like:
 - ECDSA (Elliptic Curve Digital Signature Algorithm)
 - ECDH (Elliptic Curve Diffie-Hellman).
 -
-## Documentation [![build-docs](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-docs.yaml/badge.svg?branch=master)](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-docs.yaml)
+## Documentation
 
 ### [Programmer's Guide](doc/programmer_guide/pdf/spect_programmer_guide.pdf)
 
@@ -17,7 +17,7 @@ and modular arithmetic, making it useful for implementing algorithms like:
 
 ## SPECT Compiler and Instruction Set Simulator
 
-### Download Pre-built Binaries [![build-binaries](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-release-binaries.yaml/badge.svg)](https://github.com/tropicsquare/ts-spect-compiler/actions/workflows/build-release-binaries.yaml)
+### Download Pre-built Binaries
 
 1. **Download the pre-built binaries:**
 
