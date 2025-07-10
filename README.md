@@ -15,111 +15,31 @@ and modular arithmetic, making it useful for implementing algorithms like:
 - [v0.1](doc/ISAv0.1/pdf/isav0.1.pdf)
 - [v0.2](doc/ISAv0.2/pdf/isav0.2.pdf) - Used in production TROPIC01 devices
 
-## SPECT Compiler and Instruction Set Simulator
+## Dependencies
 
-### Download Pre-built Binaries
+The `ts-spect-compiler` dependencies:
 
-1. **Download the pre-built binaries:**
+- cmake
+- C++ compiler
+- Python3.8 (or higher)
+- Xlstproc
+- jinja2 python package
 
-    Visit the [releases page](https://github.com/tropicsquare/ts-spect-compiler/releases)
-    and download the binaries for the SPECT compiler and ISS (Instruction Set
-    Simulator) that match your system architecture (either AMD64 or ARM64v7).
-    The binaries are named in the format `spect_compiler_linux_<arch>_<git-tag>`
-    and `spect_iss_linux_<arch>_<git-tag>`.
+To install the dependencies:
 
-2. **Rename the Binaries**
+```
+sudo apt-get install cmake build-essentials python3 python3-pip xsltproc
+```
 
-    Rename the binaries to `spect_compiler` and `spect_iss`. These names are
-    used by the Makefiles in the [`ts-spect-fw`](https://github.com/tropicsquare/ts-spect-fw) repository.
-
-    Open a terminal, navigate to the directory containing the downloaded
-    binaries, and rename them using the `mv` command.
-
-    ```bash
-    mv spect_compiler_linux_amd64_master spect_compiler
-    mv spect_iss_linux_amd64_master spect_iss
-    ```
-
-2. **Make the Binaries Executable:**
-
-    From the same directory containing the downloaded binaries, make them
-    executable using the `chmod` command.
-
-    ```bash
-    chmod +x spect_compiler
-    chmod +x spect_iss
-    ```
-
-3. **Run the Binaries:**
-
-    Execute the binary with your desired command-line options.
-
-    ```bash
-    ./spect_compiler --help
-    ./spect_iss --help
-    ```
-
-4. **Optional: Add to $PATH (Convenient Access):**
-   For easy access from any directory, add the binary's directory to your
-   system's `$PATH`. Edit your shell configuration file (e.g., `~/.bashrc`):
-
-   ```bash
-   # Replace '/path/to/directory' with the actual path
-   echo 'export PATH="${PATH}:/path/to/directory"' >> ~/.bashrc
-   ```
-
-   Restart your terminal or run `source ~/.bashrc`, and you can use `spect_compiler` and `spect_iss` from anywhere on your Linux system.
-
-   When compiling a firmware from [`ts-spect-fw`](https://github.com/tropicsquare/ts-spect-fw) repository using `make`, the SPECT compiler and instruction set simulator don't have to be visible in a new shell started by `make`. To ensure so, add the binary's directory using absolute path (don't use `~`) to the `$PATH` variable in your `/etc/environment` and restart system. The other way to build the SPECT firmware using `make` is to specify the absolute path to the binaries in Makefile.
+Then, to install `jinja2`:
+```
+pip install jinja2
+```
 
 
-### Build from Source with CMake
+### Build Instructions
 
-Before you begin, ensure you have the following prerequisites installed on your system:
-
-- <details>
-    <summary>CMake (version 3.18.2 or higher)</summary>
-
-    ```bash
-    sudo apt-get install cmake
-    ```
-</details>
-
-- <details>
-    <summary>C++ compiler (like g++ or clang-*)</summary>
-
-    ```bash
-    sudo apt-get install g++
-    ```
-</details>
-
-- <details>
-    <summary>Python (version 3.8 or higher)</summary>
-
-    ```bash
-    sudo apt-get update
-    sudo apt-get install python3-pip
-    ```
-</details>
-
-- <details>
-    <summary>Python packages (Jinja2)</summary>
-
-    ```bash
-    pip install jinja2
-    ```
-</details>
-
-- <details>
-    <summary>XsltProc</summary>
-
-    ```bash
-    sudo apt-get install xsltproc
-    ```
-</details>
-
-
-Now, follow these steps to build SPECT from source with CMake:
+Follow these steps to build SPECT from source with CMake:
 
 1. **Clone the Repository:**
 
