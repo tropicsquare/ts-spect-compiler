@@ -157,10 +157,9 @@ github_mirror:
       # Ensure we are on branch, not detached head
       - git checkout public
 
-      # Configure GIT user to match the "gitlab-runner" that runs the pipeline
-      # Match its email to "tropic-gitlab" users email that is used to connect to confluence
+      # Use Proxy Github account "tropic-gitlab" to push to the github
       - git config --global user.email "tropic-gitlab@tropicsquare.com"
-      - git config --global user.name "gitlab-runner"
+      - git config --global user.name "tropic-gitlab"
 
       # Add remote origin
       - git remote remove github || true
