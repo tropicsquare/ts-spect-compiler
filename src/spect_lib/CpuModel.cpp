@@ -230,6 +230,7 @@ uint32_t spect::CpuModel::ReadMemoryCoreFetch(uint16_t address)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Fetching instruction, address: ", tohexs(address, 4));
     if (IsWithinMem(CpuMemory::INSTR_MEM, address)) {
+        DebugInfo(VERBOSITY_MEDIUM, "Instruction: ", tohexs(memory_[address >> 2], 8));
         return memory_[address >> 2];
     }
     return 0x0;
@@ -703,6 +704,37 @@ void spect::CpuModel::LoadContext(const std::string &path)
         throw std::runtime_error("Unable to open a file: " + path);
 }
 
+void spect::CpuModel::DumpExecInfo(const std::string &path) {
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model execution information to: ", path);
+
+        //ofs << "Instruction Execution Count - Mnemonic" << "\n";
+
+        for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++) {
+            if (instr_exec_cnt_[i] == 0)
+                continue;
+
+            uint32_t inst_addr = SPECT_INSTR_MEM_BASE+(i*4);
+            uint32_t wrd = ReadMemoryCoreFetch(inst_addr);
+
+            DebugInfo(VERBOSITY_LOW, "wrd", wrd);
+
+            Instruction *instr = spect::Instruction::DisAssemble(spect::ParityType::NONE, wrd);
+
+            ofs << std::showbase << std::hex << std::setfill('0') << inst_addr << ":";
+            ofs << std::dec << instr_exec_cnt_[i] << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << wrd << ":";
+            ofs << instr->mnemonic_;
+            ofs << "\n";
+        }
+
+    } else
+    throw std::runtime_error("Unable to open a file: " + path);
+}
+
 bool spect::CpuModel::HasChange()
 {
     return !change_q_.empty();
@@ -772,6 +804,9 @@ void spect::CpuModel::Reset()
     // Re-create new register model -> Erase registers to reset values.
     delete regs_;
     regs_ = new ordt_root();
+
+    for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++)
+        instr_exec_cnt_[i] = 0;
 
     // To make browsing logs easier
     DebugInfo(VERBOSITY_LOW, "");
@@ -873,10 +908,16 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     gold->exec_cnt_++;
 
-    // Execute instruction
     instr->model_ = this;
-    if (instr->Execute())
+    // Count intruction execution
+    uint32_t inst_idx = (GetPc() - SPECT_INSTR_MEM_BASE)/4;
+    instr_exec_cnt_[inst_idx]++;
+    DebugInfo(VERBOSITY_LOW, "Executed: ", instr_exec_cnt_[inst_idx]);
+
+    // Execute instruction
+    if (instr->Execute()) {
         SetPc(GetPc() + 0x4);
+    }
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);
