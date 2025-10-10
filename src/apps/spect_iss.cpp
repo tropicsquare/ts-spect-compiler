@@ -41,6 +41,7 @@ enum  optionIndex {
     LOAD_CONTEXT,
     DUMP_KEYMEM,
     LOAD_KEYMEM,
+    DUMP_EXEC_INFO,
     TIMING_ACCURATE,
     EXEC_TIME_STEP
 };
@@ -76,6 +77,7 @@ const option::Descriptor usage[] =
     {LOAD_CONTEXT,          0,  ""  ,    "load-context"         ,option::Arg::Optional,     "  --load-context=<file>        Load context (state of CPU - GPR registers, Memory content, Hash unit context, RAR stack) before execution from file. \n"},
     {DUMP_KEYMEM,           0,  ""  ,    "dump-keymem"          ,option::Arg::Optional,     "  --dump-keymem=<file>         Dump Key memory after execution to file. \n"},
     {LOAD_KEYMEM,           0,  ""  ,    "load-keymem"          ,option::Arg::Optional,     "  --load-keymem=<file>         Load Key memory before execution from file. \n"},
+    {DUMP_EXEC_INFO,        0,  ""  ,    "dump-exec-info"       ,option::Arg::Optional,     "  --dump-exec-info=<file>      Dumps execution information to a file. \n"},
     {TIMING_ACCURATE,       0,  ""  ,    "timing-accurate"      ,option::Arg::Optional,     "  --timing-accurate            Launch simulator in the timing accurate mode.\n"},
     {EXEC_TIME_STEP,        0,  ""  ,    "execution-time-step"  ,option::Arg::Optional,     "  --execution-time-step=<n>    Instruction execution time step (in us) for timing accurate simulation (default = 10).\n"},
 
@@ -313,6 +315,10 @@ int main(int argc, char** argv)
 
     if (options[DUMP_CONTEXT]) {
         simulator->model_->DumpContext(std::string(options[DUMP_CONTEXT].arg));
+    }
+
+    if (options[DUMP_EXEC_INFO]) {
+        simulator->model_->DumpExecInfo(std::string(options[DUMP_EXEC_INFO].arg));
     }
 
     if (options[DUMP_KEYMEM]) {

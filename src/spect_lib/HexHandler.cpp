@@ -19,7 +19,12 @@
 void spect::HexHandler::LoadHexFile(const std::string &path, uint32_t *mem, uint32_t offset)
 {
     std::ifstream ifs;
-    ifs.open(path);
+    try {
+        ifs.open(path);
+    } catch (...) {
+        throw std::runtime_error("Unable to open a file: " + path);
+    }
+
     if (ifs.is_open()) {
         std::string line;
         bool first_line = true;
@@ -113,10 +118,12 @@ void spect::HexHandler::DumpHexFile(const std::string &path, HexFileType hex_typ
                                     uint32_t *mem, uint32_t offset, size_t size)
 {
     std::ofstream ofs;
-    ofs << std::hex;
-    ofs << std::setfill('0');
     ofs.open(path);
+
     if (ofs.is_open()) {
+        ofs << std::hex;
+        ofs << std::setfill('0');
+
         uint32_t *mem_c = mem + (offset >> 2);
 
         for (size_t i = 0; i < (size >> 2); i++) {

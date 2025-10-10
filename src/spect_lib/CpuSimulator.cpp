@@ -591,6 +591,7 @@ void spect::CpuSimulator::ExecCmdFile(cli::CliLocalTerminalSession &session)
 {
     std::ifstream ifs;
     ifs.open(cmd_file_);
+
     std::string line;
     if (ifs.is_open()) {
         std::cout << "Loading command file: " << cmd_file_ << "\n";
