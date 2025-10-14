@@ -14,6 +14,7 @@
 #include <cstdarg>
 #include <unistd.h>
 
+#include "CpuFault.h"
 #include "CpuModel.h"
 
 #include "InstructionDefs.h"
@@ -34,6 +35,7 @@ spect::CpuModel::~CpuModel()
 {
     delete[] memory_;
     delete regs_;
+    delete fault_;
 }
 
 void spect::CpuModel::Start()
@@ -75,7 +77,7 @@ void spect::CpuModel::Finish(int status_err)
     end_executed_ = true;
     DebugInfo(VERBOSITY_LOW, "Finishing program execution...");
 
-    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[IDLE] = 1.");
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[IDLE] = 1");
     regs_->r_status.f_idle.data = 1;
 
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[DONE] = ", !status_err);
@@ -704,6 +706,12 @@ void spect::CpuModel::LoadContext(const std::string &path)
         throw std::runtime_error("Unable to open a file: " + path);
 }
 
+void spect::CpuModel::LoadFault(const std::string &path) {
+    fault_ = new CpuFault(path);
+    fault_->print_fnc = print_fnc;
+    fault_->verbosity_ = verbosity_;
+}
+
 void spect::CpuModel::DumpExecInfo(const std::string &path) {
     std::ofstream ofs;
     ofs.open(path);
@@ -711,16 +719,12 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
     if (ofs.is_open()) {
         DebugInfo(VERBOSITY_LOW, "Dumping model execution information to: ", path);
 
-        //ofs << "Instruction Execution Count - Mnemonic" << "\n";
-
         for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++) {
             if (instr_exec_cnt_[i] == 0)
                 continue;
 
             uint32_t inst_addr = SPECT_INSTR_MEM_BASE+(i*4);
-            uint32_t wrd = ReadMemoryCoreFetch(inst_addr);
-
-            DebugInfo(VERBOSITY_LOW, "wrd", wrd);
+            uint32_t wrd = memory_[inst_addr >> 2];
 
             Instruction *instr = spect::Instruction::DisAssemble(spect::ParityType::NONE, wrd);
 
@@ -732,7 +736,7 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
         }
 
     } else
-    throw std::runtime_error("Unable to open a file: " + path);
+        throw std::runtime_error("Unable to open a file: " + path);
 }
 
 bool spect::CpuModel::HasChange()
@@ -866,7 +870,17 @@ void spect::CpuModel::UpdateRegisterEffects()
 
 int spect::CpuModel::ExecuteNextInstruction(int cycles)
 {
+
+    // Count intruction execution
+    uint32_t inst_idx = (GetPc() - SPECT_INSTR_MEM_BASE)/4;
+    instr_exec_cnt_[inst_idx]++;
+
     uint32_t wrd = ReadMemoryCoreFetch(GetPc());
+
+    // Check for fault
+    if (fault_ && fault_->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
+        fault_->Apply(&wrd);
+    }
 
     DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", tohexs(wrd, 8));
     Instruction *instr = spect::Instruction::DisAssemble(GetParityType(), wrd);
@@ -909,15 +923,12 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     gold->exec_cnt_++;
 
     instr->model_ = this;
-    // Count intruction execution
-    uint32_t inst_idx = (GetPc() - SPECT_INSTR_MEM_BASE)/4;
-    instr_exec_cnt_[inst_idx]++;
-    DebugInfo(VERBOSITY_LOW, "Executed: ", instr_exec_cnt_[inst_idx]);
-
     // Execute instruction
     if (instr->Execute()) {
         SetPc(GetPc() + 0x4);
     }
+
+    DebugInfo(VERBOSITY_LOW, "Executed: ", instr_exec_cnt_[inst_idx]);
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);

@@ -16,6 +16,7 @@
 #include <queue>
 
 #include "spect.h"
+#include "CpuFault.h"
 #include "CpuProgram.h"
 #include "Sha512.h"
 extern "C" {
@@ -310,10 +311,16 @@ class spect::CpuModel
         void DumpContext(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Load whole model context (GPRs, Memory content, Hash unit content, RAR, Flags)
+        /// @param path File from which load Model context
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void LoadContext(const std::string &path);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Dump whole model (GPRs, Memory content, Hash unit content, RAR, Flags)
         /// @param path File where to dump Model context
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void LoadContext(const std::string &path);
+        void LoadFault(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Dump execution information
@@ -381,6 +388,9 @@ class spect::CpuModel
 
         // Simulator
         CpuSimulator *simulator_ = NULL;
+
+        // Fault for FWFE
+        CpuFault *fault_ = NULL;
 
         // Maximal number of instructions to execute
         uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();

@@ -142,6 +142,9 @@ class spect::CpuSimulator
         // Path to CPU model context file to be preloaded before model execution
         std::string model_context_;
 
+        // Path to CPU Fault file to be preloaded before model execution
+        std::string model_fault_;
+
         // Path to command file for simulator
         std::string cmd_file_;
 
