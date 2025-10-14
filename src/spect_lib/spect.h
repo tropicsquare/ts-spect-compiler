@@ -152,6 +152,7 @@ namespace spect {
     SPECT_SUM_INSTRUCTIONS_V1
     SPECT_SUM_INSTRUCTIONS_V2
 
+    class CpuFault;
     class CpuModel;
     class CpuSimulator;
     class CpuProgram;
@@ -196,6 +197,7 @@ namespace spect {
     #define VERBOSITY_HIGH 3
 
     #define MODEL_LABEL "SPECT_MODEL: "
+    #define FAULT_LABEL "FI_MODULE  : "
 
     #define KECCAK_CAPACITY 256
     #define KECCAK_RATE     144

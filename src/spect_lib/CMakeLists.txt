@@ -17,6 +17,7 @@ add_library (SPECT STATIC
     InstructionDefsV1.cpp
     InstructionDefsV2.cpp
 
+    CpuFault.cpp
     CpuModel.cpp
     CpuProgram.cpp
     CpuSimulator.cpp

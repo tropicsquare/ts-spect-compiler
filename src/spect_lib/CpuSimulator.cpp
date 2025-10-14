@@ -273,6 +273,8 @@ void spect::CpuSimulator::CmdRun(A_UNUSED std::ostream &out)
         model_->Reset();
         if (model_context_ != "")
             model_->LoadContext(model_context_);
+        if (model_fault_ != "")
+            model_->LoadFault(model_fault_);
         model_->Start();
         program_running_ = true;
     }
@@ -450,6 +452,8 @@ void spect::CpuSimulator::CmdStart(A_UNUSED std::ostream &out)
     model_->Reset();
     if (model_context_ != "")
         model_->LoadContext(model_context_);
+    if (model_fault_ != "")
+        model_->LoadFault(model_fault_);
     model_->Start();
     program_running_ = true;
 }
@@ -563,6 +567,8 @@ void spect::CpuSimulator::Start(bool batch_mode)
         model_->Reset();
         if (model_context_ != "")
             model_->LoadContext(model_context_);
+        if (model_fault_ != "")
+            model_->LoadFault(model_fault_);
         model_->Start();
         model_->Step(0);
     } else {

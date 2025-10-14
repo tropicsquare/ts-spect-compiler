@@ -42,6 +42,7 @@ enum  optionIndex {
     DUMP_KEYMEM,
     LOAD_KEYMEM,
     DUMP_EXEC_INFO,
+    INJECT_FAULT,
     TIMING_ACCURATE,
     EXEC_TIME_STEP
 };
@@ -78,6 +79,7 @@ const option::Descriptor usage[] =
     {DUMP_KEYMEM,           0,  ""  ,    "dump-keymem"          ,option::Arg::Optional,     "  --dump-keymem=<file>         Dump Key memory after execution to file. \n"},
     {LOAD_KEYMEM,           0,  ""  ,    "load-keymem"          ,option::Arg::Optional,     "  --load-keymem=<file>         Load Key memory before execution from file. \n"},
     {DUMP_EXEC_INFO,        0,  ""  ,    "dump-exec-info"       ,option::Arg::Optional,     "  --dump-exec-info=<file>      Dumps execution information to a file. \n"},
+    {INJECT_FAULT,          0,  ""  ,    "inject-fault"         ,option::Arg::Optional,     "  --inject-fault=<file>        Load and inject fault defined in file. \n"},
     {TIMING_ACCURATE,       0,  ""  ,    "timing-accurate"      ,option::Arg::Optional,     "  --timing-accurate            Launch simulator in the timing accurate mode.\n"},
     {EXEC_TIME_STEP,        0,  ""  ,    "execution-time-step"  ,option::Arg::Optional,     "  --execution-time-step=<n>    Instruction execution time step (in us) for timing accurate simulation (default = 10).\n"},
 
@@ -296,6 +298,9 @@ int main(int argc, char** argv)
 
     if (options[LOAD_KEYMEM])
         simulator->key_memory_->Load(std::string(options[LOAD_KEYMEM].arg));
+
+    if (options[INJECT_FAULT])
+        simulator->model_fault_ = std::string(options[INJECT_FAULT].arg);
 
     EXEC_WITH_ERR_HANDLER({
         simulator->Start(batch_mode);
