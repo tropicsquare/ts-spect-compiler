@@ -42,6 +42,7 @@ spect::CpuSimulator::~CpuSimulator()
 {
     delete model_;
     delete compiler_;
+    delete key_memory_;
     delete cli_;
 }
 
