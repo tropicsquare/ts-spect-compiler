@@ -39,7 +39,12 @@ class spect::CpuFault
         /// @param fault_data tha value the insdtruction code shall be replaced with
         /// @returns New fault object
         ///////////////////////////////////////////////////////////////////////////////////////////
-        CpuFault(uint32_t inst_addr, uint32_t inst_exec_cnt, uint32_t fault_data, const std::string description);
+        CpuFault(
+            uint32_t            inst_addr,
+            uint32_t            inst_exec_cnt,
+            uint32_t            fault_data,
+            const std::string   description
+        );
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief New CPU Fault constructor
@@ -75,10 +80,10 @@ class spect::CpuFault
         /// @section Private attributes
         ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////
-        uint32_t    inst_addr_;
-        uint32_t    inst_exec_cnt_;
-        uint32_t    fault_data_;
-        std::string description_;
+        uint32_t    m_inst_addr;
+        uint32_t    m_inst_exec_cnt;
+        uint32_t    m_fault_data;
+        std::string m_description;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////
