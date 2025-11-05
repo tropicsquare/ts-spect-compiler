@@ -15,32 +15,38 @@
 
 #include "CpuFault.h"
 
-spect::CpuFault::CpuFault(uint32_t inst_addr, uint32_t inst_exec_cnt, uint32_t fault_data, const std::string description) {
-    inst_addr_       = inst_addr;
-    inst_exec_cnt_   = inst_exec_cnt;
-    fault_data_      = fault_data;
-    description_     = description;
+spect::CpuFault::CpuFault(
+    uint32_t            inst_addr,
+    uint32_t            inst_exec_cnt,
+    uint32_t            fault_data,
+    const std::string   description
+) {
+    m_inst_addr        = inst_addr;
+    m_inst_exec_cnt    = inst_exec_cnt;
+    m_fault_data       = fault_data;
+    m_description      = description;
 }
 
 spect::CpuFault::CpuFault(const std::string &path) {
     std::ifstream ifs(path);
     if (ifs.is_open()) {
-        ifs >> std::hex >> inst_addr_ >> std::dec >> inst_exec_cnt_ >> std::hex >> fault_data_;
-        //std::cout << inst_addr_ << " " << inst_exec_cnt_ << " " << fault_data_ << std::endl;
-        ifs >> description_;
-        DebugInfo(VERBOSITY_MEDIUM, "Loaded fault:", description_);
+        ifs >> std::hex >> m_inst_addr >> std::dec >> m_inst_exec_cnt >> std::hex >> m_fault_data;
+        ifs >> m_description;
+        DebugInfo(VERBOSITY_MEDIUM, "Loaded fault:", m_description);
     }
     else
         throw std::runtime_error("Unable to open a file: " + path);
 }
 
+spect::CpuFault::~CpuFault() {}
+
 bool spect::CpuFault::Check(const uint32_t addr, const uint32_t exec_cnt) {
-    return (addr == inst_addr_) && (exec_cnt == inst_exec_cnt_);
+    return (addr == m_inst_addr) && (exec_cnt == m_inst_exec_cnt);
 }
 
 void spect::CpuFault::Apply(uint32_t * wrd) {
-    DebugInfo(VERBOSITY_MEDIUM, "Injecting Fault:", description_);
-    *wrd = fault_data_;
+    DebugInfo(VERBOSITY_MEDIUM, "Injecting Fault:", m_description);
+    *wrd = m_fault_data;
 }
 
 void spect::CpuFault::PrintArgs()

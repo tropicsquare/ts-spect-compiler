@@ -734,7 +734,7 @@ void spect::CpuModel::LoadContext(const std::string &path)
 }
 
 void spect::CpuModel::LoadFault(const std::string &path) {
-    fault_ = new CpuFault(path);
+    fault_ = new spect::CpuFault(path);
     fault_->print_fnc = print_fnc;
     fault_->verbosity_ = verbosity_;
 }
