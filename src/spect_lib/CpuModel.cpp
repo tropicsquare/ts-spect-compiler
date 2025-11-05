@@ -26,6 +26,7 @@ spect::CpuModel::CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r) :
     instr_mem_ahb_r_(instr_mem_ahb_r)
 {
     memory_ = new uint32_t[SPECT_TOTAL_MEM_SIZE / 4];
+    std::memset(memory_, 0, SPECT_TOTAL_MEM_SIZE);
     regs_ = new ordt_root();
     print_fnc = &(printf);
 
@@ -839,8 +840,7 @@ void spect::CpuModel::Reset()
     delete regs_;
     regs_ = new ordt_root();
 
-    for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++)
-        instr_exec_cnt_[i] = 0;
+    std::memset(instr_exec_cnt_, 0, SPECT_INSTR_MEM_SIZE);
 
     // To make browsing logs easier
     DebugInfo(VERBOSITY_LOW, "");
