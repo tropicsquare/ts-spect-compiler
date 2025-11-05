@@ -17,14 +17,14 @@
 #include "HexHandler.h"
 #include "KeyMemory.h"
 
-spect::CpuSimulator::CpuSimulator()
+spect::CpuSimulator::CpuSimulator(uint32_t verbosity)
 {
     model_ = new spect::CpuModel(SPECT_INSTR_MEM_AHB_W, SPECT_INSTR_MEM_AHB_R);
-    model_->verbosity_ = VERBOSITY_HIGH;
+    model_->verbosity_ = verbosity;
     model_->simulator_ = this;
     compiler_ = new spect::Compiler();
     key_memory_ = new spect::KeyMemory();
-    key_memory_->verbosity_ = VERBOSITY_HIGH;
+    key_memory_->verbosity_ = verbosity;
 
     auto menu = std::make_unique<cli::Menu>("spect_iss");
     BuildCliCommands(menu);
