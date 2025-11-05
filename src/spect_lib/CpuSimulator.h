@@ -1,10 +1,12 @@
-/**************************************************************************************************
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #ifndef SPECT_LIB_CPU_SIMULATOR_H_
 #define SPECT_LIB_CPU_SIMULATOR_H_

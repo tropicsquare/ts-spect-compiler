@@ -1,10 +1,12 @@
-/**************************************************************************************************
-** SPECT Instruction set simulator - Shared Library version
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #include "spect_iss_lib.h"
 

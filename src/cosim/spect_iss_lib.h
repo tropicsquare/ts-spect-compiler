@@ -1,7 +1,14 @@
 /**************************************************************************************************
+**
+** SPECT Compiler
+** Copyright (C) 2022-present Tropic Square
+**
+** @license For the license see file LICENSE.txt file in the root directory of this source tree.
+**
+***************************************************************************************************
+** Use API from this file to embed "spect_iss" into your compiled application
 ** SPECT Instruction set simulator - Shared Library version
 **
-** Use API from this file to embed "spect_iss" into your compiled application
 **
 ***************************************************************************************************
 **
@@ -12,12 +19,7 @@
 **
 ** Initialization:
 **
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+** **************************************************************************************************/
 
 #ifndef SPECT_ISS_LIB_H_
 #define SPECT_ISS_LIB_H_

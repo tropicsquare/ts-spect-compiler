@@ -3,10 +3,8 @@
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
 *
-* @todo: License
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
 *
-* @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
-* @date 19.9.2022
 *
 *****************************************************************************/
 
@@ -466,7 +464,7 @@ class spect::CpuModel
         ParityType parity_type_ = ParityType::NONE;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // true  - Program has finished (END has been executed or Error occured)
+        // true  - Program has finished (END has been executed or Error occurred)
         // false - Program was not started or it is running
         ///////////////////////////////////////////////////////////////////////////////////////////
         bool end_executed_;

@@ -1,10 +1,12 @@
-/**************************************************************************************************
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #ifndef SPECT_LIB_COMPILER_H_
 #define SPECT_LIB_COMPILER_H_
@@ -75,8 +77,8 @@ class spect::Compiler
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Throw compiler error with reference to source file location
         /// @param err Error message to print
-        /// @param sf Pointer to source file where error occured.
-        /// @param line_nr Line number where error occured.
+        /// @param sf Pointer to source file where error occurred.
+        /// @param line_nr Line number where error occurred.
         /// @param err_code Error code to throw
         /// @throw std::runtime_error
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +93,8 @@ class spect::Compiler
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Throw compiler error with reference to source file location
         /// @param warn Warning message to print
-        /// @param sf Pointer to source file where error occured.
-        /// @param line_nr Line number where error occured.
+        /// @param sf Pointer to source file where error occurred.
+        /// @param line_nr Line number where error occurred.
         ///////////////////////////////////////////////////////////////////////////////////////////
         void WarningAt(std::string warn, const SourceFile *sf, int line_nr);
 
