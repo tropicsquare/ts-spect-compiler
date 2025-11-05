@@ -751,19 +751,24 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
                 continue;
 
             uint32_t inst_addr = SPECT_INSTR_MEM_BASE+(i*4);
-            uint32_t wrd = memory_[inst_addr >> 2];
+            uint32_t wrd = memory_[inst_addr/4];
 
             Instruction *instr = spect::Instruction::DisAssemble(spect::ParityType::NONE, wrd);
 
             ofs << std::showbase << std::hex << std::setfill('0') << inst_addr << ":";
             ofs << std::dec << instr_exec_cnt_[i] << ":";
             ofs << std::showbase << std::hex << std::setfill('0') << wrd << ":";
-            ofs << instr->mnemonic_;
+            if (instr)
+                ofs << instr->mnemonic_;
+            else
+                ofs << "INVALID";
             ofs << "\n";
         }
 
     } else
         throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
 }
 
 bool spect::CpuModel::HasChange()
