@@ -770,12 +770,14 @@ int spect::CpuModel::Step(int n)
     int cnt = 0;
     if (n == 0) {
         do {
-            ExecuteNextInstruction(0);
+            if (ExecuteNextInstruction(0) == -1)
+                return -1;
             cnt++;
         } while (!end_executed_);
     } else {
         for (int i = 0; i < n; i++) {
-            ExecuteNextInstruction(0);
+            if (ExecuteNextInstruction(0) == -1)
+                return -1;
             cnt++;
             if (end_executed_)
                 break;
@@ -878,6 +880,23 @@ void spect::CpuModel::UpdateRegisterEffects()
 
 int spect::CpuModel::ExecuteNextInstruction(int cycles)
 {
+    // Check number of executed instructions
+    instr_cnt_++;
+    if (instr_cnt_ == max_instr_cnt_) {
+        DebugInfo(VERBOSITY_NONE, "FATAL: Limit of executed instruction (", max_instr_cnt_, ") reached!");
+        Finish(1);
+        UpdateInterrupts();
+        return -1;
+    }
+
+    // Check PC is valid
+    if (! IsWithinMem(CpuMemory::INSTR_MEM, GetPc())) {
+        DebugInfo(VERBOSITY_NONE, "FATAL: Invalid PC value!");
+        Finish(1);
+        UpdateInterrupts();
+
+        return -1;
+    }
 
     // Count intruction execution
     uint32_t inst_idx = (GetPc() - SPECT_INSTR_MEM_BASE)/4;
@@ -885,21 +904,24 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     uint32_t wrd = ReadMemoryCoreFetch(GetPc());
 
-    // Check for fault
+    ////////////////////////////////////////////////////////////////////////////
+    // Firmware Fault Injection
+    ////////////////////////////////////////////////////////////////////////////
     if (fault_ && fault_->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
         fault_->Apply(&wrd);
     }
+    ////////////////////////////////////////////////////////////////////////////
 
     DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", tohexs(wrd, 8));
     Instruction *instr = spect::Instruction::DisAssemble(GetParityType(), wrd);
 
     // Detect invalid instruction and finish
     if (instr == nullptr) {
-        DebugInfo(VERBOSITY_LOW, "Detected invalid instruction!");
+        DebugInfo(VERBOSITY_LOW, "FATAL: Detected invalid instruction!");
         Finish(1);
         UpdateInterrupts();
 
-        return 0;
+        return -1;
     }
 
     DebugInfo(VERBOSITY_LOW, "Executing instruction:         ", instr->Dump());
@@ -936,19 +958,8 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
         SetPc(GetPc() + 0x4);
     }
 
-    DebugInfo(VERBOSITY_LOW, "Executed: ", instr_exec_cnt_[inst_idx]);
-
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);
-
-    // Check number of executed instructions
-    instr_cnt_++;
-    if (instr_cnt_ == max_instr_cnt_) {
-        DebugInfo(VERBOSITY_LOW, "Limit of executed instruction (", max_instr_cnt_, ") reached!");
-        Finish(1);
-        UpdateInterrupts();
-        return 0;
-    }
 
     // Separate instructions by empty line -> More readable output
     DebugInfo(VERBOSITY_MEDIUM, "");
