@@ -382,6 +382,7 @@ class spect::CpuModel
 
         // Keccak Sponge instance
         KeccakWidth400_SpongeInstance keccak_inst_;
+        bool keccak_is_initialized_;
 
         // Program
         CpuProgram *program_ = NULL;

@@ -28,6 +28,10 @@ spect::CpuModel::CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r) :
     memory_ = new uint32_t[SPECT_TOTAL_MEM_SIZE / 4];
     regs_ = new ordt_root();
     print_fnc = &(printf);
+
+    // Initialize Keccak so the library does not cause problems.
+    KeccakWidth400_SpongeInitialize(&(keccak_inst_), KECCAK_RATE, KECCAK_CAPACITY);
+
     Reset();
 }
 
@@ -516,19 +520,24 @@ void spect::CpuModel::DumpContext(const std::string &path)
             ofs << std::setw(16) << sha_512_.getContext(i) << "\n";
 
         PUT_COMMENT_LINE("TMAC context: (state (5 lines), rate, byteIOIndex, squeezing)");
-        // State
-        for (int i = 0; i < 5; i++) {
-            std::stringstream ss;
-            for (int j = 0; j < 10; j++)
-                ss << std::setfill('0') << std::setw(2) << std::hex << (int)keccak_inst_.state[i*10+j];
-            ofs << std::setw(20) << ss.str().c_str() << "\n";
+        if (keccak_is_initialized_) {
+            // State
+            for (int i = 0; i < 5; i++) {
+                std::stringstream ss;
+                for (int j = 0; j < 10; j++)
+                    ss << std::setfill('0') << std::setw(2) << std::hex << (int)keccak_inst_.state[i*10+j];
+                ofs << std::setw(20) << ss.str().c_str() << "\n";
+            }
+            // Rate, byteIOIndex, squeezing
+            ofs << std::dec;
+            ofs << keccak_inst_.rate << "\n";
+            ofs << keccak_inst_.byteIOIndex << "\n";
+            ofs << keccak_inst_.squeezing << "\n";
+            ofs << std::hex;
         }
-        // Rate, byteIOIndex, squeezing
-        ofs << std::dec;
-        ofs << keccak_inst_.rate << "\n";
-        ofs << keccak_inst_.byteIOIndex << "\n";
-        ofs << keccak_inst_.squeezing << "\n";
-        ofs << std::hex;
+        else {
+            ofs << "UNINITIALIZED\n";
+        }
 
         PUT_COMMENT_LINE("RAR stack:");
         for (int i = 0; i < SPECT_RAR_DEPTH; i++)
@@ -606,8 +615,14 @@ void spect::CpuModel::LoadContext(const std::string &path)
         // TMAC
         SKIP_COMMENT_LINES
         // State
+        bool kecak_init_flag = true;
         for (int i = 0; i < 5; i++) {
             std::getline(ifs, line);
+            if (line == "UNINITIALIZED") {
+                DebugInfo(VERBOSITY_LOW, "TMAC is not initialized in the input context.");
+                kecak_init_flag = false;
+                break;
+            }
             std::istringstream state_iss(line);
             std::string num = std::string("0x") + line;
             std::stringstream idx_low;
@@ -619,21 +634,24 @@ void spect::CpuModel::LoadContext(const std::string &path)
                 keccak_inst_.state[i*10+j] = (unsigned char)((uint256_t(num.c_str()) >> (72-j*8)) & uint256_t("0xFF"));
             }
         }
-        // Rate, byteIOIndex, squeezing
-        std::getline(ifs, line);
-        std::istringstream rate_iss(line);
-        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - rate to", line);
-        rate_iss >> keccak_inst_.rate;
-        // byteIOIndex
-        std::getline(ifs, line);
-        std::istringstream bioi_iss(line);
-        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - byteIOIndex to", line);
-        bioi_iss >> keccak_inst_.byteIOIndex;
-        // squeezing
-        std::getline(ifs, line);
-        std::istringstream squeezing_iss(line);
-        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - squeezing to", line);
-        squeezing_iss >> keccak_inst_.squeezing;
+        if (kecak_init_flag) {
+            keccak_is_initialized_ = true;
+            // Rate, byteIOIndex, squeezing
+            std::getline(ifs, line);
+            std::istringstream rate_iss(line);
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - rate to", line);
+            rate_iss >> keccak_inst_.rate;
+            // byteIOIndex
+            std::getline(ifs, line);
+            std::istringstream bioi_iss(line);
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - byteIOIndex to", line);
+            bioi_iss >> keccak_inst_.byteIOIndex;
+            // squeezing
+            std::getline(ifs, line);
+            std::istringstream squeezing_iss(line);
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - squeezing to", line);
+            squeezing_iss >> keccak_inst_.squeezing;
+        }
 
         // RAR stack
         SKIP_COMMENT_LINES
@@ -814,6 +832,8 @@ void spect::CpuModel::Reset()
     sha_512_ = Sha512();
     sha_512_.init();
     SetPc(0x0);
+
+    keccak_is_initialized_ = false;
 
     // Re-create new register model -> Erase registers to reset values.
     delete regs_;
