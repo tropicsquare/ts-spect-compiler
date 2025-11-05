@@ -6,7 +6,6 @@ verdi S-2021.09-SP1
 scl 2021.03
 dc_shell R-2020.09-SP5-1
 lc_shell S-2021.06-SP3
-vivado 2019.2
 cmake 3.23.2
 memaker 202101.3.0
 ordt 230321.01
