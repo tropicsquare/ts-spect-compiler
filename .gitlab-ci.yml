@@ -101,6 +101,9 @@ deploy_compiler:
   tags:
     - shell
   script:
+    - source ./setup_env
+    - ./build.sh
+
     - export VERSION=`git describe --tags --abbrev=0`
     - export DEST_FOLDER=/tools/tropic/ts-spect-compiler
 
