@@ -810,14 +810,12 @@ int spect::CpuModel::Step(int n)
     int cnt = 0;
     if (n == 0) {
         do {
-            if (ExecuteNextInstruction(0) == -1)
-                return -1;
+            ExecuteNextInstruction(0);
             cnt++;
         } while (!end_executed_);
     } else {
         for (int i = 0; i < n; i++) {
-            if (ExecuteNextInstruction(0) == -1)
-                return -1;
+            ExecuteNextInstruction(0);
             cnt++;
             if (end_executed_)
                 break;
@@ -927,7 +925,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
         DebugInfo(VERBOSITY_NONE, "FATAL: Limit of executed instruction (", max_instr_cnt_, ") reached!");
         Finish(1);
         UpdateInterrupts();
-        return -1;
+        return 0;
     }
 
     // Check PC is valid
@@ -936,7 +934,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
         Finish(1);
         UpdateInterrupts();
 
-        return -1;
+        return 0;
     }
 
     // Count intruction execution
@@ -963,7 +961,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
         Finish(1);
         UpdateInterrupts();
 
-        return -1;
+        return 0;
     }
 
     DebugInfo(VERBOSITY_LOW, "Executing instruction:         ", instr->Dump());
