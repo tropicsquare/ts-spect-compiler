@@ -101,6 +101,9 @@ void spect::CpuModel::Finish(int status_err)
             DebugInfo(VERBOSITY_HIGH, buf);
         }
     }
+    char buf[128];
+    sprintf(buf, "Total instructions executed: %5lu", instr_cnt_);
+    DebugInfo(VERBOSITY_HIGH, buf);
 }
 
 bool spect::CpuModel::IsFinished()
