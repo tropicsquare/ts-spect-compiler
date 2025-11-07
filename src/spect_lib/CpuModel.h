@@ -3,10 +3,8 @@
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
 *
-* @todo: License
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
 *
-* @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
-* @date 19.9.2022
 *
 *****************************************************************************/
 
@@ -16,6 +14,7 @@
 #include <queue>
 
 #include "spect.h"
+#include "CpuFault.h"
 #include "CpuProgram.h"
 #include "Sha512.h"
 extern "C" {
@@ -310,10 +309,22 @@ class spect::CpuModel
         void DumpContext(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Load whole model context (GPRs, Memory content, Hash unit content, RAR, Flags)
+        /// @param path File from which load Model context
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void LoadContext(const std::string &path);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Dump whole model (GPRs, Memory content, Hash unit content, RAR, Flags)
         /// @param path File where to dump Model context
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void LoadContext(const std::string &path);
+        void LoadFaultQ(const std::string &path);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Dump execution information
+        /// @param path File where to dump execution information
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void DumpExecInfo(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -369,6 +380,7 @@ class spect::CpuModel
 
         // Keccak Sponge instance
         KeccakWidth400_SpongeInstance keccak_inst_;
+        bool keccak_is_initialized_;
 
         // Program
         CpuProgram *program_ = NULL;
@@ -376,11 +388,17 @@ class spect::CpuModel
         // Simulator
         CpuSimulator *simulator_ = NULL;
 
+        // Fault for FWFE
+        std::queue<CpuFault> fault_q_;
+
         // Maximal number of instructions to execute
         uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();
 
         // Number of already executed instructions since start
         uint64_t instr_cnt_ = 0;
+
+        // Number of executions for each PC
+        uint32_t instr_exec_cnt_[SPECT_INSTR_MEM_SIZE/4];
 
         // Timing accurate simulation flag
         bool timing_accurate_sim_ = false;
@@ -446,7 +464,7 @@ class spect::CpuModel
         ParityType parity_type_ = ParityType::NONE;
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // true  - Program has finished (END has been executed or Error occured)
+        // true  - Program has finished (END has been executed or Error occurred)
         // false - Program was not started or it is running
         ///////////////////////////////////////////////////////////////////////////////////////////
         bool end_executed_;

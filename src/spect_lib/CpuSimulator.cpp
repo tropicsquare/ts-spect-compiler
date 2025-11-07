@@ -1,10 +1,12 @@
-/**************************************************************************************************
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #include <regex>
 #include <fstream>
@@ -17,14 +19,14 @@
 #include "HexHandler.h"
 #include "KeyMemory.h"
 
-spect::CpuSimulator::CpuSimulator()
+spect::CpuSimulator::CpuSimulator(uint32_t verbosity)
 {
     model_ = new spect::CpuModel(SPECT_INSTR_MEM_AHB_W, SPECT_INSTR_MEM_AHB_R);
-    model_->verbosity_ = VERBOSITY_HIGH;
+    model_->verbosity_ = verbosity;
     model_->simulator_ = this;
     compiler_ = new spect::Compiler();
     key_memory_ = new spect::KeyMemory();
-    key_memory_->verbosity_ = VERBOSITY_HIGH;
+    key_memory_->verbosity_ = verbosity;
 
     auto menu = std::make_unique<cli::Menu>("spect_iss");
     BuildCliCommands(menu);
@@ -42,6 +44,7 @@ spect::CpuSimulator::~CpuSimulator()
 {
     delete model_;
     delete compiler_;
+    delete key_memory_;
     delete cli_;
 }
 
@@ -273,6 +276,8 @@ void spect::CpuSimulator::CmdRun(A_UNUSED std::ostream &out)
         model_->Reset();
         if (model_context_ != "")
             model_->LoadContext(model_context_);
+        if (model_fault_ != "")
+            model_->LoadFaultQ(model_fault_);
         model_->Start();
         program_running_ = true;
     }
@@ -450,6 +455,8 @@ void spect::CpuSimulator::CmdStart(A_UNUSED std::ostream &out)
     model_->Reset();
     if (model_context_ != "")
         model_->LoadContext(model_context_);
+    if (model_fault_ != "")
+        model_->LoadFaultQ(model_fault_);
     model_->Start();
     program_running_ = true;
 }
@@ -563,6 +570,8 @@ void spect::CpuSimulator::Start(bool batch_mode)
         model_->Reset();
         if (model_context_ != "")
             model_->LoadContext(model_context_);
+        if (model_fault_ != "")
+            model_->LoadFaultQ(model_fault_);
         model_->Start();
         model_->Step(0);
     } else {
@@ -591,6 +600,7 @@ void spect::CpuSimulator::ExecCmdFile(cli::CliLocalTerminalSession &session)
 {
     std::ifstream ifs;
     ifs.open(cmd_file_);
+
     std::string line;
     if (ifs.is_open()) {
         std::cout << "Loading command file: " << cmd_file_ << "\n";

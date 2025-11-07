@@ -5,12 +5,14 @@
 ####################################################################################################
 # Generator of coverage class from instruction definitions.
 #
-# TODO: License
+# Copyright (C) 2022-present Tropic Square
+#
+# @license For the license see file LICENSE.txt file in the root directory of this source tree.
 ####################################################################################################
 
 __author__ = "Ondrej Ille"
 __copyright__ = "Tropic Square"
-__license___ = "TODO:"
+__license___ = "For the license see file LICENSE.txt file in the root directory of this source tree."
 __maintainer__ = "Ondrej Ille"
 
 import sys

@@ -1,13 +1,18 @@
 /**************************************************************************************************
+**
+** SPECT Compiler
+** Copyright (C) 2022-present Tropic Square
+**
+** @license For the license see file LICENSE.txt file in the root directory of this source tree.
+**
+**
+***************************************************************************************************
 ** DPI Interface to SPECT Instruction model
 **
 **  Common notes to the API:
 **      - All addresses are passed byte aligned (each next 32-bit word is +0x4 higher).
 **      - Sizes of all memories are handled in bytes.
 **
-** TODO: License
-**
-** Author: Ondrej Ille
 **************************************************************************************************/
 
 #ifndef COSIM_SPECT_ISS_DPI_TYPES_H_
@@ -232,7 +237,7 @@ inline std::string dpi_change_obj_to_str(dpi_change_kind_t in, uint32_t obj) {
 typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
-    // Identifies object on which change occured based on kind
+    // Identifies object on which change occurred based on kind
     //  DPI_CHANGE_GPR:
     //      0  - GPR0
     //      ...
@@ -244,7 +249,7 @@ typedef struct {
     //      DPI_SPECT_FLAG_ERROR
     //
     //  DPI_CHANGE_MEM:
-    //      Address in memory on which change occured.
+    //      Address in memory on which change occurred.
     //
     //  DPI_CHANGE_INT:
     //      DPI_SPECT_INT_DONE

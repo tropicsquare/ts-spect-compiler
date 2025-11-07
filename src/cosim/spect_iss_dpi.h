@@ -1,4 +1,12 @@
 /**************************************************************************************************
+**
+** SPECT Compiler
+** Copyright (C) 2022-present Tropic Square
+**
+** @license For the license see file LICENSE.txt file in the root directory of this source tree.
+**
+**
+***************************************************************************************************
 ** DPI Interface to SPECT Instruction model
 **
 **  Common notes to the API:
@@ -25,9 +33,6 @@
 **
 **      spect_dpi_exit();
 **
-** TODO: License
-**
-** Author: Ondrej Ille
 **************************************************************************************************/
 
 #ifndef COSIM_SPECT_ISS_DPI_H_

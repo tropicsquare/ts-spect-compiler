@@ -3,10 +3,8 @@
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
 *
-* @todo: License
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
 *
-* @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
-* @date 19.9.2022
 *
 *****************************************************************************/
 
@@ -149,9 +147,7 @@ namespace spect {
     class InstructionJ;
     class InstructionM;
 
-    SPECT_SUM_INSTRUCTIONS_V1
-    SPECT_SUM_INSTRUCTIONS_V2
-
+    class CpuFault;
     class CpuModel;
     class CpuSimulator;
     class CpuProgram;
@@ -162,6 +158,9 @@ namespace spect {
     class Symbol;
     class SymbolTable;
     class SourceFile;
+
+    SPECT_SUM_INSTRUCTIONS_V1;
+    SPECT_SUM_INSTRUCTIONS_V2;
 
     uint32_t stoint(std::string str);
     std::string tohexs(uint64_t i, int width);
@@ -196,6 +195,7 @@ namespace spect {
     #define VERBOSITY_HIGH 3
 
     #define MODEL_LABEL "SPECT_MODEL: "
+    #define FAULT_LABEL "FI_MODULE  : "
 
     #define KECCAK_CAPACITY 256
     #define KECCAK_RATE     144

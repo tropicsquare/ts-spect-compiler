@@ -3,10 +3,8 @@
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
 *
-* @todo: License
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
 *
-* @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
-* @date 19.9.2022
 *
 *****************************************************************************/
 

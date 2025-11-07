@@ -163,7 +163,7 @@ arithmetics. SPECT is useful to implement operations/algorithms such as:
         \detokenize{img/spect_pm_block_diagram.pdf}%
     }
     \caption{SPECT -- Block diagram}%
-    \label{SPECTBK}%
+    \label{SPECT:BLOCK}%
 \end{figure}
 
 \TsSection{Programmer's model}
@@ -179,7 +179,7 @@ SPECT programmer's model consists of:
     \item 2048 B read-only memory space in address range 0x3000 -- 0x37FC.
     \item 144 B read-only memory space in address range 0x4000 -- 0x408C.\newline
         (from ISA v0.2)
-    \item 50 B write-only memory space in address range 0x5000 -- 0x504C.\newline
+    \item 128 B write-only memory space in address range 0x5000 -- 0x507C.\newline
         (from ISA v0.2)
 \end{itemize}
 
@@ -195,7 +195,7 @@ SPECT programmer's model consists of:
         \detokenize{img/spect_pm_gprs.pdf}%
     }
     \caption{SPECT -- Programmer model}%
-    \label{SPECTBK}%
+    \label{SPECT:PROGRAMMODEL}%
 \end{figure}
 
 
@@ -234,18 +234,20 @@ Further, notation KBUS_WRITE[key,type,slot,offset] indicates 8 consecutive KBUS 
 with wdata = key. In first transaction, wdata = key[31:0]. In the last transaction, wdata = key[255:223].
 KBUS_OP[type,slot,op] indicates one KBUS transaction of specific OP (e.g. "program slot").
 
-Fore more information about KBUS, see TROPIC01 Functional Specification, Section 19 \cite{TROPIC01}.
+Fore more information about KBUS, see TROPIC01 Functional Specification, Section 16 \cite{TROPIC01}.
 
 \TsSubSection{RBUS}
 
-SPECT HW implements special 32 bit interface for requesting random numbers from the external systems RNG.
-SPECT ISA provides possibility to fetch 256 bit random number with GRV instruction.
+SPECT HW implements special 32 bit interface (RBUS) for requesting random numbers from the external systems RNG.
+SPECT ISA provides possibility to fetch 32 bytes of random data with GRV instruction.
+
+Fore more information about KBUS, see TROPIC01 Functional Specification, Section 17 \cite{TROPIC01}.
 
 \TsSubSection{Modular arithmetics}
 
 SPECT provides instructions for finite field arithmetic such as
 addition, subtraction and multiplication with 256 bit operands stored in general purpose
-registers. SPECT supports fast multiplication in Ed25519 and P-256 curves finite fields 
+registers. SPECT supports fast multiplication in Ed25519 and P-256 curves finite fields
 via dedicated instructions -- MUL25519 and MUL256. Modular arithmetics with generic modulus
 specified by value in \textbf{R31} is supported by instructions ADDP, SUBP, MULP. SPECT
 also supports modular reduction of 512 bit number with REDP instruction.
@@ -255,15 +257,16 @@ operands of such instructions. Following conditions must be met:
 \begin{itemize}
     \item op2 < $P_{25519}$ and op3 < $P_{25519}$ for MUL25519 instruction.
     \item op2 < $P_{256}$ and op3 < $P_{256}$ for MUL256 instruction.
+    \item R31 = $P_{25519}$ for MUL25519 instruction.
+    \item R31 = $P_{256}$ for MUL256 instruction.
     \item op2 < R31 and op3 < R31 for ADDP, SUBP instructions.
-    \item R31 != 0 and R31 != 1 for ADDP, SUBP, MULP, REDP instructions.
+    \item R31 > 1 for ADDP, SUBP, MULP, REDP instructions.
 \end{itemize}
 if these conditions are not met when invoking such a instruction, result
 of the instruction calculation is undefined (value in op1).
 
 \TropicNote{
-    Performance of MULP when \textbf{R31} = $P_{25519}$ / $P_{256}$ is lower
-    than performance of MUL25519 / MUL256.
+    MUL25519 and MUL256 instruction offers much higher performance than MULP.
 }
 
 \TsSubSection{SHA512}
@@ -313,7 +316,7 @@ memory bus as shown in following figure:
         \detokenize{img/spect_pm_invocation.pdf}%
     }
     \caption{SPECT -- Invocation}%
-    \label{SPECTBK}%
+    \label{SPECT:INVOCATION}%
 \end{figure}
 
 \TropicNote{
@@ -371,7 +374,7 @@ firmware sees it as write-only memory.
 
 Instruction memory contains the firmware executed by SPECT. External system preloads
 the SPECT firmware to this memory in its boot up sequence.
-SPECT firmware do not have access to this memory via load and store instructions. 
+SPECT firmware do not have access to this memory via load and store instructions.
 
 \TsSubSection{Constant ROM}
 
@@ -389,8 +392,8 @@ There are two memories:
     \item External Memory OUT -- SPECT firmware sees it as write-only memory.
 \end{itemize}
 
-These memories are mapped in to SPECT memory space. Load and store instruction directs read / write transactions to
-SPECTs memory subsystem or on to EMEM interface depending on the address in Addr field os the instruction.
+These memories are mapped in to SPECT memory space. Load and store instructions redirect read / write transactions to
+SPECTs memory subsystem or to the EMEM interface depending on the address in Addr field of the instruction.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SPECT Assembler
@@ -448,7 +451,7 @@ _start:
 \end{lstlisting}
 
 \TropicNote{
-    Currently, SPECT compiler does not support expression parsing.
+    SPECT compiler does not support expression parsing.
     It only supports simple decimal, hexadecimal or binary value
     when defining constants.
 }

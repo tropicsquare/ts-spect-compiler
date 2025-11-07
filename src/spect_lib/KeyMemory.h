@@ -1,10 +1,12 @@
-/**************************************************************************************************
-** Key Memory model.
-**
-** TODO: License
-**
-** Author: Marek Santa
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #ifndef SPECT_LIB_KEY_MEMORY_H_
 #define SPECT_LIB_KEY_MEMORY_H_

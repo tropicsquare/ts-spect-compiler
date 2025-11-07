@@ -1,9 +1,11 @@
 /******************************************************************************
 * SPECT - DPI Package
 *
-* TODO: License
+* Copyright (C) 2022-present Tropic Square
 *
-* Author: Vit Masek
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
 ******************************************************************************/
 `ifndef SPECT_ISS_DPI_PKG_SV
 `define SPECT_ISS_DPI_PKG_SV
@@ -78,7 +80,7 @@ typedef enum {
   typedef struct {
     dpi_change_kind_t kind = DPI_CHANGE_GPR;
 
-    // Identifies object on which change occured based on kind
+    // Identifies object on which change occurred based on kind
     //  DPI_CHANGE_GPR:
     //      0  - GPR0
     //      ...
@@ -89,7 +91,7 @@ typedef enum {
     //      DPI_SPECT_FLAG_CARRY
     //
     //  DPI_CHANGE_MEM:
-    //      Address in memory on which change occured.
+    //      Address in memory on which change occurred.
     //
     //  DPI_CHANGE_INT:
     //      DPI_SPECT_INT_DONE

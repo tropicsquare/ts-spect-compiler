@@ -3,10 +3,8 @@
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
 *
-* @todo: License
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
 *
-* @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
-* @date 19.9.2022
 *
 *****************************************************************************/
 
@@ -591,11 +589,13 @@ bool spect::V2InstructionSUBP::Execute()
 
 bool spect::V2InstructionTMAC_IT::Execute()
 {
+    model_->keccak_is_initialized_ = true;
     // Initialize Keccak
     if (KeccakWidth400_SpongeInitialize(&(model_->keccak_inst_), KECCAK_RATE, KECCAK_CAPACITY) != 0) {
         std::stringstream ss;
         ss << "Error: Calling KeccakWidth400_SpongeInitialize() failed.";
         model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+        model_->keccak_is_initialized_ = false;
     }
 
     return true;
@@ -605,6 +605,11 @@ bool spect::V2InstructionTMAC_UP::Execute()
 {
     unsigned char msg[KECCAK_RATE/8];
     std::stringstream ss;
+
+    if (!model_->keccak_is_initialized_) {
+        ss << "Error: Executing TMAC_UP on unitialized core.";
+        model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+    }
 
     // Convert register op2_ to input message (must be character stream)
     uint256_t tmp = model_->GetGpr(TO_INT(op2_));
@@ -634,6 +639,11 @@ bool spect::V2InstructionTMAC_RD::Execute()
 {
     unsigned char msg[KECCAK_CAPACITY/8];
     std::stringstream ss;
+
+    if (!model_->keccak_is_initialized_) {
+        ss << "Error: Executing TMAC_RD on unitialized core.";
+        model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+    }
 
     DEFINE_CHANGE(ch_gpr, DPI_CHANGE_GPR, TO_INT(op1_));
     PUT_GPR_TO_CHANGE(ch_gpr, old_val, model_->GetGpr(TO_INT(op1_)));
@@ -760,6 +770,11 @@ bool spect::V2InstructionTMAC_IS::Execute()
     // Init string in format {nonce, key length, key, 0x00, 0x00}
     unsigned char initstr[36];
     std::stringstream ss;
+
+    if (!model_->keccak_is_initialized_) {
+        ss << "Error: Executing TMAC_IS on unitialized core.";
+        model_->DebugInfo(VERBOSITY_NONE, ss.str().c_str());
+    }
 
     // Nonce
     initstr[0] = uint8_t(immediate_ & 0xFF);
