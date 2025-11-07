@@ -38,7 +38,6 @@ spect::CpuModel::~CpuModel()
 {
     delete[] memory_;
     delete regs_;
-    delete fault_;
 }
 
 void spect::CpuModel::Start()
@@ -731,10 +730,26 @@ void spect::CpuModel::LoadContext(const std::string &path)
         throw std::runtime_error("Unable to open a file: " + path);
 }
 
-void spect::CpuModel::LoadFault(const std::string &path) {
-    fault_ = new spect::CpuFault(path);
-    fault_->print_fnc = print_fnc;
-    fault_->verbosity_ = verbosity_;
+void spect::CpuModel::LoadFaultQ(const std::string &path) {
+    DebugInfo(VERBOSITY_LOW, "Loading faults from ", path);
+    std::ifstream ifs(path);
+    std::string line;
+    if (ifs.is_open()) {
+        while (!ifs.eof()) {
+            std::getline(ifs, line);
+            if (line.length() == 0) continue;
+
+            spect::CpuFault fault = spect::CpuFault(line);
+            fault.print_fnc = print_fnc;
+            fault.verbosity_ = verbosity_;
+            fault_q_.push(fault);
+            DebugInfo(VERBOSITY_LOW, "Pushing fault '", line, "' into fault queue");
+        }
+        DebugInfo(VERBOSITY_LOW, "\n");
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ifs.close();
 }
 
 void spect::CpuModel::DumpExecInfo(const std::string &path) {
@@ -930,8 +945,9 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     ////////////////////////////////////////////////////////////////////////////
     // Firmware Fault Injection
     ////////////////////////////////////////////////////////////////////////////
-    if (fault_ && fault_->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
-        fault_->Apply(&wrd);
+    if (fault_q_.size() > 0 && fault_q_.front().Check(GetPc(), instr_exec_cnt_[inst_idx])) {
+        fault_q_.front().Apply(&wrd);
+        fault_q_.pop();
     }
     ////////////////////////////////////////////////////////////////////////////
 
@@ -940,7 +956,7 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     // Detect invalid instruction and finish
     if (instr == nullptr) {
-        DebugInfo(VERBOSITY_LOW, "FATAL: Detected invalid instruction!");
+        DebugInfo(VERBOSITY_NONE, "FATAL: Detected invalid instruction!");
         Finish(1);
         UpdateInterrupts();
 

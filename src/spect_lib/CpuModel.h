@@ -318,7 +318,7 @@ class spect::CpuModel
         /// @brief Dump whole model (GPRs, Memory content, Hash unit content, RAR, Flags)
         /// @param path File where to dump Model context
         ///////////////////////////////////////////////////////////////////////////////////////////
-        void LoadFault(const std::string &path);
+        void LoadFaultQ(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Dump execution information
@@ -389,7 +389,7 @@ class spect::CpuModel
         CpuSimulator *simulator_ = NULL;
 
         // Fault for FWFE
-        CpuFault *fault_ = NULL;
+        std::queue<CpuFault> fault_q_;
 
         // Maximal number of instructions to execute
         uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();

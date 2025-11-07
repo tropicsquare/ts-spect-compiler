@@ -8,10 +8,12 @@
 *
 *****************************************************************************/
 
-#include <fstream>
+#include <sstream>
 #include <iostream>
 
 #include "CpuFault.h"
+
+spect::CpuFault::CpuFault(){}
 
 spect::CpuFault::CpuFault(
     uint32_t            inst_addr,
@@ -25,15 +27,10 @@ spect::CpuFault::CpuFault(
     m_description      = description;
 }
 
-spect::CpuFault::CpuFault(const std::string &path) {
-    std::ifstream ifs(path);
-    if (ifs.is_open()) {
-        ifs >> std::hex >> m_inst_addr >> std::dec >> m_inst_exec_cnt >> std::hex >> m_fault_data;
-        ifs >> m_description;
-        DebugInfo(VERBOSITY_MEDIUM, "Loaded fault:", m_description);
-    }
-    else
-        throw std::runtime_error("Unable to open a file: " + path);
+spect::CpuFault::CpuFault(const std::string fault_line) {
+    std::stringstream is(fault_line);
+    is >> std::hex >> m_inst_addr >> std::dec >> m_inst_exec_cnt >> std::hex >> m_fault_data;
+    is >> m_description;
 }
 
 spect::CpuFault::~CpuFault() {}

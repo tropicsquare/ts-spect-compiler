@@ -147,9 +147,6 @@ namespace spect {
     class InstructionJ;
     class InstructionM;
 
-    SPECT_SUM_INSTRUCTIONS_V1
-    SPECT_SUM_INSTRUCTIONS_V2
-
     class CpuFault;
     class CpuModel;
     class CpuSimulator;
@@ -161,6 +158,9 @@ namespace spect {
     class Symbol;
     class SymbolTable;
     class SourceFile;
+
+    SPECT_SUM_INSTRUCTIONS_V1;
+    SPECT_SUM_INSTRUCTIONS_V2;
 
     uint32_t stoint(std::string str);
     std::string tohexs(uint64_t i, int width);
