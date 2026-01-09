@@ -389,7 +389,7 @@ class spect::CpuModel
         CpuSimulator *simulator_ = NULL;
 
         // Fault for FWFE
-        std::queue<CpuFault> fault_q_;
+        std::queue<std::unique_ptr<spect::CpuFault>> fault_q_;
 
         // Maximal number of instructions to execute
         uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();

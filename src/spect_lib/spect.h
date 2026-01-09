@@ -148,6 +148,11 @@ namespace spect {
     class InstructionM;
 
     class CpuFault;
+    class CpuFaultInstruction;
+    class CpuFaultPC;
+    class CpuFaultGPR;
+    class CpuFaultMemory;
+
     class CpuModel;
     class CpuSimulator;
     class CpuProgram;

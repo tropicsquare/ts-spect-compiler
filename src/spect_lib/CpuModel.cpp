@@ -742,10 +742,10 @@ void spect::CpuModel::LoadFaultQ(const std::string &path) {
             std::getline(ifs, line);
             if (line.length() == 0) continue;
 
-            spect::CpuFault fault = spect::CpuFault(line);
-            fault.print_fnc = print_fnc;
-            fault.verbosity_ = verbosity_;
-            fault_q_.push(fault);
+            std::unique_ptr<spect::CpuFault> fault = GetFault(line);
+            fault->print_fnc = print_fnc;
+            fault->verbosity_ = verbosity_;
+            fault_q_.push(std::move(fault));
             DebugInfo(VERBOSITY_LOW, "Pushing fault '", line, "' into fault queue");
         }
         DebugInfo(VERBOSITY_LOW, "\n");
@@ -946,8 +946,51 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     ////////////////////////////////////////////////////////////////////////////
     // Firmware Fault Injection
     ////////////////////////////////////////////////////////////////////////////
-    if (fault_q_.size() > 0 && fault_q_.front().Check(GetPc(), instr_exec_cnt_[inst_idx])) {
-        fault_q_.front().Apply(&wrd);
+    if (fault_q_.size() > 0 && fault_q_.front()->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
+        // We have 4 types of faults:
+        //  - Instruction : Corrupts the instruction as it is fetched
+        //  - PC          : Adds some constant to the Program Counter and refetch - instruction skip
+        //  - GPR         : Inject persistent (multi)bitflip to General Purpose Register
+        //  - Memory      : Inject persistent (multi)bitflip to Memory
+        switch (fault_q_.front()->GetType()) {
+
+            case FaultType::INSTRUCTION : {
+                spect::CpuFaultInstruction * p = static_cast<spect::CpuFaultInstruction*>(fault_q_.front().get());
+                p->Apply(&wrd);
+                break;
+            }
+
+            case FaultType::PC : {
+                spect::CpuFaultPC* p = static_cast<spect::CpuFaultPC*>(fault_q_.front().get());
+                uint32_t pc = GetPc();
+                p->Apply(&pc);
+                SetPc(pc);
+                wrd = ReadMemoryCoreFetch(GetPc());
+                break;
+            }
+
+            case FaultType::GPR : {
+                spect::CpuFaultGPR* p = static_cast<spect::CpuFaultGPR*>(fault_q_.front().get());
+                int gpr_index = p->GetGPRIndex();
+                uint256_t gpr = GetGpr(gpr_index);
+                p->Apply(&gpr);
+                SetGpr(gpr_index, gpr);
+                break;
+            }
+
+            case FaultType::MEMORY : {
+                spect::CpuFaultMemory* p = static_cast<spect::CpuFaultMemory*>(fault_q_.front().get());
+                uint16_t mem_address = p->GetMemAddress();
+                uint32_t mem_data = GetMemory(mem_address);
+                p->Apply(&mem_data);
+                SetMemory(mem_address, mem_data);
+                break;
+            }
+
+            default :
+                break;
+        }
+
         fault_q_.pop();
     }
     ////////////////////////////////////////////////////////////////////////////
