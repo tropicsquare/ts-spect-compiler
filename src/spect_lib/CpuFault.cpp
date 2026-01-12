@@ -65,12 +65,14 @@ spect::CpuFaultPC::CpuFaultPC(std::stringstream & is)
 spect::CpuFaultGPR::CpuFaultGPR(std::stringstream & is)
 {
     is >> std::hex >> inst_addr_ >> std::dec >> inst_exec_cnt_ >> gpr_index_ >> bitflip_pos_ >> std::hex >> bitflip_mask_;
+    is >> is_transient_;
     is >> description_;
 }
 
 spect::CpuFaultMemory::CpuFaultMemory(std::stringstream & is)
 {
     is >> std::hex >> inst_addr_ >> std::dec >> inst_exec_cnt_ >> std::hex >> mem_address_ >> bitflip_mask_;
+    is >> is_transient_;
     is >> description_;
 }
 
@@ -94,22 +96,33 @@ FaultType   spect::CpuFaultMemory::GetType () const
 void        spect::CpuFaultInstruction::Apply  (uint32_t *data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Apply Instruction Fault:", description_);
+    DebugInfo(VERBOSITY_MEDIUM, "Original : ", *data);
+    DebugInfo(VERBOSITY_MEDIUM, "Faulted  : ", new_instruction_);
     *data = new_instruction_;
 }
 void        spect::CpuFaultPC::Apply  (uint32_t *data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Apply Program Counter Fault:", description_);
-    *data += (skip_cnt_ << 2);
+    uint32_t new_pc = *data + (skip_cnt_ << 2);
+    DebugInfo(VERBOSITY_MEDIUM, "Original : ", *data);
+    DebugInfo(VERBOSITY_MEDIUM, "Faulted  : ", new_pc);
+    *data = new_pc;
 }
 void        spect::CpuFaultGPR::Apply  (uint256_t *data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Apply GPR Fault:", description_);
-    *data ^= ((uint256_t)(bitflip_mask_) << bitflip_pos_);
+    uint256_t new_gpr = *data ^ ((uint256_t)(bitflip_mask_) << bitflip_pos_);
+    DebugInfo(VERBOSITY_MEDIUM, "Original : ", *data);
+    DebugInfo(VERBOSITY_MEDIUM, "Faulted  : ", new_gpr);
+    *data = new_gpr;
 }
 void        spect::CpuFaultMemory::Apply  (uint32_t *data)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Apply Memory Fault:", description_);
-    *data ^= bitflip_mask_;
+    uint32_t new_data = *data ^ bitflip_mask_;
+    DebugInfo(VERBOSITY_MEDIUM, "Original : ", *data);
+    DebugInfo(VERBOSITY_MEDIUM, "Faulted  : ", new_data);
+    *data = new_data;
 }
 
 int         spect::CpuFaultGPR::GetGPRIndex ()
@@ -120,6 +133,14 @@ int         spect::CpuFaultGPR::GetGPRIndex ()
 uint16_t    spect::CpuFaultMemory::GetMemAddress ()
 {
     return mem_address_;
+}
+
+bool        spect::CpuFaultGPR::IsTransient () {
+    return is_transient_;
+}
+
+bool        spect::CpuFaultMemory::IsTransient () {
+    return is_transient_;
 }
 
 std::unique_ptr<spect::CpuFault> GetFault (const std::string fault_line)

@@ -946,6 +946,15 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     ////////////////////////////////////////////////////////////////////////////
     // Firmware Fault Injection
     ////////////////////////////////////////////////////////////////////////////
+    bool transient_gpr_fault_flag = false;
+    bool transient_memory_fault_flag = false;
+
+    uint256_t fi_gpr_backup = 0;
+    int       fi_gpr_index = 0;
+
+    uint16_t  fi_mem_address = 0;
+    uint32_t  fi_mem_backup = 0;
+
     if (fault_q_.size() > 0 && fault_q_.front()->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
         // We have 4 types of faults:
         //  - Instruction : Corrupts the instruction as it is fetched
@@ -956,34 +965,40 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
             case FaultType::INSTRUCTION : {
                 spect::CpuFaultInstruction * p = static_cast<spect::CpuFaultInstruction*>(fault_q_.front().get());
-                p->Apply(&wrd);
+                p->Apply(&wrd);                                 // Apply the fault to the instruction
                 break;
             }
 
             case FaultType::PC : {
                 spect::CpuFaultPC* p = static_cast<spect::CpuFaultPC*>(fault_q_.front().get());
-                uint32_t pc = GetPc();
-                p->Apply(&pc);
-                SetPc(pc);
-                wrd = ReadMemoryCoreFetch(GetPc());
+                uint32_t pc = GetPc();                          // Get the PC value
+                p->Apply(&pc);                                  // Applu the fault
+                SetPc(pc);                                      // Set the PC to the faulted value
+                wrd = ReadMemoryCoreFetch(GetPc());             // re-fetch from the new PC value
                 break;
             }
 
             case FaultType::GPR : {
                 spect::CpuFaultGPR* p = static_cast<spect::CpuFaultGPR*>(fault_q_.front().get());
-                int gpr_index = p->GetGPRIndex();
-                uint256_t gpr = GetGpr(gpr_index);
-                p->Apply(&gpr);
-                SetGpr(gpr_index, gpr);
+                fi_gpr_index = p->GetGPRIndex();                // Get the GPR to fault
+                uint256_t gpr = GetGpr(fi_gpr_index);           // Get the current value of the GPR
+                transient_gpr_fault_flag = p->IsTransient();    // Check if the fault is transient
+                if (transient_gpr_fault_flag == true)
+                    fi_gpr_backup = gpr;                        // If so, store the GPR value for later restore
+                p->Apply(&gpr);                                 // Apply the fault to the GPR value
+                SetGpr(fi_gpr_index, gpr);                      // Set the GPR to the faulted value
                 break;
             }
 
             case FaultType::MEMORY : {
                 spect::CpuFaultMemory* p = static_cast<spect::CpuFaultMemory*>(fault_q_.front().get());
-                uint16_t mem_address = p->GetMemAddress();
-                uint32_t mem_data = GetMemory(mem_address);
-                p->Apply(&mem_data);
-                SetMemory(mem_address, mem_data);
+                fi_mem_address = p->GetMemAddress();            // Get the memory address to fault
+                uint32_t mem_data = GetMemory(fi_mem_address);  // Get the current value from memory
+                transient_memory_fault_flag = p->IsTransient(); // Check if the fault is transient
+                if (transient_memory_fault_flag == true)
+                    fi_mem_backup = mem_data;                   // If so, store the original value fot later restore
+                p->Apply(&mem_data);                            // Apply the fault
+                SetMemory(fi_mem_address, mem_data);            // Store the faulted value back to the memory
                 break;
             }
 
@@ -1043,6 +1058,17 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Restore the state if transient fault occured
+    ////////////////////////////////////////////////////////////////////////////
+    if (transient_gpr_fault_flag == true) {
+        SetGpr(fi_gpr_index, fi_gpr_backup);
+    }
+    if (transient_memory_fault_flag == true) {
+        SetMemory(fi_mem_address, fi_mem_backup);
+    }
+    ////////////////////////////////////////////////////////////////////////////
 
     // Separate instructions by empty line -> More readable output
     DebugInfo(VERBOSITY_MEDIUM, "");
