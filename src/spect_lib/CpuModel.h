@@ -327,6 +327,12 @@ class spect::CpuModel
         void DumpExecInfo(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Dump memory access trace
+        /// @param path File where to dump execution information
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void DumpMemAccessTrace(const std::string &path);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @section Simple accessors
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -389,7 +395,7 @@ class spect::CpuModel
         CpuSimulator *simulator_ = NULL;
 
         // Fault for FWFE
-        std::queue<CpuFault> fault_q_;
+        std::queue<std::unique_ptr<spect::CpuFault>> fault_q_;
 
         // Maximal number of instructions to execute
         uint64_t max_instr_cnt_ = std::numeric_limits<uint64_t>::max();
@@ -399,6 +405,8 @@ class spect::CpuModel
 
         // Number of executions for each PC
         uint32_t instr_exec_cnt_[SPECT_INSTR_MEM_SIZE/4];
+        // Memory access trace:  PC    , Exec num, Address
+        std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> mem_access_trace_;
 
         // Timing accurate simulation flag
         bool timing_accurate_sim_ = false;

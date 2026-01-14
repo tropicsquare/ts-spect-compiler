@@ -207,6 +207,10 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
         ReportChange(ch_emem);
     }
 
+    // Record memory access
+    uint32_t pc = GetPc();
+    mem_access_trace_.push_back({pc, instr_exec_cnt_[(pc-SPECT_INSTR_MEM_BASE)>>2], address});
+
     DebugInfo(VERBOSITY_MEDIUM, "Core Read", tohexs(address, 4), "data:", tohexs(rv, 8));
 
     return rv;
@@ -742,10 +746,10 @@ void spect::CpuModel::LoadFaultQ(const std::string &path) {
             std::getline(ifs, line);
             if (line.length() == 0) continue;
 
-            spect::CpuFault fault = spect::CpuFault(line);
-            fault.print_fnc = print_fnc;
-            fault.verbosity_ = verbosity_;
-            fault_q_.push(fault);
+            std::unique_ptr<spect::CpuFault> fault = GetFault(line);
+            fault->print_fnc = print_fnc;
+            fault->verbosity_ = verbosity_;
+            fault_q_.push(std::move(fault));
             DebugInfo(VERBOSITY_LOW, "Pushing fault '", line, "' into fault queue");
         }
         DebugInfo(VERBOSITY_LOW, "\n");
@@ -761,6 +765,8 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
 
     if (ofs.is_open()) {
         DebugInfo(VERBOSITY_LOW, "Dumping model execution information to: ", path);
+
+        ofs << "PC:EXEC_NUM:CODE:NAME\n";
 
         for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++) {
             if (instr_exec_cnt_[i] == 0)
@@ -778,6 +784,37 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
                 ofs << instr->mnemonic_;
             else
                 ofs << "INVALID";
+            ofs << "\n";
+        }
+
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
+}
+
+void spect::CpuModel::DumpMemAccessTrace(const std::string &path)
+{
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model memory access trace to: ", path);
+
+        // Header
+        ofs << "PC:EXEC_NUM:ADDR\n";
+
+        // Data
+        uint32_t pc;
+        uint32_t mem_address;
+        uint32_t exec_num;
+
+        for (auto x : mem_access_trace_) {
+            std::tie(pc, exec_num, mem_address) = x;
+
+            ofs << std::showbase << std::hex << std::setfill('0') << pc << ":";
+            ofs << std::dec << exec_num << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << mem_address;
             ofs << "\n";
         }
 
@@ -946,8 +983,66 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     ////////////////////////////////////////////////////////////////////////////
     // Firmware Fault Injection
     ////////////////////////////////////////////////////////////////////////////
-    if (fault_q_.size() > 0 && fault_q_.front().Check(GetPc(), instr_exec_cnt_[inst_idx])) {
-        fault_q_.front().Apply(&wrd);
+    bool transient_gpr_fault_flag = false;
+    bool transient_memory_fault_flag = false;
+
+    uint256_t fi_gpr_backup = 0;
+    int       fi_gpr_index = 0;
+
+    uint16_t  fi_mem_address = 0;
+    uint32_t  fi_mem_backup = 0;
+
+    if (fault_q_.size() > 0 && fault_q_.front()->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
+        // We have 4 types of faults:
+        //  - Instruction : Corrupts the instruction as it is fetched
+        //  - PC          : Adds some constant to the Program Counter and refetch - instruction skip
+        //  - GPR         : Inject persistent (multi)bitflip to General Purpose Register
+        //  - Memory      : Inject persistent (multi)bitflip to Memory
+        switch (fault_q_.front()->GetType()) {
+
+            case FaultType::INSTRUCTION : {
+                spect::CpuFaultInstruction * p = static_cast<spect::CpuFaultInstruction*>(fault_q_.front().get());
+                p->Apply(&wrd);                                 // Apply the fault to the instruction
+                break;
+            }
+
+            case FaultType::PC : {
+                spect::CpuFaultPC* p = static_cast<spect::CpuFaultPC*>(fault_q_.front().get());
+                uint32_t pc = GetPc();                          // Get the PC value
+                p->Apply(&pc);                                  // Applu the fault
+                SetPc(pc);                                      // Set the PC to the faulted value
+                wrd = ReadMemoryCoreFetch(GetPc());             // re-fetch from the new PC value
+                break;
+            }
+
+            case FaultType::GPR : {
+                spect::CpuFaultGPR* p = static_cast<spect::CpuFaultGPR*>(fault_q_.front().get());
+                fi_gpr_index = p->GetGPRIndex();                // Get the GPR to fault
+                uint256_t gpr = GetGpr(fi_gpr_index);           // Get the current value of the GPR
+                transient_gpr_fault_flag = p->IsTransient();    // Check if the fault is transient
+                if (transient_gpr_fault_flag == true)
+                    fi_gpr_backup = gpr;                        // If so, store the GPR value for later restore
+                p->Apply(&gpr);                                 // Apply the fault to the GPR value
+                SetGpr(fi_gpr_index, gpr);                      // Set the GPR to the faulted value
+                break;
+            }
+
+            case FaultType::MEMORY : {
+                spect::CpuFaultMemory* p = static_cast<spect::CpuFaultMemory*>(fault_q_.front().get());
+                fi_mem_address = p->GetMemAddress();            // Get the memory address to fault
+                uint32_t mem_data = GetMemory(fi_mem_address);  // Get the current value from memory
+                transient_memory_fault_flag = p->IsTransient(); // Check if the fault is transient
+                if (transient_memory_fault_flag == true)
+                    fi_mem_backup = mem_data;                   // If so, store the original value fot later restore
+                p->Apply(&mem_data);                            // Apply the fault
+                SetMemory(fi_mem_address, mem_data);            // Store the faulted value back to the memory
+                break;
+            }
+
+            default :
+                break;
+        }
+
         fault_q_.pop();
     }
     ////////////////////////////////////////////////////////////////////////////
@@ -1000,6 +1095,17 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Restore the state if transient fault occured
+    ////////////////////////////////////////////////////////////////////////////
+    if (transient_gpr_fault_flag == true) {
+        SetGpr(fi_gpr_index, fi_gpr_backup);
+    }
+    if (transient_memory_fault_flag == true) {
+        SetMemory(fi_mem_address, fi_mem_backup);
+    }
+    ////////////////////////////////////////////////////////////////////////////
 
     // Separate instructions by empty line -> More readable output
     DebugInfo(VERBOSITY_MEDIUM, "");

@@ -348,4 +348,4 @@ int spect_iss_get_git_hash(void);
  */
 std::string spect_iss_get_version(void);
 
-#endif SPECT_ISS_LIB_H_
+#endif
