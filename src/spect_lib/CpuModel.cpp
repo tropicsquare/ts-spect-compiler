@@ -766,6 +766,8 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
     if (ofs.is_open()) {
         DebugInfo(VERBOSITY_LOW, "Dumping model execution information to: ", path);
 
+        ofs << "PC:EXEC_NUM:CODE:NAME\n";
+
         for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++) {
             if (instr_exec_cnt_[i] == 0)
                 continue;
