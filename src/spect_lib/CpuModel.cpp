@@ -207,6 +207,10 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
         ReportChange(ch_emem);
     }
 
+    // Record memory access
+    uint32_t pc = GetPc();
+    mem_access_trace_.push_back({pc, instr_exec_cnt_[(pc-SPECT_INSTR_MEM_BASE)>>2], address});
+
     DebugInfo(VERBOSITY_MEDIUM, "Core Read", tohexs(address, 4), "data:", tohexs(rv, 8));
 
     return rv;
@@ -778,6 +782,37 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
                 ofs << instr->mnemonic_;
             else
                 ofs << "INVALID";
+            ofs << "\n";
+        }
+
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
+}
+
+void spect::CpuModel::DumpMemAccessTrace(const std::string &path)
+{
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model memory access trace to: ", path);
+
+        // Header
+        ofs << "PC:EXEC_NUM:ADDR\n";
+
+        // Data
+        uint32_t pc;
+        uint32_t mem_address;
+        uint32_t exec_num;
+
+        for (auto x : mem_access_trace_) {
+            std::tie(pc, exec_num, mem_address) = x;
+
+            ofs << std::showbase << std::hex << std::setfill('0') << pc << ":";
+            ofs << std::dec << exec_num << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << mem_address;
             ofs << "\n";
         }
 
