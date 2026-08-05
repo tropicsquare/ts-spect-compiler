@@ -33,6 +33,17 @@ spect::Instruction::Instruction(std::string mnemonic, InstructionType itype, uin
 spect::Instruction::~Instruction()
 {}
 
+bool spect::Instruction::IsBranch() {
+    return (itype_ == InstructionType::J && (
+        opcode_ == 0b0100 ||
+        opcode_ == 0b0101 ||
+        opcode_ == 0b0110 ||
+        opcode_ == 0b0111 ||
+        opcode_ == 0b1110 ||
+        opcode_ == 0b1111
+    ));
+}
+
 uint32_t spect::Instruction::Assemble(spect::ParityType parity_type)
 {
     using namespace spect;

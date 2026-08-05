@@ -333,6 +333,12 @@ class spect::CpuModel
         void DumpMemAccessTrace(const std::string &path);
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Dump memory access trace
+        /// @param path File where to dump execution information
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        void DumpBranchTrace(const std::string &path);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////////////////////////////////////
         /// @section Simple accessors
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -407,6 +413,8 @@ class spect::CpuModel
         uint32_t instr_exec_cnt_[SPECT_INSTR_MEM_SIZE/4];
         // Memory access trace:  PC    , Exec num, Address
         std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> mem_access_trace_;
+        // Branch trace:         PC    , target
+        std::vector<std::tuple<uint32_t, uint32_t>> branch_trace_;
 
         // Timing accurate simulation flag
         bool timing_accurate_sim_ = false;

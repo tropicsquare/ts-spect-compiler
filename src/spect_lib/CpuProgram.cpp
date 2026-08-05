@@ -102,3 +102,7 @@ void spect::CpuProgram::Dump(std::ostream &os)
         os << "\n";
     }
 }
+
+int spect::CpuProgram::Size() {
+    return code_.size();
+}
