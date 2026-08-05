@@ -763,9 +763,12 @@ void spect::CpuModel::DumpExecInfo(const std::string &path) {
     std::ofstream ofs;
     ofs.open(path);
 
+    int fw_size = program_->Size();
+
     if (ofs.is_open()) {
         DebugInfo(VERBOSITY_LOW, "Dumping model execution information to: ", path);
 
+        ofs << "# FW Size: " << fw_size << "\n";
         ofs << "PC:EXEC_NUM:CODE:NAME\n";
 
         for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++) {
@@ -823,6 +826,35 @@ void spect::CpuModel::DumpMemAccessTrace(const std::string &path)
 
     ofs.close();
 }
+
+void spect::CpuModel::DumpBranchTrace(const std::string &path) {
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model branch trace to: ", path);
+
+        // Header
+        ofs << "PC:TARGET\n";
+
+        // Data
+        uint32_t pc;
+        uint32_t target;
+
+        for (auto x : branch_trace_) {
+            std::tie(pc, target) = x;
+
+            ofs << std::showbase << std::hex << std::setfill('0') << pc << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << target;
+            ofs << "\n";
+        }
+
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
+}
+
 
 bool spect::CpuModel::HasChange()
 {
@@ -975,7 +1007,8 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     }
 
     // Count intruction execution
-    uint32_t inst_idx = (GetPc() - SPECT_INSTR_MEM_BASE)/4;
+    uint32_t pc_backup = GetPc();
+    uint32_t inst_idx = (pc_backup - SPECT_INSTR_MEM_BASE)/4;
     instr_exec_cnt_[inst_idx]++;
 
     uint32_t wrd = ReadMemoryCoreFetch(GetPc());
@@ -1091,6 +1124,10 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
     // Execute instruction
     if (instr->Execute()) {
         SetPc(GetPc() + 0x4);
+    }
+
+    if (instr->IsBranch()) {
+        branch_trace_.push_back({pc_backup, GetPc()});
     }
 
     // Sample output operands and values for DPI readout

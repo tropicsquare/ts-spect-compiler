@@ -46,6 +46,7 @@ enum  optionIndex {
     LOAD_KEYMEM,
     DUMP_EXEC_INFO,
     DUMP_MEM_ACCESS,
+    DUMP_BR_TRACE,
     INJECT_FAULT,
     TIMING_ACCURATE,
     EXEC_TIME_STEP
@@ -85,6 +86,7 @@ const option::Descriptor usage[] =
     {LOAD_KEYMEM,           0,  ""  ,    "load-keymem"          ,option::Arg::Optional,     "  --load-keymem=<file>         Load Key memory before execution from file. \n"},
     {DUMP_EXEC_INFO,        0,  ""  ,    "dump-exec-info"       ,option::Arg::Optional,     "  --dump-exec-info=<file>      Dumps execution information to a file. \n"},
     {DUMP_MEM_ACCESS,       0,  ""  ,    "dump-mem-access"      ,option::Arg::Optional,     "  --dump-mem-access=<file>     Dumps memory access trace to a file. \n"},
+    {DUMP_BR_TRACE,         0,  ""  ,    "dump-branch-trace"    ,option::Arg::Optional,     "  --dump-branch-trace=<file>   Dumps branch trace to a file. \n"},
     {INJECT_FAULT,          0,  ""  ,    "inject-fault"         ,option::Arg::Optional,     "  --inject-fault=<file>        Load and inject fault defined in file. \n"},
     {TIMING_ACCURATE,       0,  ""  ,    "timing-accurate"      ,option::Arg::Optional,     "  --timing-accurate            Launch simulator in the timing accurate mode.\n"},
     {EXEC_TIME_STEP,        0,  ""  ,    "execution-time-step"  ,option::Arg::Optional,     "  --execution-time-step=<n>    Instruction execution time step (in us) for timing accurate simulation (default = 10).\n"},
@@ -337,6 +339,10 @@ int main(int argc, char** argv)
 
     if (options[DUMP_MEM_ACCESS]) {
         simulator->model_->DumpMemAccessTrace(std::string(options[DUMP_MEM_ACCESS].arg));
+    }
+
+    if (options[DUMP_BR_TRACE]) {
+        simulator->model_->DumpBranchTrace(std::string(options[DUMP_BR_TRACE].arg));
     }
 
     if (options[DUMP_KEYMEM]) {

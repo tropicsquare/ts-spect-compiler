@@ -51,6 +51,12 @@ class spect::Instruction
         std::string Dump();
 
         ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Check if the instruction is Branch
+        /// @returns True if it is a Branch instructio
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        bool IsBranch();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
         /// @brief Execute the instruction
         /// @returns True  - PC shall be increased by +0x4 after the call (e.g ADD)/
         ///          False - PC shall not be increased, instruction modfied the PC by itself
