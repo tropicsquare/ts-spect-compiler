@@ -1,10 +1,12 @@
-/**************************************************************************************************
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #include <iostream>
 #include <fstream>
@@ -99,4 +101,8 @@ void spect::CpuProgram::Dump(std::ostream &os)
         instr->Dump(os);
         os << "\n";
     }
+}
+
+int spect::CpuProgram::Size() {
+    return code_.size();
 }

@@ -3,10 +3,8 @@
 * SPECT Compiler
 * Copyright (C) 2022-present Tropic Square
 *
-* @todo: License
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
 *
-* @author Ondrej Ille, <ondrej.ille@tropicsquare.com>
-* @date 19.9.2022
 *
 *****************************************************************************/
 
@@ -14,6 +12,7 @@
 #include <cstdarg>
 #include <unistd.h>
 
+#include "CpuFault.h"
 #include "CpuModel.h"
 
 #include "InstructionDefs.h"
@@ -25,8 +24,13 @@ spect::CpuModel::CpuModel(bool instr_mem_ahb_w, bool instr_mem_ahb_r) :
     instr_mem_ahb_r_(instr_mem_ahb_r)
 {
     memory_ = new uint32_t[SPECT_TOTAL_MEM_SIZE / 4];
+    std::memset(memory_, 0, SPECT_TOTAL_MEM_SIZE);
     regs_ = new ordt_root();
     print_fnc = &(printf);
+
+    // Initialize Keccak so the library does not cause problems.
+    KeccakWidth400_SpongeInitialize(&(keccak_inst_), KECCAK_RATE, KECCAK_CAPACITY);
+
     Reset();
 }
 
@@ -75,7 +79,7 @@ void spect::CpuModel::Finish(int status_err)
     end_executed_ = true;
     DebugInfo(VERBOSITY_LOW, "Finishing program execution...");
 
-    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[IDLE] = 1.");
+    DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[IDLE] = 1");
     regs_->r_status.f_idle.data = 1;
 
     DebugInfo(VERBOSITY_MEDIUM, "SPECT setting STATUS[DONE] = ", !status_err);
@@ -97,6 +101,9 @@ void spect::CpuModel::Finish(int status_err)
             DebugInfo(VERBOSITY_HIGH, buf);
         }
     }
+    char buf[128];
+    sprintf(buf, "Total instructions executed: %5lu", instr_cnt_);
+    DebugInfo(VERBOSITY_HIGH, buf);
 }
 
 bool spect::CpuModel::IsFinished()
@@ -200,6 +207,10 @@ uint32_t spect::CpuModel::ReadMemoryCoreData(uint16_t address)
         ReportChange(ch_emem);
     }
 
+    // Record memory access
+    uint32_t pc = GetPc();
+    mem_access_trace_.push_back({pc, instr_exec_cnt_[(pc-SPECT_INSTR_MEM_BASE)>>2], address});
+
     DebugInfo(VERBOSITY_MEDIUM, "Core Read", tohexs(address, 4), "data:", tohexs(rv, 8));
 
     return rv;
@@ -230,6 +241,7 @@ uint32_t spect::CpuModel::ReadMemoryCoreFetch(uint16_t address)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Fetching instruction, address: ", tohexs(address, 4));
     if (IsWithinMem(CpuMemory::INSTR_MEM, address)) {
+        DebugInfo(VERBOSITY_MEDIUM, "Instruction: ", tohexs(memory_[address >> 2], 8));
         return memory_[address >> 2];
     }
     return 0x0;
@@ -302,19 +314,27 @@ void spect::CpuModel::RarPush(uint16_t ret_addr)
 {
     DebugInfo(VERBOSITY_MEDIUM, "Pushing", tohexs(ret_addr, 4), "to RAR stack.");
 
-    if (GetRarSp() == SPECT_RAR_DEPTH)
-        DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack overflow");
+    uint32_t new_rar_sp = GetRarSp() + 1;
+
+    if (GetRarSp() == SPECT_RAR_DEPTH) {
+        DebugInfo(VERBOSITY_NONE, "FATAL: RAR stack overflow");
+        new_rar_sp = SPECT_RAR_DEPTH;
+    }
 
     rar_stack_[rar_sp_] = ret_addr;
-    SetRarSp(GetRarSp() + 1);
+    SetRarSp(new_rar_sp);
 }
 
 uint16_t spect::CpuModel::RarPop()
 {
-    if (GetRarSp() == 0)
-        DebugInfo(VERBOSITY_LOW, "FATAL: RAR stack underflow");
+    uint32_t new_rar_sp = GetRarSp() - 1;
 
-    SetRarSp(GetRarSp() - 1);
+    if (GetRarSp() == 0) {
+        DebugInfo(VERBOSITY_NONE, "FATAL: RAR stack underflow");
+        new_rar_sp = 0;
+    }
+
+    SetRarSp(new_rar_sp);
     uint16_t rv = GetRarAt(GetRarSp());
 
     DebugInfo(VERBOSITY_MEDIUM, "Poping ", tohexs(rv, 4), "from RAR stack.");
@@ -505,19 +525,24 @@ void spect::CpuModel::DumpContext(const std::string &path)
             ofs << std::setw(16) << sha_512_.getContext(i) << "\n";
 
         PUT_COMMENT_LINE("TMAC context: (state (5 lines), rate, byteIOIndex, squeezing)");
-        // State
-        for (int i = 0; i < 5; i++) {
-            std::stringstream ss;
-            for (int j = 0; j < 10; j++)
-                ss << std::setfill('0') << std::setw(2) << std::hex << (int)keccak_inst_.state[i*10+j];
-            ofs << std::setw(20) << ss.str().c_str() << "\n";
+        if (keccak_is_initialized_) {
+            // State
+            for (int i = 0; i < 5; i++) {
+                std::stringstream ss;
+                for (int j = 0; j < 10; j++)
+                    ss << std::setfill('0') << std::setw(2) << std::hex << (int)keccak_inst_.state[i*10+j];
+                ofs << std::setw(20) << ss.str().c_str() << "\n";
+            }
+            // Rate, byteIOIndex, squeezing
+            ofs << std::dec;
+            ofs << keccak_inst_.rate << "\n";
+            ofs << keccak_inst_.byteIOIndex << "\n";
+            ofs << keccak_inst_.squeezing << "\n";
+            ofs << std::hex;
         }
-        // Rate, byteIOIndex, squeezing
-        ofs << std::dec;
-        ofs << keccak_inst_.rate << "\n";
-        ofs << keccak_inst_.byteIOIndex << "\n";
-        ofs << keccak_inst_.squeezing << "\n";
-        ofs << std::hex;
+        else {
+            ofs << "UNINITIALIZED\n";
+        }
 
         PUT_COMMENT_LINE("RAR stack:");
         for (int i = 0; i < SPECT_RAR_DEPTH; i++)
@@ -595,8 +620,14 @@ void spect::CpuModel::LoadContext(const std::string &path)
         // TMAC
         SKIP_COMMENT_LINES
         // State
+        bool kecak_init_flag = true;
         for (int i = 0; i < 5; i++) {
             std::getline(ifs, line);
+            if (line == "UNINITIALIZED") {
+                DebugInfo(VERBOSITY_LOW, "TMAC is not initialized in the input context.");
+                kecak_init_flag = false;
+                break;
+            }
             std::istringstream state_iss(line);
             std::string num = std::string("0x") + line;
             std::stringstream idx_low;
@@ -608,21 +639,24 @@ void spect::CpuModel::LoadContext(const std::string &path)
                 keccak_inst_.state[i*10+j] = (unsigned char)((uint256_t(num.c_str()) >> (72-j*8)) & uint256_t("0xFF"));
             }
         }
-        // Rate, byteIOIndex, squeezing
-        std::getline(ifs, line);
-        std::istringstream rate_iss(line);
-        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - rate to", line);
-        rate_iss >> keccak_inst_.rate;
-        // byteIOIndex
-        std::getline(ifs, line);
-        std::istringstream bioi_iss(line);
-        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - byteIOIndex to", line);
-        bioi_iss >> keccak_inst_.byteIOIndex;
-        // squeezing
-        std::getline(ifs, line);
-        std::istringstream squeezing_iss(line);
-        DebugInfo(VERBOSITY_LOW, "Setting TMAC context - squeezing to", line);
-        squeezing_iss >> keccak_inst_.squeezing;
+        if (kecak_init_flag) {
+            keccak_is_initialized_ = true;
+            // Rate, byteIOIndex, squeezing
+            std::getline(ifs, line);
+            std::istringstream rate_iss(line);
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - rate to", line);
+            rate_iss >> keccak_inst_.rate;
+            // byteIOIndex
+            std::getline(ifs, line);
+            std::istringstream bioi_iss(line);
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - byteIOIndex to", line);
+            bioi_iss >> keccak_inst_.byteIOIndex;
+            // squeezing
+            std::getline(ifs, line);
+            std::istringstream squeezing_iss(line);
+            DebugInfo(VERBOSITY_LOW, "Setting TMAC context - squeezing to", line);
+            squeezing_iss >> keccak_inst_.squeezing;
+        }
 
         // RAR stack
         SKIP_COMMENT_LINES
@@ -703,6 +737,122 @@ void spect::CpuModel::LoadContext(const std::string &path)
         throw std::runtime_error("Unable to open a file: " + path);
 }
 
+void spect::CpuModel::LoadFaultQ(const std::string &path) {
+    DebugInfo(VERBOSITY_LOW, "Loading faults from ", path);
+    std::ifstream ifs(path);
+    std::string line;
+    if (ifs.is_open()) {
+        while (!ifs.eof()) {
+            std::getline(ifs, line);
+            if (line.length() == 0) continue;
+
+            std::unique_ptr<spect::CpuFault> fault = GetFault(line);
+            fault->print_fnc = print_fnc;
+            fault->verbosity_ = verbosity_;
+            fault_q_.push(std::move(fault));
+            DebugInfo(VERBOSITY_LOW, "Pushing fault '", line, "' into fault queue");
+        }
+        DebugInfo(VERBOSITY_LOW, "\n");
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ifs.close();
+}
+
+void spect::CpuModel::DumpExecInfo(const std::string &path) {
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model execution information to: ", path);
+
+        ofs << "PC:EXEC_NUM:CODE:NAME\n";
+
+        for (int i = 0; i < SPECT_INSTR_MEM_SIZE/4; i++) {
+            if (instr_exec_cnt_[i] == 0)
+                continue;
+
+            uint32_t inst_addr = SPECT_INSTR_MEM_BASE+(i*4);
+            uint32_t wrd = memory_[inst_addr/4];
+
+            Instruction *instr = spect::Instruction::DisAssemble(spect::ParityType::NONE, wrd);
+
+            ofs << std::showbase << std::hex << std::setfill('0') << inst_addr << ":";
+            ofs << std::dec << instr_exec_cnt_[i] << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << wrd << ":";
+            if (instr)
+                ofs << instr->mnemonic_;
+            else
+                ofs << "INVALID";
+            ofs << "\n";
+        }
+
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
+}
+
+void spect::CpuModel::DumpMemAccessTrace(const std::string &path)
+{
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model memory access trace to: ", path);
+
+        // Header
+        ofs << "PC:EXEC_NUM:ADDR\n";
+
+        // Data
+        uint32_t pc;
+        uint32_t mem_address;
+        uint32_t exec_num;
+
+        for (auto x : mem_access_trace_) {
+            std::tie(pc, exec_num, mem_address) = x;
+
+            ofs << std::showbase << std::hex << std::setfill('0') << pc << ":";
+            ofs << std::dec << exec_num << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << mem_address;
+            ofs << "\n";
+        }
+
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
+}
+
+void spect::CpuModel::DumpBranchTrace(const std::string &path) {
+    std::ofstream ofs;
+    ofs.open(path);
+
+    if (ofs.is_open()) {
+        DebugInfo(VERBOSITY_LOW, "Dumping model branch trace to: ", path);
+
+        // Header
+        ofs << "PC:TARGET\n";
+
+        // Data
+        uint32_t pc;
+        uint32_t target;
+
+        for (auto x : branch_trace_) {
+            std::tie(pc, target) = x;
+
+            ofs << std::showbase << std::hex << std::setfill('0') << pc << ":";
+            ofs << std::showbase << std::hex << std::setfill('0') << target;
+            ofs << "\n";
+        }
+
+    } else
+        throw std::runtime_error("Unable to open a file: " + path);
+
+    ofs.close();
+}
+
+
 bool spect::CpuModel::HasChange()
 {
     return !change_q_.empty();
@@ -769,9 +919,13 @@ void spect::CpuModel::Reset()
     sha_512_.init();
     SetPc(0x0);
 
+    keccak_is_initialized_ = false;
+
     // Re-create new register model -> Erase registers to reset values.
     delete regs_;
     regs_ = new ordt_root();
+
+    std::memset(instr_exec_cnt_, 0, SPECT_INSTR_MEM_SIZE);
 
     // To make browsing logs easier
     DebugInfo(VERBOSITY_LOW, "");
@@ -831,14 +985,104 @@ void spect::CpuModel::UpdateRegisterEffects()
 
 int spect::CpuModel::ExecuteNextInstruction(int cycles)
 {
+    // Check number of executed instructions
+    instr_cnt_++;
+    if (instr_cnt_ == max_instr_cnt_) {
+        DebugInfo(VERBOSITY_NONE, "FATAL: Limit of executed instruction (", max_instr_cnt_, ") reached!");
+        Finish(1);
+        UpdateInterrupts();
+        return 0;
+    }
+
+    // Check PC is valid
+    if (! IsWithinMem(CpuMemory::INSTR_MEM, GetPc())) {
+        DebugInfo(VERBOSITY_NONE, "FATAL: Invalid PC value!");
+        Finish(1);
+        UpdateInterrupts();
+
+        return 0;
+    }
+
+    // Count intruction execution
+    uint32_t pc_backup = GetPc();
+    uint32_t inst_idx = (pc_backup - SPECT_INSTR_MEM_BASE)/4;
+    instr_exec_cnt_[inst_idx]++;
+
     uint32_t wrd = ReadMemoryCoreFetch(GetPc());
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Firmware Fault Injection
+    ////////////////////////////////////////////////////////////////////////////
+    bool transient_gpr_fault_flag = false;
+    bool transient_memory_fault_flag = false;
+
+    uint256_t fi_gpr_backup = 0;
+    int       fi_gpr_index = 0;
+
+    uint16_t  fi_mem_address = 0;
+    uint32_t  fi_mem_backup = 0;
+
+    if (fault_q_.size() > 0 && fault_q_.front()->Check(GetPc(), instr_exec_cnt_[inst_idx])) {
+        // We have 4 types of faults:
+        //  - Instruction : Corrupts the instruction as it is fetched
+        //  - PC          : Adds some constant to the Program Counter and refetch - instruction skip
+        //  - GPR         : Inject persistent (multi)bitflip to General Purpose Register
+        //  - Memory      : Inject persistent (multi)bitflip to Memory
+        switch (fault_q_.front()->GetType()) {
+
+            case FaultType::INSTRUCTION : {
+                spect::CpuFaultInstruction * p = static_cast<spect::CpuFaultInstruction*>(fault_q_.front().get());
+                p->Apply(&wrd);                                 // Apply the fault to the instruction
+                break;
+            }
+
+            case FaultType::PC : {
+                spect::CpuFaultPC* p = static_cast<spect::CpuFaultPC*>(fault_q_.front().get());
+                uint32_t pc = GetPc();                          // Get the PC value
+                p->Apply(&pc);                                  // Applu the fault
+                SetPc(pc);                                      // Set the PC to the faulted value
+                wrd = ReadMemoryCoreFetch(GetPc());             // re-fetch from the new PC value
+                break;
+            }
+
+            case FaultType::GPR : {
+                spect::CpuFaultGPR* p = static_cast<spect::CpuFaultGPR*>(fault_q_.front().get());
+                fi_gpr_index = p->GetGPRIndex();                // Get the GPR to fault
+                uint256_t gpr = GetGpr(fi_gpr_index);           // Get the current value of the GPR
+                transient_gpr_fault_flag = p->IsTransient();    // Check if the fault is transient
+                if (transient_gpr_fault_flag == true)
+                    fi_gpr_backup = gpr;                        // If so, store the GPR value for later restore
+                p->Apply(&gpr);                                 // Apply the fault to the GPR value
+                SetGpr(fi_gpr_index, gpr);                      // Set the GPR to the faulted value
+                break;
+            }
+
+            case FaultType::MEMORY : {
+                spect::CpuFaultMemory* p = static_cast<spect::CpuFaultMemory*>(fault_q_.front().get());
+                fi_mem_address = p->GetMemAddress();            // Get the memory address to fault
+                uint32_t mem_data = GetMemory(fi_mem_address);  // Get the current value from memory
+                transient_memory_fault_flag = p->IsTransient(); // Check if the fault is transient
+                if (transient_memory_fault_flag == true)
+                    fi_mem_backup = mem_data;                   // If so, store the original value fot later restore
+                p->Apply(&mem_data);                            // Apply the fault
+                SetMemory(fi_mem_address, mem_data);            // Store the faulted value back to the memory
+                break;
+            }
+
+            default :
+                break;
+        }
+
+        fault_q_.pop();
+    }
+    ////////////////////////////////////////////////////////////////////////////
 
     DebugInfo(VERBOSITY_MEDIUM, "Disassembling instruction:     ", tohexs(wrd, 8));
     Instruction *instr = spect::Instruction::DisAssemble(GetParityType(), wrd);
 
     // Detect invalid instruction and finish
     if (instr == nullptr) {
-        DebugInfo(VERBOSITY_LOW, "Detected invalid instruction!");
+        DebugInfo(VERBOSITY_NONE, "FATAL: Detected invalid instruction!");
         Finish(1);
         UpdateInterrupts();
 
@@ -873,22 +1117,29 @@ int spect::CpuModel::ExecuteNextInstruction(int cycles)
 
     gold->exec_cnt_++;
 
-    // Execute instruction
     instr->model_ = this;
-    if (instr->Execute())
+    // Execute instruction
+    if (instr->Execute()) {
         SetPc(GetPc() + 0x4);
+    }
+
+    if (instr->IsBranch()) {
+        branch_trace_.push_back({pc_backup, GetPc()});
+    }
 
     // Sample output operands and values for DPI readout
     instr->SampleOutputs(&(last_instr), this);
 
-    // Check number of executed instructions
-    instr_cnt_++;
-    if (instr_cnt_ == max_instr_cnt_) {
-        DebugInfo(VERBOSITY_LOW, "Limit of executed instruction (", max_instr_cnt_, ") reached!");
-        Finish(1);
-        UpdateInterrupts();
-        return 0;
+    ////////////////////////////////////////////////////////////////////////////
+    // Restore the state if transient fault occured
+    ////////////////////////////////////////////////////////////////////////////
+    if (transient_gpr_fault_flag == true) {
+        SetGpr(fi_gpr_index, fi_gpr_backup);
     }
+    if (transient_memory_fault_flag == true) {
+        SetMemory(fi_mem_address, fi_mem_backup);
+    }
+    ////////////////////////////////////////////////////////////////////////////
 
     // Separate instructions by empty line -> More readable output
     DebugInfo(VERBOSITY_MEDIUM, "");

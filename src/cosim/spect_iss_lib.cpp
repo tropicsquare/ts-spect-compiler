@@ -1,10 +1,12 @@
-/**************************************************************************************************
-** SPECT Instruction set simulator - Shared Library version
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #include "spect_iss_lib.h"
 
@@ -18,7 +20,7 @@ spect::ParityType parity_type_ = spect::ParityType::NONE;
 void spect_iss_init(int isa_version)
 {
     spect::InstructionFactory::SetActiveISAVersion(isa_version);
-    simulator = new spect::CpuSimulator();
+    simulator = new spect::CpuSimulator(VERBOSITY_HIGH);
     simulator->model_->SetParityType(parity_type_);
 }
 

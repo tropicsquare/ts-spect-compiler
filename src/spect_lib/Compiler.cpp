@@ -1,10 +1,12 @@
-/**************************************************************************************************
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #include <fstream>
 #include <regex>
@@ -289,8 +291,6 @@ bool spect::Compiler::ParseConstant(spect::SourceFile *sf, std::string &line_buf
                                 ParseValue(sf, line_nr, val, s_dummy), line_nr);
         }
 
-        // TODO: Check s_dummy ??
-
         return true;
     }
     return false;
@@ -302,7 +302,6 @@ bool spect::Compiler::ParseIncludeFile(spect::SourceFile *sf, std::string &line_
         // Store parent file handler
         SourceFile *parent_file = symbols_->curr_file_;
 
-        // TODO: Make this universal across OS type!
         std::string new_file = sf->path_.substr(0, sf->path_.find_last_of("/")) + "/" +
                                                    line_buf.substr(line_buf.find_last_of(' ') + 1,
                                                 line_buf.size() - 1);

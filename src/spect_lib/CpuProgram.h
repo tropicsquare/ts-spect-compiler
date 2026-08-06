@@ -1,10 +1,12 @@
-/**************************************************************************************************
-**
-**
-** TODO: License
-**
-** Author: Ondrej Ille
-**************************************************************************************************/
+/******************************************************************************
+*
+* SPECT Compiler
+* Copyright (C) 2022-present Tropic Square
+*
+* @license For the license see file LICENSE.txt file in the root directory of this source tree.
+*
+*
+*****************************************************************************/
 
 #ifndef SPECT_LIB_CPU_PROGRAM_H_
 #define SPECT_LIB_CPU_PROGRAM_H_
@@ -55,6 +57,12 @@ class spect::CpuProgram
         /// @param os Stream to dump the program into
         ///////////////////////////////////////////////////////////////////////////////////////////
         void Dump(std::ostream &os);
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        /// @brief Return program size
+        /// @return Number of instructions in code_
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        int Size();
 
         // Address of first instruction of program (not first executed instruction, but instruction
         //  with lowest address)
